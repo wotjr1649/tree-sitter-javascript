@@ -3,7 +3,7 @@ $(error Windows is not supported)
 endif
 
 LANGUAGE_NAME := tree-sitter-javascript
-HOMEPAGE_URL := https://github.com/tree-sitter/tree-sitter-javascript
+HOMEPAGE_URL := https://github.com/wotjr1649/tree-sitter-javascript
 VERSION := 0.25.0
 
 # repository
