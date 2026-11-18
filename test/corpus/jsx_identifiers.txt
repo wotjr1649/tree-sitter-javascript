@@ -120,3 +120,77 @@ JSX reserved words in element pairs, member names and attributes
         (property_identifier))
       (jsx_attribute
         (property_identifier)))))
+
+==============================================
+JSX contextual keywords as member objects and attribute names
+==============================================
+
+<async.A />;
+<await.A />;
+<get.A />;
+<let.A></let.A>;
+<set.A />;
+<static.A />;
+<using.A />;
+<C async get set static let await using />;
+
+---
+
+(program
+  (expression_statement
+    (jsx_self_closing_element
+      name: (member_expression
+        object: (identifier)
+        property: (property_identifier))))
+  (expression_statement
+    (jsx_self_closing_element
+      name: (member_expression
+        object: (identifier)
+        property: (property_identifier))))
+  (expression_statement
+    (jsx_self_closing_element
+      name: (member_expression
+        object: (identifier)
+        property: (property_identifier))))
+  (expression_statement
+    (jsx_element
+      open_tag: (jsx_opening_element
+        name: (member_expression
+          object: (identifier)
+          property: (property_identifier)))
+      close_tag: (jsx_closing_element
+        name: (member_expression
+          object: (identifier)
+          property: (property_identifier)))))
+  (expression_statement
+    (jsx_self_closing_element
+      name: (member_expression
+        object: (identifier)
+        property: (property_identifier))))
+  (expression_statement
+    (jsx_self_closing_element
+      name: (member_expression
+        object: (identifier)
+        property: (property_identifier))))
+  (expression_statement
+    (jsx_self_closing_element
+      name: (member_expression
+        object: (identifier)
+        property: (property_identifier))))
+  (expression_statement
+    (jsx_self_closing_element
+      name: (identifier)
+      attribute: (jsx_attribute
+        (property_identifier))
+      attribute: (jsx_attribute
+        (property_identifier))
+      attribute: (jsx_attribute
+        (property_identifier))
+      attribute: (jsx_attribute
+        (property_identifier))
+      attribute: (jsx_attribute
+        (property_identifier))
+      attribute: (jsx_attribute
+        (property_identifier))
+      attribute: (jsx_attribute
+        (property_identifier)))))
