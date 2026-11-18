@@ -12,7 +12,8 @@ as an independent source, created without a GitHub fork relationship, with the s
 comparison (rule 7.5, ADR-0023 patches carried unchanged per 7.6) and the owner's approval (7.10).
 
 The baseline is origin v0.25.0, commit `44c892e0be055ac465d5eeddae6d3e194424e7de` (tag object `f76aea6`). The commit
-go-treesitter pinned before this move (`58404d8`) differs from it only in `.github/*`, `Cargo.toml` and README.
+go-treesitter pinned before this move (`58404d8`) differs from it only in `.github/workflows/ci.yml` and `.github/workflows/lint.yml` (`Cargo.toml` and README are
+identical).
 
 ## Decision
 
@@ -31,9 +32,13 @@ go-treesitter pinned before this move (`58404d8`) differs from it only in `.gith
 5. The grammar name `javascript`, the C symbol `tree_sitter_javascript`, node kinds and fields stay unless a release
    declares a breaking change (major version, CHANGELOG).
 6. The parser is ABI 15 and the binding runtimes follow it: lower bounds are the 0.25 line (Rust `>=0.25, <0.28`,
-   Node `^0.25.0`, Python `~=0.25`, Go go-tree-sitter v0.25.0 with Go 1.23, Swift SwiftTreeSitter 0.25.0), the
-   lockfiles use the newest release of each (Rust 0.27.2, Python 0.26.1, Node 0.25.1), CMake defaults to ABI 15, and
-   binding tests parse a small input so a mismatch fails. The origin's own v0.25.0 declared Python and Go runtimes
+   Node `^0.25.0`, Python `~=0.25`, Go go-tree-sitter v0.25.0 with Go 1.23, Swift SwiftTreeSitter 0.25.0 and
+   `swift-tools-version` 5.9, the minimum SwiftTreeSitter 0.25.0 itself declares), the lockfiles use the newest release
+   (Rust 0.27.2, Node 0.25.1) and `Package.resolved` pins SwiftTreeSitter 0.25.0 and tree-sitter 0.25.10. Python has no
+   lockfile: CI installs it under `ci/python-constraints.txt` (`tree-sitter==0.26.1`) and checks the installed version.
+   CI builds Swift with `--force-resolved-versions` so a changed `Package.resolved` fails, on Swift 6.1 (Ubuntu 24.04,
+   macOS 15) and on the 5.9 toolchain. CMake defaults to ABI 15, and binding tests parse a small input so a mismatch
+   fails. The origin's own v0.25.0 declared Python and Go runtimes
    (0.24) that cannot load its ABI 15 parser; this repository does not keep them. Lowering these needs the owner's
    approval.
 7. Planned oracle for later fixes: a reference JavaScript parser (acorn or Babel, or `tsc`) judging whether a source
@@ -43,6 +48,7 @@ go-treesitter pinned before this move (`58404d8`) differs from it only in `.gith
 
 - Pinned commits stay reachable because this repository does not rewrite its history.
 - The origin's publish workflow, `FUNDING.yml` and the maintainers entry are removed; the release path is decided
-  separately by the owner. CI runs on `main` without path filters and can be started manually.
-- Binding module paths (`go.mod`, the Go binding import) and package names still carry the origin's names; the owner
-  decides when to change them.
+  separately by the owner. CI runs on `main` and pull requests without path filters. Its manual trigger (`workflow_dispatch`) is declared, and the
+  Actions tab offers it once the workflows are on the default branch.
+- The Go module path is `github.com/wotjr1649/tree-sitter-javascript` (`go.mod` and the Go binding test import). Package
+  names (npm, crate, PyPI, Swift) still carry the origin's names; the owner decides when to change them.

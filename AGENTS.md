@@ -19,7 +19,9 @@ origin's v0.25.0 is commit `44c892e` in this history, kept as `refs/upstream/v0.
   breaks the byte-identical baseline (ADR-0024 7.5). Set the real version in the first behaviour-changing release
   (v1.1 or later).
 - The parser is ABI 15. Binding runtime lower bounds are the 0.25 line (Rust, Node, Python, Go, Swift) and CMake
-  defaults to ABI 15; do not lower them without the owner's approval. Every binding test sets the language on a parser
+  defaults to ABI 15; do not lower them without the owner's approval. `Package.swift` declares `swift-tools-version`
+  5.9, the minimum SwiftTreeSitter 0.25.0 requires. CI tests Python under `ci/python-constraints.txt` and Swift with
+  `--force-resolved-versions`. Every binding test sets the language on a parser
   and parses a small input.
 - Node kinds and field names are a public contract: removing or renaming one is breaking (major version, CHANGELOG);
   adding one is not. `CHANGELOG.md` does not exist yet: create it with the first release that needs it. Keep the
