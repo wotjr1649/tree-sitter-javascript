@@ -58,7 +58,7 @@ node oracle/run.mjs                      # rewrites oracle/verdicts.json; byte-i
 (cd oracle/replay && go test .)          # self-check of the judging logic
 ```
 
-`go run . -oracle ..` also judges, but it reports exit code 2 of the program as 1 (`exit status 2`): to see the real exit code, run the built binary as above (CI only needs pass or fail and uses `go run`). `build/` is git-ignored.
+`go run . -oracle ..` also judges, but it reports exit code 2 of the program as 1 (`exit status 2`): to see the real exit code, run the built binary as above (CI only needs pass or fail and uses `go run`). `build/` is git-ignored. The Go binding `#include`s `../../src/parser.c` and `scanner.c`, which the Go build cache does not track: after `src/` changes (another branch, a regenerated parser), build with a fresh `GOCACHE` or `go build -a`, or the replay judges the old grammar. CI builds without a restored cache.
 
 `run.mjs --rehash` fills in or fixes every `sha256` and rewrites `cases.jsonl` in its canonical form. `run.mjs --cases FILE --out FILE` works on other files (scratch runs).
 
