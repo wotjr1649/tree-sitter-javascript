@@ -1218,6 +1218,122 @@ a ?. b;
       (property_identifier))))
 
 ============================================
+Optional chaining with reserved words
+============================================
+
+a?.delete(b);
+a?.class;
+a?.return;
+
+---
+
+(program
+  (expression_statement
+    (call_expression
+      (member_expression
+        (identifier)
+        (optional_chain)
+        (property_identifier))
+      (arguments
+        (identifier))))
+  (expression_statement
+    (member_expression
+      (identifier)
+      (optional_chain)
+      (property_identifier)))
+  (expression_statement
+    (member_expression
+      (identifier)
+      (optional_chain)
+      (property_identifier))))
+
+============================================
+Optional chaining with more reserved words
+============================================
+
+a?.new;
+a?.in;
+a?.typeof;
+a?.void;
+a?.if;
+a?.this();
+a?.b?.class?.delete();
+a?.class.new;
+a.b?.typeof;
+a?.class?.();
+
+---
+
+(program
+  (expression_statement
+    (member_expression
+      (identifier)
+      (optional_chain)
+      (property_identifier)))
+  (expression_statement
+    (member_expression
+      (identifier)
+      (optional_chain)
+      (property_identifier)))
+  (expression_statement
+    (member_expression
+      (identifier)
+      (optional_chain)
+      (property_identifier)))
+  (expression_statement
+    (member_expression
+      (identifier)
+      (optional_chain)
+      (property_identifier)))
+  (expression_statement
+    (member_expression
+      (identifier)
+      (optional_chain)
+      (property_identifier)))
+  (expression_statement
+    (call_expression
+      (member_expression
+        (identifier)
+        (optional_chain)
+        (property_identifier))
+      (arguments)))
+  (expression_statement
+    (call_expression
+      (member_expression
+        (member_expression
+          (member_expression
+            (identifier)
+            (optional_chain)
+            (property_identifier))
+          (optional_chain)
+          (property_identifier))
+        (optional_chain)
+        (property_identifier))
+      (arguments)))
+  (expression_statement
+    (member_expression
+      (member_expression
+        (identifier)
+        (optional_chain)
+        (property_identifier))
+      (property_identifier)))
+  (expression_statement
+    (member_expression
+      (member_expression
+        (identifier)
+        (property_identifier))
+      (optional_chain)
+      (property_identifier)))
+  (expression_statement
+    (call_expression
+      (member_expression
+        (identifier)
+        (optional_chain)
+        (property_identifier))
+      (optional_chain)
+      (arguments))))
+
+============================================
 Optional chaining array access
 ============================================
 
