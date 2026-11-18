@@ -20,7 +20,7 @@ jobs:
         os: [ubuntu-24.04, windows-latest, macos-15]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
       - name: Set up tree-sitter
         uses: tree-sitter/setup-action/cli@v2
         with:
@@ -61,7 +61,7 @@ jobs:
         os: [ubuntu-24.04, macos-15]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
       - name: Set up Swift
         uses: swift-actions/setup-swift@v2
         with:
@@ -81,7 +81,7 @@ jobs:
     container: swift:5.9
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
       - name: Build module
         run: |-
           cp Package.resolved "$RUNNER_TEMP/Package.resolved"
