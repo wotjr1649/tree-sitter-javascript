@@ -1,6 +1,6 @@
 {
   "name": "tree-sitter-javascript",
-  "version": "0.25.0",
+  "version": "1.0.0",
   "description": "JavaScript grammar for tree-sitter",
   "repository": "https://github.com/wotjr1649/tree-sitter-javascript",
   "license": "MIT",
@@ -8,12 +8,6 @@
     "name": "Max Brunsfeld",
     "email": "maxbrunsfeld@gmail.com"
   },
-  "maintainers": [
-    {
-      "name": "Amaan Qureshi",
-      "email": "amaanq12@gmail.com"
-    }
-  ],
   "main": "bindings/node",
   "types": "bindings/node",
   "keywords": [
