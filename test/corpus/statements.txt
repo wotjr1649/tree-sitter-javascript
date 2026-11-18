@@ -1008,6 +1008,33 @@ x = 1; }
         (number)))))
 
 ============================================
+'as' and 'satisfies' as using bindings
+============================================
+
+{ using as = f(); }
+for (using as of y);
+for (using satisfies of y);
+
+---
+
+(program
+  (statement_block
+    (using_declaration
+      (variable_declarator
+        (identifier)
+        (call_expression
+          (identifier)
+          (arguments)))))
+  (for_in_statement
+    (identifier)
+    (identifier)
+    (empty_statement))
+  (for_in_statement
+    (identifier)
+    (identifier)
+    (empty_statement)))
+
+============================================
 'of' as identifier in declarations
 ============================================
 
