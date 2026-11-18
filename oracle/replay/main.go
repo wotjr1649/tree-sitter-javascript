@@ -1,10 +1,10 @@
 // Command replay judges the oracle's verdicts against this grammar through the tree-sitter API.
 //
-//	go run . [-oracle DIR] [-tree]
+//	replay [-oracle DIR] [-tree]
 //
 // Exit codes: 0 every gated case is consistent; 1 a result differs (listed); 2 the inputs are inconsistent
 // (hash mismatch, verdicts made from other cases, another runner or other tool versions, a case that does not fit its
-// verdict) or nothing could be judged. See oracle/README.md.
+// verdict, a malformed record, an empty case set) or nothing could be judged. See oracle/README.md.
 package main
 
 import (
@@ -14,6 +14,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"sort"
@@ -39,8 +40,31 @@ type verdictFile struct {
 		SHA256     string `json:"sha256"`
 		SourceType string `json:"sourceType"`
 		Verdict    string `json:"verdict"`
+		Babel      struct {
+			Class string `json:"class"`
+		} `json:"babel"`
+		Oxc struct {
+			Class string `json:"class"`
+		} `json:"oxc"`
 	} `json:"results"`
 }
+
+// pinnedTools are exactly the two tools of the consensus: verdicts.json `meta.tools` key and npm package.
+var pinnedTools = []struct{ key, pkg string }{{"babel", "@babel/parser"}, {"oxc", "oxc-parser"}}
+
+type manifest struct {
+	Dependencies map[string]string `json:"dependencies"`
+}
+
+// consensus is the verdict two tool classes give: the common class, or disagree.
+func consensus(babel, oxc string) string {
+	if babel == oxc {
+		return babel
+	}
+	return "disagree"
+}
+
+func validClass(c string) bool { return c == "accept" || c == "syntax" || c == "early" }
 
 type lockFile struct {
 	Packages map[string]struct {
@@ -74,6 +98,10 @@ func load(dir string) (cases []Case, verdicts map[string]string, problems []stri
 	if err = readJSON(filepath.Join(dir, "package-lock.json"), &lock); err != nil {
 		return nil, nil, nil, err
 	}
+	var pkgJSON manifest
+	if err = readJSON(filepath.Join(dir, "package.json"), &pkgJSON); err != nil {
+		return nil, nil, nil, err
+	}
 	runner, err := os.ReadFile(filepath.Join(dir, "run.mjs"))
 	if err != nil {
 		return nil, nil, nil, err
@@ -89,14 +117,21 @@ func load(dir string) (cases []Case, verdicts map[string]string, problems []stri
 	if vf.Meta.RunnerSHA256 != sum(runner) {
 		bad("verdicts.json was made by another runner (runner_sha256 %s, run.mjs %s)", vf.Meta.RunnerSHA256, sum(runner))
 	}
-	if len(vf.Meta.Tools) == 0 {
-		bad("verdicts.json lists no tools")
+	// Exactly the two pinned tools, each equal in verdicts.json, package.json (an exact pin) and package-lock.json.
+	if len(vf.Meta.Tools) != len(pinnedTools) {
+		bad("verdicts.json must list exactly the tools babel and oxc, it lists %d", len(vf.Meta.Tools))
 	}
-	for name, t := range vf.Meta.Tools {
-		e := lock.Packages["node_modules/"+t.Package]
-		if e.Version != t.Version || e.Integrity != t.Integrity || t.Integrity == "" || lock.Packages[""].Dependencies[t.Package] != t.Version {
+	for _, p := range pinnedTools {
+		t, ok := vf.Meta.Tools[p.key]
+		if !ok || t.Package != p.pkg {
+			bad("verdicts.json: tool %s must be %s, found %q", p.key, p.pkg, t.Package)
+			continue
+		}
+		e := lock.Packages["node_modules/"+p.pkg]
+		pin := pkgJSON.Dependencies[p.pkg]
+		if t.Version == "" || t.Integrity == "" || e.Version != t.Version || e.Integrity != t.Integrity || pin != t.Version {
 			bad("tool %s drifted: verdicts have %s %s %s, package-lock.json has %q %q, package.json pins %q",
-				name, t.Package, t.Version, t.Integrity, e.Version, e.Integrity, lock.Packages[""].Dependencies[t.Package])
+				p.key, p.pkg, t.Version, t.Integrity, e.Version, e.Integrity, pin)
 		}
 	}
 
@@ -108,16 +143,30 @@ func load(dir string) (cases []Case, verdicts map[string]string, problems []stri
 		}
 		byID[r.ID] = i
 	}
-	dec := json.NewDecoder(bytes.NewReader(casesBytes))
-	dec.DisallowUnknownFields()
+	// One record per line, read to the end: a line that is not exactly one JSON object is an error.
 	seen := map[string]bool{}
-	for n := 1; dec.More(); n++ {
+	for n, line := range bytes.Split(casesBytes, []byte("\n")) {
+		line = bytes.TrimSpace(line)
+		if len(line) == 0 {
+			continue
+		}
+		if line[0] != '{' {
+			return nil, nil, nil, fmt.Errorf("cases.jsonl line %d is not a JSON object", n+1)
+		}
+		dec := json.NewDecoder(bytes.NewReader(line))
+		dec.DisallowUnknownFields()
 		var c Case
 		if err := dec.Decode(&c); err != nil {
-			return nil, nil, nil, fmt.Errorf("cases.jsonl record %d: %w", n, err)
+			return nil, nil, nil, fmt.Errorf("cases.jsonl line %d: %w", n+1, err)
+		}
+		if _, err := dec.Token(); err != io.EOF {
+			return nil, nil, nil, fmt.Errorf("cases.jsonl line %d: more than one JSON value", n+1)
 		}
 		if c.SourceType == "" {
 			c.SourceType = "module"
+		}
+		if c.SourceType != "module" && c.SourceType != "script" {
+			bad("%s: sourceType must be module or script, found %q", c.ID, c.SourceType)
 		}
 		if seen[c.ID] || c.ID == "" {
 			bad("cases.jsonl: empty or duplicate id %q", c.ID)
@@ -135,7 +184,13 @@ func load(dir string) (cases []Case, verdicts map[string]string, problems []stri
 		}
 		v := ""
 		if ok {
-			v = vf.Results[i].Verdict
+			r := vf.Results[i]
+			v = r.Verdict
+			if !validClass(r.Babel.Class) || !validClass(r.Oxc.Class) {
+				bad("%s: unknown tool class (babel %q, oxc %q)", c.ID, r.Babel.Class, r.Oxc.Class)
+			} else if want := consensus(r.Babel.Class, r.Oxc.Class); v != want {
+				bad("%s: verdict %q, but babel %s and oxc %s give %s", c.ID, v, r.Babel.Class, r.Oxc.Class, want)
+			}
 		}
 		verdicts[c.ID] = v
 		for _, e := range c.Expect {
@@ -163,6 +218,9 @@ func load(dir string) (cases []Case, verdicts map[string]string, problems []stri
 			bad("%s: a %s case needs a reason", c.ID, v)
 		}
 		cases = append(cases, c)
+	}
+	if len(cases) == 0 {
+		bad("cases.jsonl has no cases: nothing to judge")
 	}
 	for id := range byID {
 		if !seen[id] {

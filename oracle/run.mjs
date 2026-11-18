@@ -42,13 +42,17 @@ const cases = casesBytes
     } catch (e) {
       fail(`${basename(casesPath)}:${n + 1}: ${e.message}`);
     }
+    if (c === null || typeof c !== "object" || Array.isArray(c)) fail(`${basename(casesPath)}:${n + 1}: a record must be a JSON object`);
     for (const k of Object.keys(c)) if (!KEYS.includes(k)) fail(`${basename(casesPath)}:${n + 1}: unknown field ${k}`);
     return c;
   });
 
+if (cases.length === 0) fail(`${basename(casesPath)} has no cases`);
+
 if (args.includes("--rehash")) {
   // Fill in or fix `sha256` and write the file in the canonical form (one record per line, fixed key order).
   const out = cases.map((c) => {
+    if (typeof c.source !== "string") fail(`${c.id}: source must be a string`);
     c.sha256 = sha256(Buffer.from(c.source, "utf8"));
     c.sourceType ??= "module";
     return JSON.stringify(Object.fromEntries(KEYS.filter((k) => k in c).map((k) => [k, c[k]])));

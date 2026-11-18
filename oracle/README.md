@@ -33,11 +33,11 @@ What the replay requires of the tree-sitter tree, per verdict:
 | `early` | Recorded and printed, never gated: tree-sitter is not expected to catch early errors. The case needs a `reason` |
 | `disagree` | Recorded and printed, never gated. The case needs a `reason` |
 
-**Faithful tree**, judged through the API and not through the CLI summary: the root does not report `has_error`; there is no `ERROR` node, no `MISSING` node and no zero-width node (other than the root of an empty input); and the leaves cover the input, that is every byte outside all leaves is white space (Unicode `White_Space`, U+FEFF, U+200B, U+2060: the gaps `grammar.js` skips).
+**Faithful tree**, judged through the API and not through the CLI summary: the root does not report `has_error`; there is no `ERROR` node, no `MISSING` node and no zero-width node (the zero-width root of an empty or whitespace-only input is not a defect, and such an input is faithful); and the leaves cover the input, that is every byte outside all leaves is white space (Unicode `White_Space`, U+FEFF, U+200B, U+2060: the gaps `grammar.js` skips).
 
 **`expect`** (accept cases): entries `s-e:kind`; the deepest node whose range covers bytes `[s,e)` has that kind (the first one in document order among equals), as in go-treesitter's `testdata/korean/manifest.csv`. Offsets are UTF-8 bytes.
 
-**`errorAt`** (syntax cases): the decided error position, a UTF-8 byte offset. Take it from the tools' positions in `verdicts.json` (they may differ by tool; pick the first offending token). It holds when some `ERROR` or `MISSING` node starts at or before `errorAt` and either contains it (`start <= errorAt <= end`) or ends before it with only white space in between. The second part exists because recovery leaves the node on the last good token while the tools name the next one (`{ using a = ; }`: the `ERROR` ends at 11, the tools say 12).
+**`errorAt`** (syntax cases): the decided error position, a UTF-8 byte offset. Take it from the tools' positions in `verdicts.json` (they may differ by tool; pick the first offending token). It holds when some `ERROR` or `MISSING` node starts at or before `errorAt` and either contains it (`start <= errorAt <= end`) or ends before it with only gap characters in between (the same set as above: Unicode `White_Space`, U+FEFF, U+200B, U+2060; any number of bytes and lines, so an input that is only white space between the node and `errorAt` qualifies). The second part exists because recovery leaves the node on the last good token while the tools name the next one (`{ using a = ; }`: the `ERROR` ends at 11, the tools say 12).
 
 ## Case records
 
@@ -54,19 +54,21 @@ What the replay requires of the tree-sitter tree, per verdict:
 ```sh
 (cd oracle && npm ci --ignore-scripts)
 node oracle/run.mjs                      # rewrites oracle/verdicts.json; byte-identical on every run
-(cd oracle/replay && go run . -oracle ..)  # judge; add -tree to print every tree with byte ranges
+(cd oracle/replay && go build -o ../../build/oracle-replay . && ../../build/oracle-replay -oracle ..)  # judge; add -tree to print every tree with byte ranges
 (cd oracle/replay && go test .)          # self-check of the judging logic
 ```
 
+`go run . -oracle ..` also judges, but it reports exit code 2 of the program as 1 (`exit status 2`): to see the real exit code, run the built binary as above (CI only needs pass or fail and uses `go run`). `build/` is git-ignored.
+
 `run.mjs --rehash` fills in or fixes every `sha256` and rewrites `cases.jsonl` in its canonical form. `run.mjs --cases FILE --out FILE` works on other files (scratch runs).
 
-Exit codes of `run.mjs`: 0 verdicts written; 2 inconsistent inputs (bad record, id or hash, installed tool differs from the pin or the lockfile), nothing written.
+Exit codes of `run.mjs`: 0 verdicts written; 2 inconsistent inputs (a line that is not a JSON object, an unknown field, a bad or duplicate id, a hash that does not match, an invalid `sourceType`, an empty case set, an installed tool that differs from the pin or the lockfile), nothing written.
 
 Exit codes of the replay:
 
 - **0**: every gated case is consistent.
 - **1**: a result differs; the differences are listed. Registering such a case is not an option (rule: no mismatch in the committed set).
-- **2**: the inputs are inconsistent: a `sha256` that does not match its source, verdicts made from other cases (`cases_sha256`) or another runner (`runner_sha256`), tool versions or integrity that differ from `package-lock.json` or from the exact pins in `package.json`, a case that does not fit its verdict, or a grammar that cannot be loaded. Nothing is judged.
+- **2**: the inputs are inconsistent: a `sha256` that does not match its source, verdicts made from other cases (`cases_sha256`) or another runner (`runner_sha256`), a `meta.tools` that is not exactly the two tools `babel` (`@babel/parser`) and `oxc` (`oxc-parser`), versions or integrity that differ between `verdicts.json`, `package-lock.json` and the exact pins in `package.json`, a case whose `verdict` is not what its Babel and oxc classes give (the replay recomputes every consensus), a case that does not fit its verdict, a `cases.jsonl` line that is not exactly one JSON object (the file is read line by line to the end, so trailing bytes are an error), a `sourceType` other than `module` or `script`, an empty case set, or a grammar that cannot be loaded. Nothing is judged.
 
 CI (`oracle` job of `.github/workflows/ci.yml`, `ubuntu-24.04`): `npm ci`, regenerate `verdicts.json` and fail on any difference from the committed file, the self-check, then the replay.
 
@@ -74,7 +76,7 @@ CI (`oracle` job of `.github/workflows/ci.yml`, `ubuntu-24.04`): `npm ci`, regen
 
 1. Write the failing input (corpus case or here) first. Append the record to `cases.jsonl` with the correct `sourceType`; leave `sha256` empty or wrong.
 2. `node oracle/run.mjs --rehash`, then `node oracle/run.mjs`; read the verdict and the positions in `verdicts.json`. A `disagree` or `early` input is not a defect input: do not register it as one.
-3. After the fix, `go run . -oracle .. -tree` in `oracle/replay` shows the trees. For an `accept` case add `expect` entries for the nodes the fix is about; for a `syntax` case add `errorAt`.
+3. After the fix, `-tree` on the replay (`../../build/oracle-replay -oracle .. -tree` in `oracle/replay`, or `go run . -oracle .. -tree`) shows the trees. For an `accept` case add `expect` entries for the nodes the fix is about; for a `syntax` case add `errorAt`.
 4. `node oracle/run.mjs` again, then the replay must exit 0. Commit `cases.jsonl` and `verdicts.json` together.
 
 Changing a tool version means changing `package.json` and `package-lock.json` and regenerating `verdicts.json` in the same pull request; review every verdict that moves.

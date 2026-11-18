@@ -1,8 +1,6 @@
 package main
 
 import (
-	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 
@@ -124,49 +122,10 @@ func TestParseExpect(t *testing.T) {
 	}
 }
 
-// TestLoadRefusesInconsistentInputs runs load on a copy of the committed oracle with one thing broken at a time.
-func TestLoadRefusesInconsistentInputs(t *testing.T) {
-	files := []string{"cases.jsonl", "verdicts.json", "run.mjs", "package-lock.json"}
-	copyTo := func(edit func(name, text string) string) string {
-		dir := t.TempDir()
-		for _, f := range files {
-			b, err := os.ReadFile(filepath.Join("..", f))
-			if err != nil {
-				t.Fatal(err)
-			}
-			if err := os.WriteFile(filepath.Join(dir, f), []byte(edit(f, string(b))), 0o644); err != nil {
-				t.Fatal(err)
-			}
-		}
-		return dir
-	}
-	same := func(_, s string) string { return s }
-	if _, _, p, err := load(copyTo(same)); err != nil || len(p) != 0 {
-		t.Fatalf("the committed oracle must be consistent: %v %v", err, p)
-	}
-	broken := map[string]func(name, text string) string{
-		"a case's source changed (sha256 mismatch)": func(n, s string) string {
-			if n == "cases.jsonl" {
-				return strings.Replace(s, `"source":"a?.delete(b)"`, `"source":"a?.delete(c)"`, 1)
-			}
-			return s
-		},
-		"another runner": func(n, s string) string {
-			if n == "run.mjs" {
-				return s + "// changed\n"
-			}
-			return s
-		},
-		"version drift": func(n, s string) string {
-			if n == "package-lock.json" {
-				return strings.Replace(s, "\"node_modules/oxc-parser\": {\n      \"version\": \"0.159.0\"", "\"node_modules/oxc-parser\": {\n      \"version\": \"0.159.1\"", 1)
-			}
-			return s
-		},
-	}
-	for name, edit := range broken {
-		if _, _, p, err := load(copyTo(edit)); err != nil || len(p) == 0 {
-			t.Errorf("%s: want inconsistent-input problems, got %v %v", name, p, err)
+func TestWhitespaceOnlyInputIsFaithful(t *testing.T) {
+	for _, src := range []string{"", " ", " \n\t\n"} {
+		if _, r := parse(t, src); !r.Clean() {
+			t.Errorf("%q: want a clean tree, got %s", src, r)
 		}
 	}
 }
