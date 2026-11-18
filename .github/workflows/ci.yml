@@ -67,11 +67,13 @@ jobs:
         with:
           swift-version: "6.1"
       - name: Build module
-        run: swift build --build-tests --force-resolved-versions
+        run: |-
+          cp Package.resolved "$RUNNER_TEMP/Package.resolved"
+          swift build --build-tests --force-resolved-versions
       - name: Run tests
         run: swift test --skip-build -q
       - name: Check Package.resolved is unchanged
-        run: git diff --exit-code -- Package.resolved
+        run: cmp Package.resolved "$RUNNER_TEMP/Package.resolved"
 
   swift-min:
     name: Test Swift (tools 5.9)
@@ -81,8 +83,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
       - name: Build module
-        run: swift build --build-tests --force-resolved-versions
+        run: |-
+          cp Package.resolved "$RUNNER_TEMP/Package.resolved"
+          swift build --build-tests --force-resolved-versions
       - name: Run tests
         run: swift test --skip-build -q
       - name: Check Package.resolved is unchanged
-        run: git diff --exit-code -- Package.resolved
+        run: cmp Package.resolved "$RUNNER_TEMP/Package.resolved"
