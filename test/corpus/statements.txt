@@ -935,6 +935,63 @@ for await (await using resource of resources) {
             (identifier)))))))
 
 ============================================
+Using declarations in plain for loops
+============================================
+
+for (using x = f();;) {}
+
+for (using x = f(), y = g(); x; ) {}
+
+async function h() {
+  for (await using x = f(); x; x.next()) {}
+}
+
+---
+
+(program
+  (for_statement
+    initializer: (using_declaration
+      (variable_declarator
+        name: (identifier)
+        value: (call_expression
+          function: (identifier)
+          arguments: (arguments))))
+    condition: (empty_statement)
+    body: (statement_block))
+  (for_statement
+    initializer: (using_declaration
+      (variable_declarator
+        name: (identifier)
+        value: (call_expression
+          function: (identifier)
+          arguments: (arguments)))
+      (variable_declarator
+        name: (identifier)
+        value: (call_expression
+          function: (identifier)
+          arguments: (arguments))))
+    condition: (identifier)
+    body: (statement_block))
+  (function_declaration
+    name: (identifier)
+    parameters: (formal_parameters)
+    body: (statement_block
+      (for_statement
+        initializer: (using_declaration
+          (variable_declarator
+            name: (identifier)
+            value: (call_expression
+              function: (identifier)
+              arguments: (arguments))))
+        condition: (identifier)
+        increment: (call_expression
+          function: (member_expression
+            object: (identifier)
+            property: (property_identifier))
+          arguments: (arguments))
+        body: (statement_block)))))
+
+============================================
 'using' as identifier
 ============================================
 

@@ -357,7 +357,7 @@ module.exports = grammar({
       'for',
       '(',
       choice(
-        field('initializer', choice($.lexical_declaration, $.variable_declaration)),
+        field('initializer', choice($.lexical_declaration, $.variable_declaration, $.using_declaration)),
         seq(field('initializer', $._expressions), ';'),
         field('initializer', $.empty_statement),
       ),
