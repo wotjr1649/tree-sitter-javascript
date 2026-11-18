@@ -32,7 +32,7 @@
    }
   },
   "cases_file": "cases.jsonl",
-  "cases_sha256": "b55d79a615c9d88158b58ee57423c3b09996a6dcdeb278190ad65c6f8bc9305b",
+  "cases_sha256": "f32b95cb9a8a177f91e02269fa43e31de533405e68482864f41a584cb068cf85",
   "runner": "run.mjs",
   "runner_sha256": "06cfe49cd56d0bac9b5c672b1f62fc0f44b37de02c0a2bf04c557e5354c5c24d"
  },
@@ -1220,6 +1220,156 @@
       "at": 8
      }
     ]
+   }
+  },
+  {
+   "id": "j2/optchain-in",
+   "sha256": "f879b5dc45985bd75f342ae71864e8afc48f4e95b69f8bc5845270c8bdc0147f",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j2/optchain-typeof",
+   "sha256": "5d45473d429b5d93b8602d559d0252d88c371ac541e30e3b301d8159cbd7aae8",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j2/optchain-void",
+   "sha256": "ddae5612e1315ba757bc89b13273c4d97c820f63545bf509aa4ea17ba1285294",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j2/optchain-if",
+   "sha256": "39f84a26b15e02c6362a6c12d261001a747e30bad1bb62c02b126045d2e764ae",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j2/optchain-return",
+   "sha256": "8ff2feace62d39fc62e96245418f5f05a12d29189b767958b32e37328c9c3bcf",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j2/optchain-this-call",
+   "sha256": "43a0c3cf00c4f86c7d6587618251cdf696b86086b25875b441b83597eca2b7b4",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j2/optchain-null-true",
+   "sha256": "2862bdb164724022103b9bd7e94b6ea5ab6fa69359792b7152cc1ee069abd725",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j2/optchain-class-then-new",
+   "sha256": "d304964c719e8cb16332c12344ccd6293db491766c39a4841a2619b734e44bd1",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j2/optchain-class-optional-call",
+   "sha256": "a5f71e34a024e35d93d61385a79ad137c23b674acdb38d033a7d59e7e5e15c29",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j2/optchain-typeof-script",
+   "sha256": "5d45473d429b5d93b8602d559d0252d88c371ac541e30e3b301d8159cbd7aae8",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
    }
   }
  ]
