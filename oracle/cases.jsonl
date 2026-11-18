@@ -58,3 +58,9 @@
 {"id":"j1/ampersand-shipping","sha256":"ebd948b0df2e6346fab5495acdb509d31b8a757ced977da16723d9d467ff047a","source":"<p>Shipping & Handling</p>;","sourceType":"module","expect":["3-22:jsx_text"]}
 {"id":"j1/ampersand-mixed-refs","sha256":"eb5288696ad7c91d2be0d0430802525413bb3aca5dcce881e71e594cec24d0f3","source":"<p>a &b; c &#; d &#x; e &amp;</p>;","sourceType":"module","expect":["3-5:jsx_text","5-8:html_character_reference","8-24:jsx_text","24-29:html_character_reference"]}
 {"id":"j1/ampersand-bare-statement","sha256":"46f06dc51e92dbdd55382f9b2d3310b95718477ae0ade3d41124d621dc3428e1","source":"<p>&</p>;","sourceType":"module","expect":["3-4:jsx_text"]}
+{"id":"j1b/charref-fullwidth-digit","sha256":"8cfd9368874c4e4fa297abacd3917f67517ae204774fd5443bcc52a146be66e5","source":"<p>&#１;</p>","sourceType":"module","expect":["3-9:jsx_text"]}
+{"id":"j1b/charref-arabic-indic-digit","sha256":"7da1022eee9636cce3d0a88aa227fc698918e5122f0d9874771540d2e92d15e5","source":"<p>&#١;</p>","sourceType":"module","expect":["3-8:jsx_text"]}
+{"id":"j1b/charref-fullwidth-hex-letter","sha256":"3518e7d4137173cb37e18fc576b1d4a46e9b9d24d9db3e5d8a7a72df69ee7543","source":"<p>&#xＦ;</p>","sourceType":"module","expect":["3-10:jsx_text"]}
+{"id":"j1b/charref-fullwidth-hex-digit","sha256":"6ce6d5d81329f145f2865903ea5e9b13e2e85a45888c6555a3d5bf9e15b92caf","source":"<p>&#x１;</p>","sourceType":"module","expect":["3-10:jsx_text"]}
+{"id":"j1b/charref-ascii-then-fullwidth-digit","sha256":"4eb9f86898ad2a704df6968cf597fbc40de9d33fb7df22c6b923907bfa08c600","source":"<p>&#1１;</p>","sourceType":"module","expect":["3-10:jsx_text"]}
+{"id":"j1b/charref-ascii-then-fullwidth-hex","sha256":"c0a4674ff5fb3fb7bb6d7e144306e7b938d66a49939a27cfcd4695c358b83d0a","source":"<p>&#x1Ｆ;</p>","sourceType":"module","expect":["3-11:jsx_text"]}
