@@ -46,7 +46,7 @@ jobs:
         shell: bash
         run: python -c "import importlib.metadata as m; v = m.version('tree-sitter'); print(v); assert v == '0.26.1'"
       - name: Parse examples
-        uses: tree-sitter/parse-action@v4
+        uses: tree-sitter/parse-action@v5
         with:
           files: |
             examples/*.js
