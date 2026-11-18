@@ -36,11 +36,14 @@ identical).
    `swift-tools-version` 5.9, the minimum SwiftTreeSitter 0.25.0 itself declares), the lockfiles use the newest release
    (Rust 0.27.2, Node 0.25.1) and `Package.resolved` pins SwiftTreeSitter 0.25.0 and tree-sitter 0.25.10. Python has no
    lockfile: CI installs it under `ci/python-constraints.txt` (`tree-sitter==0.26.1`) and checks the installed version.
-   CI builds Swift with `--force-resolved-versions` so a changed `Package.resolved` fails, on Swift 6.1 (Ubuntu 24.04,
-   macOS 15) and on the 5.9 toolchain. CMake defaults to ABI 15, and binding tests parse a small input so a mismatch
-   fails. The origin's own v0.25.0 declared Python and Go runtimes
-   (0.24) that cannot load its ABI 15 parser; this repository does not keep them. Lowering these needs the owner's
-   approval.
+   CI builds Swift with `--force-resolved-versions`, which rejects a `Package.resolved` that no longer matches the
+   manifest and would need re-resolving, and compares `Package.resolved` byte for byte before and after the build and
+   test (`cmp` against a copy), so the build does not rewrite it; a lockfile update that matches the manifest is
+   committed with the PR and passes. It runs on Swift 6.1 (Ubuntu 24.04, macOS 15) and on the 5.9 toolchain. CMake
+   defaults to ABI 15, and binding tests parse a small input so a mismatch fails. The origin's v0.25.0 Python
+   requirement `tree-sitter~=0.24` allowed 0.24.0, which cannot load its ABI 15 parser, as well as 0.25.0 and 0.26.1;
+   this repository's `~=0.25` excludes the 0.24 line. The origin's Go module required go-tree-sitter v0.24.0 explicitly;
+   this repository requires v0.25.0. Lowering these needs the owner's approval.
 7. Planned oracle for later fixes: a reference JavaScript parser (acorn or Babel, or `tsc`) judging whether a source
    is valid. It is not set up in v1.0.0.
 
