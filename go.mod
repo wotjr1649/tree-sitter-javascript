@@ -1,4 +1,4 @@
-module github.com/tree-sitter/tree-sitter-javascript
+module github.com/wotjr1649/tree-sitter-javascript
 
 go 1.23
 
