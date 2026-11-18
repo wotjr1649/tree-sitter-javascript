@@ -2903,6 +2903,10 @@
         {
           "type": "STRING",
           "value": "let"
+        },
+        {
+          "type": "STRING",
+          "value": "using"
         }
       ]
     },
@@ -6998,6 +7002,10 @@
         {
           "type": "STRING",
           "value": "let"
+        },
+        {
+          "type": "STRING",
+          "value": "using"
         }
       ]
     },
@@ -7171,6 +7179,10 @@
         {
           "type": "STRING",
           "value": "let"
+        },
+        {
+          "type": "STRING",
+          "value": "using"
         }
       ]
     },
@@ -7455,6 +7467,16 @@
       {
         "type": "SYMBOL",
         "name": "primary_expression"
+      }
+    ],
+    [
+      {
+        "type": "SYMBOL",
+        "name": "primary_expression"
+      },
+      {
+        "type": "SYMBOL",
+        "name": "using_declaration"
       }
     ]
   ],

@@ -19,7 +19,7 @@ const RESERVED_WORDS = [
 ];
 
 const CONTEXTUAL_KEYWORDS = [
-  'get', 'set', 'async', 'await', 'static', 'export', 'let',
+  'get', 'set', 'async', 'await', 'static', 'export', 'let', 'using',
 ];
 
 module.exports = grammar({
@@ -107,6 +107,8 @@ module.exports = grammar({
     [$.import_statement, $.import],
     [$.export_statement, $.primary_expression],
     [$.lexical_declaration, $.primary_expression],
+    // Unlike `let [`, `using [` starts an expression: a using declaration binds identifiers only.
+    [$.primary_expression, $.using_declaration],
   ],
 
   conflicts: $ => [
