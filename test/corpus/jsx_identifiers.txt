@@ -1,0 +1,122 @@
+==============================================
+JSX reserved identifiers
+==============================================
+
+a = <class />;
+c = <await />;
+d = <for />;
+f = <Foo.class />;
+g = <a class="v" for="x" const="y" await="z" />;
+
+---
+
+(program
+  (expression_statement
+    (assignment_expression
+      (identifier)
+      (jsx_self_closing_element
+        (identifier))))
+  (expression_statement
+    (assignment_expression
+      (identifier)
+      (jsx_self_closing_element
+        (identifier))))
+  (expression_statement
+    (assignment_expression
+      (identifier)
+      (jsx_self_closing_element
+        (identifier))))
+  (expression_statement
+    (assignment_expression
+      (identifier)
+      (jsx_self_closing_element
+        (member_expression
+          (identifier)
+          (property_identifier)))))
+  (expression_statement
+    (assignment_expression
+      (identifier)
+      (jsx_self_closing_element
+        (identifier)
+        (jsx_attribute
+          (property_identifier)
+          (string
+            (string_fragment)))
+        (jsx_attribute
+          (property_identifier)
+          (string
+            (string_fragment)))
+        (jsx_attribute
+          (property_identifier)
+          (string
+            (string_fragment)))
+        (jsx_attribute
+          (property_identifier)
+          (string
+            (string_fragment)))))))
+
+==============================================
+JSX reserved words in element pairs, member names and attributes
+==============================================
+
+<C in={x}>y</C>;
+<class></class>;
+<Foo.class>x</Foo.class>;
+<a.delete />;
+<a.b.class.new />;
+<input disabled default if />;
+
+---
+
+(program
+  (expression_statement
+    (jsx_element
+      (jsx_opening_element
+        (identifier)
+        (jsx_attribute
+          (property_identifier)
+          (jsx_expression
+            (identifier))))
+      (jsx_text)
+      (jsx_closing_element
+        (identifier))))
+  (expression_statement
+    (jsx_element
+      (jsx_opening_element
+        (identifier))
+      (jsx_closing_element
+        (identifier))))
+  (expression_statement
+    (jsx_element
+      (jsx_opening_element
+        (member_expression
+          (identifier)
+          (property_identifier)))
+      (jsx_text)
+      (jsx_closing_element
+        (member_expression
+          (identifier)
+          (property_identifier)))))
+  (expression_statement
+    (jsx_self_closing_element
+      (member_expression
+        (identifier)
+        (property_identifier))))
+  (expression_statement
+    (jsx_self_closing_element
+      (member_expression
+        (member_expression
+          (member_expression
+            (identifier)
+            (property_identifier))
+          (property_identifier))
+        (property_identifier))))
+  (expression_statement
+    (jsx_self_closing_element
+      (identifier)
+      (jsx_attribute
+        (property_identifier))
+      (jsx_attribute
+        (property_identifier))
+      (jsx_attribute
+        (property_identifier)))))
