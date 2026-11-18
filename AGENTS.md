@@ -12,8 +12,10 @@ origin's v0.25.0 is commit `44c892e` in this history, kept as `refs/upstream/v0.
 
 - Source is `grammar.js` and hand-written `src/scanner.c`. `src/parser.c`, `src/grammar.json`, `src/node-types.json`
   and `src/tree_sitter/*.h` are generated: edit the grammar, run `tree-sitter generate --abi 15 --js-runtime native`
-  with CLI 0.27.2, commit all of them. `src/scanner.c` equals the origin's; go-treesitter applies its own ADR-0023
-  JSX patch on top and keeps it there, not here.
+  with CLI 0.27.2, commit all of them. `src/scanner.c` carries the JSX bare-ampersand fix (origin PR #388's scanner
+  hunks, identical to go-treesitter's ADR-0023 patch record 0001; ADR-0001 amendment 2026-11-19); v1.0.0 kept the
+  origin's scanner and left that patch in go-treesitter, which retires it only in a later, separately approved pin move
+  to a release containing the fix (its ADR-0024 7.6).
 - Exception to the 1.0.0 manifest versions (owner decision, 2026-11-18): `tree-sitter.json` `metadata.version` stays at
   the upstream value `0.25.0` for v1.0.0, because CLI 0.27.2 compiles it into `parser.c` (`.metadata`) and changing it
   breaks the byte-identical baseline (ADR-0024 7.5). Set the real version in the first behaviour-changing release

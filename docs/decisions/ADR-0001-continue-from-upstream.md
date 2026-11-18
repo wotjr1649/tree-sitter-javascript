@@ -2,6 +2,7 @@
 
 - Status: accepted (owner decision, 2026-11-18)
 - Date: 2026-11-18
+- Amended: 2026-11-19 (decision 3, owner-approved)
 
 ## Context
 
@@ -28,6 +29,12 @@ identical).
    `tree-sitter.json` `metadata.version`, which the generator compiles into `parser.c` (`.metadata`) and which stays
    `0.25.0` so `src/` stays identical (owner decision; the real version is set in the first behaviour-changing release,
    v1.1 or later); nothing is tagged or published here. Later versions change behaviour only through fixes that start from a failing case.
+
+   Amendment (owner-approved, 2026-11-19): the v1.0.0 baseline above kept go-treesitter's ADR-0023 JSX patch in
+   go-treesitter, with `src/scanner.c` equal to the origin's. From the change that adds this amendment on, this
+   repository carries that fix: `src/scanner.c` has the origin's PR #388 scanner hunks (issue #366), identical to
+   go-treesitter patch record 0001; the generated `src/` files are unchanged. go-treesitter retires its patch record
+   only in a later, separately approved pin move to a release that contains the fix (its ADR-0024 7.6, ADR-0023).
 4. No registry publishing (npm, crates.io, PyPI) and no automated tagging or release workflow. Consumers pin commits.
 5. The grammar name `javascript`, the C symbol `tree_sitter_javascript`, node kinds and fields stay unless a release
    declares a breaking change (major version, CHANGELOG).
