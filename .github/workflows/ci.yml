@@ -90,3 +90,35 @@ jobs:
         run: swift test --skip-build -q
       - name: Check Package.resolved is unchanged
         run: cmp Package.resolved "$RUNNER_TEMP/Package.resolved"
+
+  probe:
+    name: TEMP probe ${{matrix.tc}}
+    runs-on: ubuntu-24.04
+    container: ${{matrix.container}}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - tc: "5.9"
+            container: swift:5.9
+          - tc: "6.1"
+            container: swift:6.1
+    steps:
+      - uses: actions/checkout@v5
+      - name: Probe
+        shell: bash
+        run: |
+          swift --version
+          cp Package.resolved /tmp/orig
+          swift package resolve
+          echo "=== generated Package.resolved"
+          cat Package.resolved
+          echo "=== corrupt pin (swift-tree-sitter 0.25.0 -> 0.24.0), default build"
+          cp /tmp/orig Package.resolved
+          sed -i '/"SwiftTreeSitter"/,/}/ s/"version": "0.25.0"/"version": "0.24.0"/' Package.resolved
+          grep -n '"version"' Package.resolved
+          swift build 2>&1 | tail -5; echo "default build exit=${PIPESTATUS[0]}"
+          echo "=== corrupt pin, --force-resolved-versions"
+          cp /tmp/orig Package.resolved
+          sed -i '/"SwiftTreeSitter"/,/}/ s/"version": "0.25.0"/"version": "0.24.0"/' Package.resolved
+          swift build --force-resolved-versions 2>&1 | tail -5; echo "forced build exit=${PIPESTATUS[0]}"
