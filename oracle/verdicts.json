@@ -1,0 +1,1226 @@
+{
+ "meta": {
+  "format": 1,
+  "encoding": "utf-8",
+  "offsets": "UTF-8 byte offsets",
+  "tools": {
+   "babel": {
+    "package": "@babel/parser",
+    "version": "8.1.2",
+    "integrity": "sha512-ZDKU7vaX0VORd2BhaO+3FKr/30TKjbUy3SMZcydiPngnAb+MesgUoh5SJcE5EwEyBj14M5J6fK56GuBqvYmOpw==",
+    "options": {
+     "sourceType": "per case",
+     "plugins": [
+      "jsx"
+     ],
+     "errorRecovery": true
+    }
+   },
+   "oxc": {
+    "package": "oxc-parser",
+    "version": "0.159.0",
+    "integrity": "sha512-Z1OaHU1EeTtobDHlYOAijfCTZr13PpWs/ZvwbJHaz5zOHfV6fLSmYZwB6klE8cggz51syi8HmLikHju0orJr4g==",
+    "options": {
+     "filename": "oracle.jsx",
+     "lang": "jsx",
+     "sourceType": "per case",
+     "showSemanticErrors": [
+      false,
+      true
+     ]
+    }
+   }
+  },
+  "cases_file": "cases.jsonl",
+  "cases_sha256": "b55d79a615c9d88158b58ee57423c3b09996a6dcdeb278190ad65c6f8bc9305b",
+  "runner": "run.mjs",
+  "runner_sha256": "06cfe49cd56d0bac9b5c672b1f62fc0f44b37de02c0a2bf04c557e5354c5c24d"
+ },
+ "results": [
+  {
+   "id": "j2/optchain-delete-call",
+   "sha256": "295796c680d61557199c59fd2cc65e422a5f53bddcbf1b887e0cb0528b842575",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j2/optchain-delete-member",
+   "sha256": "4da797b33a933faa537618dd554bee1f72c330143ab4d46a7cf5df8da9cc38d4",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j2/optchain-class-member",
+   "sha256": "5ee3fdb636bb0f85dbcab5522082be1853f574c425d0ba3a39dc5d2c6c37bc36",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j2/optchain-class-call",
+   "sha256": "e11a5d5645015097b06cde1bb16bfb31ce86b230aa17e8249ca33a4a09f85f37",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j2/optchain-new-call",
+   "sha256": "ce9b9aa06ad8bb514bb5ee9dea3756b896d59fe4d951c0895d229138619b9f7c",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j2/optchain-nested",
+   "sha256": "ceca9b166d88320125a1c826322e05f6b58854b8f181e8b68794b40f26287923",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j2/optchain-bracket-then-delete",
+   "sha256": "e2a829011b36894fdfe8ff9d454c2fddebcdcbac2bbc7239f2dee91514898cae",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j2/optchain-statements",
+   "sha256": "96a2bb46026ba3cc5f8ee437fe83090fca32b1d2d6f680cd577add6cc55c1e47",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j2/optchain-delete-script",
+   "sha256": "295796c680d61557199c59fd2cc65e422a5f53bddcbf1b887e0cb0528b842575",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "using/block",
+   "sha256": "65934aec29e641acc470455529dc1533b5dfd3f154a644b6d37f296456ff09a8",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "using/await-block",
+   "sha256": "d4fca18ed76dc457423a2736cd317748c4224090653c5591ddb6e0e0d7b2e6ff",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "using/for-of",
+   "sha256": "e8aff91a14ce2d4f732ab693dfaa7dd4dc1b7da68746f84b434a88c8c789af3d",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "using/for-await-of-in-async-function",
+   "sha256": "dab7047f673d7c2a248154d1c25a50d194b121b5701616a760143b22ea5b2748",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "using/function-body-two-declarators",
+   "sha256": "0258545e96257710812c671f3cc9bc41ab09fd474aa47d0ac01d886c215bb4e1",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "jsx/attribute-and-expression",
+   "sha256": "ae7acc0d8bead61cc64d4695b03a2ba0f4a89230d8c06a4922545befc81bd65c",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "jsx/entity",
+   "sha256": "9d01a2f4885095a9a22c368c3ba93f990016ffbcebc803ea4a242c0b0aee005a",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "jsx/hangul-and-entity",
+   "sha256": "b84fae70b63a8c6e99bfa0206d758a9baf31b1e2775e3b177f30a17470a1267a",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j1/reject-lt-in-text",
+   "sha256": "cd533b5f3dbf2301e88b8a346773cab4e557f509d2cfae657755edc1f0d6f671",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (1:8)",
+      "at": 8
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected `>` but found `<`",
+      "at": 8
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected `>` but found `<`",
+      "at": 8
+     }
+    ]
+   }
+  },
+  {
+   "id": "j1/reject-hangul-lt-in-text",
+   "sha256": "e3f1f2ca7b0985b5f6e33300736750c96356023ba97ba06b5c2e18803d0e6e47",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (1:8)",
+      "at": 12
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected `>` but found `<`",
+      "at": 12
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected `>` but found `<`",
+      "at": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "j1/reject-unclosed-end-tag",
+   "sha256": "ed3ca50f3c96ab685e2cc946d644465db6ec0ed36a6335c78142baca8f570524",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token, expected \"jsxTagEnd\" (1:7)",
+      "at": 7
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected `>` but found `EOF`",
+      "at": 7
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected `>` but found `EOF`",
+      "at": 7
+     }
+    ]
+   }
+  },
+  {
+   "id": "j1/reject-brace-open",
+   "sha256": "7f0bdda951093d977f74cd5b92e14c7a9acd7fcc3df00642bff5bb5e6dc575ad",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (1:5)",
+      "at": 5
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token",
+      "at": 5
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Unexpected token",
+      "at": 5
+     }
+    ]
+   }
+  },
+  {
+   "id": "j2/reject-no-name",
+   "sha256": "c644eb38ef3eac4160f042dd8c6348bcd2fe0ca73ee70877cb50275a14f30f43",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (1:3)",
+      "at": 3
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Identifier expected after '?.'",
+      "at": 1
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Identifier expected after '?.'",
+      "at": 1
+     }
+    ]
+   }
+  },
+  {
+   "id": "j2/reject-class-call-unclosed",
+   "sha256": "f49beaaec468644b0dee9caba4cd0294c089d28f343041ef359cdf1037630b9a",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (1:9)",
+      "at": 9
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected `)` but found `EOF`",
+      "at": 9
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected `)` but found `EOF`",
+      "at": 9
+     }
+    ]
+   }
+  },
+  {
+   "id": "j2/reject-delete-call-unclosed",
+   "sha256": "55ad4591a2d9d684235cce73395e6c88b36e69768ba0eb9b1734d0d5010004df",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (1:10)",
+      "at": 10
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token",
+      "at": 10
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Unexpected token",
+      "at": 10
+     }
+    ]
+   }
+  },
+  {
+   "id": "j2/reject-bracket-unclosed",
+   "sha256": "b6710e920e84fd73dab3b5fd6ee4728f830fa1fc530ac4836994dbec069898d7",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token, expected \"]\" (1:5)",
+      "at": 5
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected `]` but found `;`",
+      "at": 5
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected `]` but found `;`",
+      "at": 5
+     }
+    ]
+   }
+  },
+  {
+   "id": "j2/reject-astral-before",
+   "sha256": "846f11283bb2723e71126a0a1042105366faea1c26cdc67ed9410d78f17f76d0",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (1:9)",
+      "at": 11
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Identifier expected after '?.'",
+      "at": 9
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Identifier expected after '?.'",
+      "at": 9
+     }
+    ]
+   }
+  },
+  {
+   "id": "j3/reject-class-unterminated",
+   "sha256": "ce9b510f6be9e4aea11025a160ebb0b22a34a273b44dc16d912fdae90db00873",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (1:6)",
+      "at": 6
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token",
+      "at": 6
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Unexpected token",
+      "at": 6
+     }
+    ]
+   }
+  },
+  {
+   "id": "j3/reject-class-trailing-gt",
+   "sha256": "53b08ec65e2ab661869e5a8df86e9d3e8aa29c73f200ac1ab4f0fed156904dff",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (1:10)",
+      "at": 10
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token",
+      "at": 10
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Unexpected token",
+      "at": 10
+     }
+    ]
+   }
+  },
+  {
+   "id": "j3/reject-member-empty",
+   "sha256": "47f3dc4b3ee9ffbd129256fa32f65cceabd6ab1bcfcfd8a53592002e3b862c0c",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (1:6)",
+      "at": 6
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token",
+      "at": 6
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Unexpected token",
+      "at": 6
+     }
+    ]
+   }
+  },
+  {
+   "id": "j3/reject-class-attr-missing-value",
+   "sha256": "002bb97b78ab79b0e1320e5ce4a5f48859dda3ded5af817770963253edb49760",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "JSX value should be either an expression or a quoted JSX text. (1:10)",
+      "at": 10
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token",
+      "at": 10
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Unexpected token",
+      "at": 10
+     }
+    ]
+   }
+  },
+  {
+   "id": "j3/reject-close-only",
+   "sha256": "0f6d443427030231f0182951f45a071fcd58554a1e338257aed01dcc9768ee06",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (1:1)",
+      "at": 1
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token",
+      "at": 1
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Unexpected token",
+      "at": 1
+     }
+    ]
+   }
+  },
+  {
+   "id": "j4/reject-for-of-no-right",
+   "sha256": "bfaec97363d9d5a8e49833e2687b46d105b23e39e446e08c855a9115cbabd1e8",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (1:15)",
+      "at": 15
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token",
+      "at": 15
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Unexpected token",
+      "at": 15
+     }
+    ]
+   }
+  },
+  {
+   "id": "j4/reject-using-eq-nothing",
+   "sha256": "acb17f5c871f0e72c0cfae9724569ccef47940280d0c8ddf49cc0bf1ba32b012",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (1:12)",
+      "at": 12
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token",
+      "at": 12
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Unexpected token",
+      "at": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "j4/reject-await-using-eq-nothing",
+   "sha256": "dfdaf2ff75d9d85a16e9eb49310eda643d9a074ba8b148dd2dbecfdda67e33f4",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (1:18)",
+      "at": 18
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token",
+      "at": 18
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Unexpected token",
+      "at": 18
+     }
+    ]
+   }
+  },
+  {
+   "id": "j4/reject-using-comma-missing",
+   "sha256": "840ec82c2f59890e59603ea678d3e197e6e7e6081f3843fd4571768014056c92",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (1:15)",
+      "at": 15
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token",
+      "at": 15
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Unexpected token",
+      "at": 15
+     }
+    ]
+   }
+  },
+  {
+   "id": "j4/reject-for-of-extra-token",
+   "sha256": "cfaf0f45cc8aac35debd99eccdcab0fcd372dc4f78d8ee4177d970dedcaf4f63",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token, expected \")\" (1:18)",
+      "at": 18
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected `)` but found `Identifier`",
+      "at": 18
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected `)` but found `Identifier`",
+      "at": 18
+     }
+    ]
+   }
+  },
+  {
+   "id": "j5/reject-for-await-of-no-right",
+   "sha256": "3586c48621c474568a457a6ea36b929f4c8d191198893e51255084784743f38f",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (1:42)",
+      "at": 42
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token",
+      "at": 42
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Unexpected token",
+      "at": 42
+     }
+    ]
+   }
+  },
+  {
+   "id": "j5/reject-for-head-unclosed",
+   "sha256": "3bc1740891ed0a7d56ae6e766c4b12f8bfbb93cc5d58be49f8360b3813009e37",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token, expected \")\" (1:18)",
+      "at": 18
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected `)` but found `{`",
+      "at": 18
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected `)` but found `{`",
+      "at": 18
+     }
+    ]
+   }
+  },
+  {
+   "id": "early/let-redeclared",
+   "sha256": "5146c3637a58d570119fd50ee48f768c5a8426ba8833dde2d614c78a75e337b0",
+   "sourceType": "module",
+   "verdict": "early",
+   "babel": {
+    "class": "early",
+    "errors": [
+     {
+      "message": "Identifier 'a' has already been declared. (1:11)",
+      "at": 11
+     }
+    ]
+   },
+   "oxc": {
+    "class": "early",
+    "errors": [],
+    "errorsWithSemantic": [
+     {
+      "message": "Identifier `a` has already been declared",
+      "at": 4
+     }
+    ]
+   }
+  },
+  {
+   "id": "early/var-let-in-module",
+   "sha256": "4f67fe389a000ef7ced123e7bce9ccf24632befd313120c6b0bf49fea34be8ff",
+   "sourceType": "module",
+   "verdict": "early",
+   "babel": {
+    "class": "early",
+    "errors": [
+     {
+      "message": "Unexpected reserved word 'let'. (1:4)",
+      "at": 4
+     }
+    ]
+   },
+   "oxc": {
+    "class": "early",
+    "errors": [],
+    "errorsWithSemantic": [
+     {
+      "message": "The keyword 'let' is reserved",
+      "at": 4
+     }
+    ]
+   }
+  },
+  {
+   "id": "early/using-at-script-top-level",
+   "sha256": "41af6ccc9355b1cf55702192b7a5f6f18c3e7043c122f566922a75c9a0bc7e8a",
+   "sourceType": "script",
+   "verdict": "early",
+   "babel": {
+    "class": "early",
+    "errors": [
+     {
+      "message": "Using declaration cannot appear in the top level when source type is `script` or in the bare case statement. (1:0)",
+      "at": 0
+     }
+    ]
+   },
+   "oxc": {
+    "class": "early",
+    "errors": [],
+    "errorsWithSemantic": [
+     {
+      "message": "'using' declarations are not allowed at the top level of a script",
+      "at": 0
+     }
+    ]
+   }
+  },
+  {
+   "id": "early/duplicate-constructor",
+   "sha256": "1f1277fc863703c403e414bcc4c0f40eab9e09b463969606b9fb46c041eba428",
+   "sourceType": "module",
+   "verdict": "early",
+   "babel": {
+    "class": "early",
+    "errors": [
+     {
+      "message": "Duplicate constructor in the same class. (1:27)",
+      "at": 27
+     }
+    ]
+   },
+   "oxc": {
+    "class": "early",
+    "errors": [],
+    "errorsWithSemantic": [
+     {
+      "message": "Multiple constructor implementations are not allowed.",
+      "at": 10
+     }
+    ]
+   }
+  },
+  {
+   "id": "early/break-outside-loop",
+   "sha256": "42af036c740443455b79633c4ad8b5b729798d3a7a26ae1ca2f96dda0e1d266f",
+   "sourceType": "module",
+   "verdict": "early",
+   "babel": {
+    "class": "early",
+    "errors": [
+     {
+      "message": "Unsyntactic break. (1:0)",
+      "at": 0
+     }
+    ]
+   },
+   "oxc": {
+    "class": "early",
+    "errors": [],
+    "errorsWithSemantic": [
+     {
+      "message": "Illegal break statement",
+      "at": 0
+     }
+    ]
+   }
+  },
+  {
+   "id": "early/yield-as-identifier-in-module",
+   "sha256": "26b946d7cc01c2266a1de06a5b90e0de475090940605785f67da3621e8a41f96",
+   "sourceType": "module",
+   "verdict": "early",
+   "babel": {
+    "class": "early",
+    "errors": [
+     {
+      "message": "Unexpected reserved word 'yield'. (1:4)",
+      "at": 4
+     }
+    ]
+   },
+   "oxc": {
+    "class": "early",
+    "errors": [],
+    "errorsWithSemantic": [
+     {
+      "message": "The keyword 'yield' is reserved",
+      "at": 4
+     }
+    ]
+   }
+  },
+  {
+   "id": "j1/disagree-gt-in-text",
+   "sha256": "f13ff285e30d2ca813a6d6fcdc96e14ee8a4ac8cea76dfb7762f2c498f71f5a4",
+   "sourceType": "module",
+   "verdict": "disagree",
+   "babel": {
+    "class": "early",
+    "errors": [
+     {
+      "message": "Unexpected token `>`. Did you mean `&gt;` or `{'>'}`? (1:5)",
+      "at": 5
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token. Did you mean `{'>'}` or `&gt;`?",
+      "at": 5
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Unexpected token. Did you mean `{'>'}` or `&gt;`?",
+      "at": 5
+     }
+    ]
+   }
+  },
+  {
+   "id": "j2/disagree-optchain-template",
+   "sha256": "58e8e3a49471e879e5ab53e16ae8ca385e373fff6077ed6e0912bc1f62d7e2f6",
+   "sourceType": "module",
+   "verdict": "disagree",
+   "babel": {
+    "class": "early",
+    "errors": [
+     {
+      "message": "Tagged Template Literals are not allowed in optionalChain. (1:0)",
+      "at": 0
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Tagged template expressions are not permitted in an optional chain",
+      "at": 4
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Tagged template expressions are not permitted in an optional chain",
+      "at": 4
+     }
+    ]
+   }
+  },
+  {
+   "id": "j3/disagree-mismatched-close-tag",
+   "sha256": "b23a2163a0fb5eeb1825cbd9a8b4da2fbb1ea861653c7fb7cb2d8dfddbcd9fed",
+   "sourceType": "module",
+   "verdict": "disagree",
+   "babel": {
+    "class": "early",
+    "errors": [
+     {
+      "message": "Expected corresponding JSX closing tag for <class>. (1:7)",
+      "at": 7
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected corresponding JSX closing tag for 'class'.",
+      "at": 9
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected corresponding JSX closing tag for 'class'.",
+      "at": 9
+     }
+    ]
+   }
+  },
+  {
+   "id": "j4/disagree-for-using-in",
+   "sha256": "cce44220a18ca2d34b8fa132e83dce7fc7d292aa6b12c254e2db890847668d46",
+   "sourceType": "module",
+   "verdict": "disagree",
+   "babel": {
+    "class": "early",
+    "errors": [
+     {
+      "message": "For-in loop may not start with 'using' declaration. (1:5)",
+      "at": 5
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "The left-hand side of a for...in statement cannot be an using declaration.",
+      "at": 5
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "The left-hand side of a for...in statement cannot be an using declaration.",
+      "at": 5
+     }
+    ]
+   }
+  },
+  {
+   "id": "j4/disagree-using-without-initializer",
+   "sha256": "f8e79014fd0ccc74e3a0d4ca1ab7c7e900f7a521d3b3cb38c3f33b5e02706185",
+   "sourceType": "module",
+   "verdict": "disagree",
+   "babel": {
+    "class": "early",
+    "errors": [
+     {
+      "message": "Missing initializer in using declaration. (1:9)",
+      "at": 9
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Using declarations must have an initializer.",
+      "at": 8
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Using declarations must have an initializer.",
+      "at": 8
+     }
+    ]
+   }
+  }
+ ]
+}
