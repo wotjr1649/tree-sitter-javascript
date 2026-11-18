@@ -1,0 +1,92 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{github.workflow}}-${{github.ref}}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Test parser
+    runs-on: ${{matrix.os}}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-latest, macos-15]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+      - name: Set up tree-sitter
+        uses: tree-sitter/setup-action/cli@v2
+        with:
+          tree-sitter-ref: v0.27.2
+      - name: Verify generated sources
+        shell: bash
+        run: |-
+          tree-sitter generate --abi 15 --js-runtime native
+          git diff --exit-code -- src
+      - name: Run tests
+        uses: tree-sitter/parser-test-action@v2
+        env:
+          # Test the 0.26.1 Python runtime; the package range (~=0.25) stays as the consumer lower bound.
+          PIP_CONSTRAINT: ${{github.workspace}}/ci/python-constraints.txt
+        with:
+          generate: false
+          test-rust: true
+          test-node: true
+          test-python: true
+          test-go: true
+          go-version: "1.23"
+      - name: Check Python runtime pin
+        shell: bash
+        run: python -c "import importlib.metadata as m; v = m.version('tree-sitter'); print(v); assert v == '0.26.1'"
+      - name: Parse examples
+        uses: tree-sitter/parse-action@v4
+        with:
+          files: |
+            examples/*.js
+            examples/*.jsx
+
+  swift:
+    name: Test Swift (${{matrix.os}})
+    runs-on: ${{matrix.os}}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-15]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+      - name: Set up Swift
+        uses: swift-actions/setup-swift@v2
+        with:
+          swift-version: "6.1"
+      - name: Build module
+        run: |-
+          cp Package.resolved "$RUNNER_TEMP/Package.resolved"
+          swift build --build-tests --force-resolved-versions
+      - name: Run tests
+        run: swift test --skip-build -q
+      - name: Check Package.resolved is unchanged
+        run: cmp Package.resolved "$RUNNER_TEMP/Package.resolved"
+
+  swift-min:
+    name: Test Swift (tools 5.9)
+    runs-on: ubuntu-24.04
+    container: swift:5.9
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+      - name: Build module
+        run: |-
+          cp Package.resolved "$RUNNER_TEMP/Package.resolved"
+          swift build --build-tests --force-resolved-versions
+      - name: Run tests
+        run: swift test --skip-build -q
+      - name: Check Package.resolved is unchanged
+        run: cmp Package.resolved "$RUNNER_TEMP/Package.resolved"
