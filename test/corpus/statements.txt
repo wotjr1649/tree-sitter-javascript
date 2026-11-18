@@ -992,6 +992,65 @@ async function h() {
         body: (statement_block)))))
 
 ============================================
+Line breaks around plain for loop using declarations
+============================================
+
+for (using /* c */ x = f()
+;y;) {}
+
+for (using
+[a] = b;;) {}
+
+for (using
+of y);
+
+---
+
+(program
+  (for_statement
+    initializer: (using_declaration
+      (comment)
+      (variable_declarator
+        name: (identifier)
+        value: (call_expression
+          function: (identifier)
+          arguments: (arguments))))
+    condition: (identifier)
+    body: (statement_block))
+  (for_statement
+    initializer: (assignment_expression
+      left: (subscript_expression
+        object: (identifier)
+        index: (identifier))
+      right: (identifier))
+    condition: (empty_statement)
+    body: (statement_block))
+  (for_in_statement
+    left: (identifier)
+    right: (identifier)
+    body: (empty_statement)))
+
+============================================
+Line break after using in a plain for loop
+:error
+============================================
+
+for (using
+x = f();;) {}
+
+---
+
+============================================
+Missing first semicolon in a plain for loop using declaration
+:error
+============================================
+
+for (using x = f()
+y;) {}
+
+---
+
+============================================
 'using' as identifier
 ============================================
 

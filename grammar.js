@@ -109,6 +109,7 @@ module.exports = grammar({
     [$.lexical_declaration, $.primary_expression],
     // Unlike `let [`, `using [` starts an expression: a using declaration binds identifiers only.
     [$.primary_expression, $.using_declaration],
+    [$.primary_expression, $._for_using_declaration],
   ],
 
   conflicts: $ => [
@@ -122,7 +123,6 @@ module.exports = grammar({
     [$.primary_expression, $.pattern],
     [$.primary_expression, $._for_header],
     [$.variable_declarator, $._for_header],
-    [$._using_keyword_declarator, $._for_header],
     [$.array, $.array_pattern],
     [$.object, $.object_pattern],
     [$.assignment_expression, $.pattern],
@@ -314,20 +314,10 @@ module.exports = grammar({
       $._semicolon,
     ),
 
-    using_declaration: $ => {
-      const kind = field('kind', choice('using', seq('await', 'using')));
-      return choice(
-        seq(kind, commaSep1($.variable_declarator), $._semicolon),
-        // TypeScript reads `using as …` and `using satisfies …` as declarations; the static precedence keeps the
-        // expression reading (`using as T`) from taking these names at the start of a statement.
-        prec(1, seq(
-          kind,
-          alias($._using_keyword_declarator, $.variable_declarator),
-          repeat(seq(',', $.variable_declarator)),
-          $._semicolon,
-        )),
-      );
-    },
+    using_declaration: $ => usingDeclaration($, $._semicolon),
+
+    // A plain `for` initializer ends at a real `;`: the automatic semicolon is never inserted in a `for` header.
+    _for_using_declaration: $ => usingDeclaration($, ';'),
 
     _using_keyword_declarator: $ => seq(
       field('name', alias(choice('as', 'satisfies'), $.identifier)),
@@ -369,7 +359,11 @@ module.exports = grammar({
       'for',
       '(',
       choice(
-        field('initializer', choice($.lexical_declaration, $.variable_declaration, $.using_declaration)),
+        field('initializer', choice(
+          $.lexical_declaration,
+          $.variable_declaration,
+          alias($._for_using_declaration, $.using_declaration),
+        )),
         seq(field('initializer', $._expressions), ';'),
         field('initializer', $.empty_statement),
       ),
@@ -396,6 +390,9 @@ module.exports = grammar({
           $._lhs_expression,
           $.parenthesized_expression,
         )),
+        // `using` and a line break is an identifier, not a declaration (`for (using\nof y)`): the automatic semicolon
+        // there makes a declarator after the line break an error.
+        seq(field('left', alias('using', $.identifier)), $._automatic_semicolon),
         seq(
           field('kind', 'var'),
           field('left', choice(
@@ -1319,6 +1316,29 @@ module.exports = grammar({
     _semicolon: $ => choice($._automatic_semicolon, ';'),
   },
 });
+
+/**
+ * Creates a using declaration ending with the given semicolon rule
+ *
+ * @param {GrammarSymbols<string>} $
+ * @param {RuleOrLiteral} semicolon
+ *
+ * @returns {ChoiceRule}
+ */
+function usingDeclaration($, semicolon) {
+  const kind = field('kind', choice('using', seq('await', 'using')));
+  return choice(
+    seq(kind, commaSep1($.variable_declarator), semicolon),
+    // TypeScript reads `using as …` and `using satisfies …` as declarations; the static precedence keeps the
+    // expression reading (`using as T`) from taking these names at the start of a statement.
+    prec(1, seq(
+      kind,
+      alias($._using_keyword_declarator, $.variable_declarator),
+      repeat(seq(',', $.variable_declarator)),
+      semicolon,
+    )),
+  );
+}
 
 /**
  * Creates a rule to match one or more of the rules separated by a comma
