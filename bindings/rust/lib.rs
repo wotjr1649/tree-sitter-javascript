@@ -55,8 +55,13 @@ mod tests {
     #[test]
     fn test_can_load_grammar() {
         let mut parser = tree_sitter::Parser::new();
+        // set_language rejects a parser whose ABI the runtime does not support.
         parser
             .set_language(&super::LANGUAGE.into())
             .expect("Error loading JavaScript parser");
+
+        let tree = parser.parse("const x = 1;", None).unwrap();
+        assert_eq!(tree.root_node().kind(), "program");
+        assert!(!tree.root_node().has_error());
     }
 }
