@@ -14,6 +14,9 @@ origin's v0.25.0 is commit `44c892e` in this history, kept as `refs/upstream/v0.
   and `src/tree_sitter/*.h` are generated: edit the grammar, run `tree-sitter generate --abi 15 --js-runtime native`
   with CLI 0.27.2, commit all of them. `src/scanner.c` equals the origin's; go-treesitter applies its own ADR-0023
   JSX patch on top and keeps it there, not here.
+- `tree-sitter.json` `metadata.version` is compiled into `parser.c` (`.metadata`), so it stays `0.25.0` to keep the
+  baseline `src/` byte-identical to go-treesitter's output. Bumping it changes `parser.c` by those three lines; the
+  owner decides when, together with the first release.
 - The parser is ABI 15. Binding runtime lower bounds are the 0.25 line (Rust, Node, Python, Go, Swift) and CMake
   defaults to ABI 15; do not lower them without the owner's approval. Every binding test sets the language on a parser
   and parses a small input.

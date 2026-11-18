@@ -23,8 +23,9 @@ go-treesitter pinned before this move (`58404d8`) differs from it only in `.gith
 3. Own versions start at v1.0.0, which is exactly the baseline behaviour: regenerating `src/` with tree-sitter CLI
    0.27.2 (`--abi 15 --js-runtime native`) gives `src/parser.c`, `src/grammar.json`, `src/node-types.json` and the
    `src/tree_sitter` headers identical to what go-treesitter generates from the previous pin; `src/scanner.c` equals the
-   origin's (go-treesitter's ADR-0023 patch to it stays in go-treesitter). Manifest versions are 1.0.0; nothing is
-   tagged or published here. Later versions change behaviour only through fixes that start from a failing case.
+   origin's (go-treesitter's ADR-0023 patch to it stays in go-treesitter). Manifest versions are 1.0.0 except
+   `tree-sitter.json` `metadata.version`, which the generator compiles into `parser.c` (`.metadata`) and which stays
+   `0.25.0` so `src/` stays identical; nothing is tagged or published here. Later versions change behaviour only through fixes that start from a failing case.
 4. No registry publishing (npm, crates.io, PyPI) and no automated tagging or release workflow. Consumers pin commits.
 5. The grammar name `javascript`, the C symbol `tree_sitter_javascript`, node kinds and fields stay unless a release
    declares a breaking change (major version, CHANGELOG).
