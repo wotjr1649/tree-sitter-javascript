@@ -292,18 +292,21 @@ static bool scan_html_comment(TSLexer *lexer) {
 // After an `&`: is what follows the rest of an HTML character reference
 // (`&amp;`, `&#38;`, `&#x26;`), as the grammar's html_character_reference
 // token defines it? Consumes the name or number either way.
+// ASCII comparisons, not isw*: those match non-ASCII digits on some C runtimes.
 static bool scan_character_reference_tail(TSLexer *lexer) {
     unsigned length = 0;
     if (lexer->lookahead == '#') {
         advance(lexer);
         if (lexer->lookahead == 'x' || lexer->lookahead == 'X') {
             advance(lexer);
-            while (length < 6 && iswxdigit(lexer->lookahead)) {
+            while (length < 6 && ((lexer->lookahead >= '0' && lexer->lookahead <= '9') ||
+                                  (lexer->lookahead >= 'a' && lexer->lookahead <= 'f') ||
+                                  (lexer->lookahead >= 'A' && lexer->lookahead <= 'F'))) {
                 advance(lexer);
                 length++;
             }
         } else {
-            while (length < 5 && iswdigit(lexer->lookahead)) {
+            while (length < 5 && lexer->lookahead >= '0' && lexer->lookahead <= '9') {
                 advance(lexer);
                 length++;
             }

@@ -368,3 +368,154 @@ JSX bare ampersand (go-treesitter 0001): entities-attribute-and-expression
       (jsx_text)
       (jsx_closing_element
         (identifier)))))
+
+============================================================
+JSX character reference ASCII classes: fullwidth digit one
+============================================================
+
+<p>&#１;</p>;
+
+---
+
+(program
+  (expression_statement
+    (jsx_element
+      (jsx_opening_element
+        (identifier))
+      (jsx_text)
+      (jsx_closing_element
+        (identifier)))))
+
+============================================================
+JSX character reference ASCII classes: Arabic-Indic digit one
+============================================================
+
+<p>&#١;</p>;
+
+---
+
+(program
+  (expression_statement
+    (jsx_element
+      (jsx_opening_element
+        (identifier))
+      (jsx_text)
+      (jsx_closing_element
+        (identifier)))))
+
+============================================================
+JSX character reference ASCII classes: fullwidth hex letter F
+============================================================
+
+<p>&#xＦ;</p>;
+
+---
+
+(program
+  (expression_statement
+    (jsx_element
+      (jsx_opening_element
+        (identifier))
+      (jsx_text)
+      (jsx_closing_element
+        (identifier)))))
+
+============================================================
+JSX character reference ASCII classes: fullwidth hex digit one
+============================================================
+
+<p>&#x１;</p>;
+
+---
+
+(program
+  (expression_statement
+    (jsx_element
+      (jsx_opening_element
+        (identifier))
+      (jsx_text)
+      (jsx_closing_element
+        (identifier)))))
+
+============================================================
+JSX character reference ASCII classes: ASCII then non-ASCII digits
+============================================================
+
+<p>&#1１;</p>;
+<p>&#x1Ｆ;</p>;
+
+---
+
+(program
+  (expression_statement
+    (jsx_element
+      (jsx_opening_element
+        (identifier))
+      (jsx_text)
+      (jsx_closing_element
+        (identifier))))
+  (expression_statement
+    (jsx_element
+      (jsx_opening_element
+        (identifier))
+      (jsx_text)
+      (jsx_closing_element
+        (identifier)))))
+
+============================================================
+JSX character reference ASCII classes: non-ASCII letters after &
+============================================================
+
+<p>&ｂ;</p>;
+<p>&é;</p>;
+
+---
+
+(program
+  (expression_statement
+    (jsx_element
+      (jsx_opening_element
+        (identifier))
+      (jsx_text)
+      (jsx_closing_element
+        (identifier))))
+  (expression_statement
+    (jsx_element
+      (jsx_opening_element
+        (identifier))
+      (jsx_text)
+      (jsx_closing_element
+        (identifier)))))
+
+============================================================
+JSX character reference ASCII classes: ASCII references
+============================================================
+
+<p>&#1;</p>;
+<p>&#x1F;</p>;
+<p>&amp;</p>;
+
+---
+
+(program
+  (expression_statement
+    (jsx_element
+      (jsx_opening_element
+        (identifier))
+      (html_character_reference)
+      (jsx_closing_element
+        (identifier))))
+  (expression_statement
+    (jsx_element
+      (jsx_opening_element
+        (identifier))
+      (html_character_reference)
+      (jsx_closing_element
+        (identifier))))
+  (expression_statement
+    (jsx_element
+      (jsx_opening_element
+        (identifier))
+      (html_character_reference)
+      (jsx_closing_element
+        (identifier)))))
