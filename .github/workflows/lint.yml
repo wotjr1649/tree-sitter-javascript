@@ -2,12 +2,9 @@ name: Lint
 
 on:
   push:
-    branches: [master]
-    paths:
-      - grammar.js
+    branches: [main]
   pull_request:
-    paths:
-      - grammar.js
+  workflow_dispatch:
 
 jobs:
   lint:
@@ -19,7 +16,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           cache: npm
-          node-version: ${{vars.NODE_VERSION}}
+          node-version: ${{vars.NODE_VERSION || 'lts/*'}}
       - name: Install modules
         run: npm ci --legacy-peer-deps
       - name: Run ESLint

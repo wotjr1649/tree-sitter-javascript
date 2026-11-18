@@ -2,20 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [master]
-    paths:
-      - grammar.js
-      - src/**
-      - test/**
-      - bindings/**
-      - binding.gyp
+    branches: [main]
   pull_request:
-    paths:
-      - grammar.js
-      - src/**
-      - test/**
-      - bindings/**
-      - binding.gyp
+  workflow_dispatch:
 
 concurrency:
   group: ${{github.workflow}}-${{github.ref}}
@@ -36,17 +25,20 @@ jobs:
         uses: tree-sitter/setup-action/cli@v2
         with:
           tree-sitter-ref: v0.27.2
-      - name: Set up examples
+      - name: Verify generated sources
+        shell: bash
         run: |-
-          git config --global core.longpaths true
-          git clone https://github.com/npm/cli examples/cli --single-branch --depth=1 --filter=blob:none
+          tree-sitter generate --abi 15 --js-runtime native
+          git diff --exit-code -- src
       - name: Run tests
         uses: tree-sitter/parser-test-action@v2
         with:
+          generate: false
           test-rust: true
           test-node: true
           test-python: true
           test-go: true
+          go-version: "1.23"
           test-swift: true
       - name: Parse examples
         uses: tree-sitter/parse-action@v4
