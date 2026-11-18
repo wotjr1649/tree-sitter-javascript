@@ -2875,34 +2875,6 @@
         {
           "type": "SYMBOL",
           "name": "null"
-        },
-        {
-          "type": "STRING",
-          "value": "get"
-        },
-        {
-          "type": "STRING",
-          "value": "set"
-        },
-        {
-          "type": "STRING",
-          "value": "async"
-        },
-        {
-          "type": "STRING",
-          "value": "await"
-        },
-        {
-          "type": "STRING",
-          "value": "static"
-        },
-        {
-          "type": "STRING",
-          "value": "export"
-        },
-        {
-          "type": "STRING",
-          "value": "let"
         }
       ]
     },

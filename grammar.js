@@ -688,11 +688,12 @@ module.exports = grammar({
     ),
 
     // `const` and `extends` are left out: in TSX they would conflict with the type parameters of a generic arrow
-    // function (`<const T,>() => {}`, `<T extends U>() => {}`). Attribute names add `const` back.
+    // function (`<const T,>() => {}`, `<T extends U>() => {}`). Attribute names add `const` back. Contextual keywords
+    // are left out too: they already lex as identifier here, and as keyword tokens `<async.A />` would fail, because
+    // a member's object takes only identifier.
     _jsx_keyword_identifier: $ => choice(
       ...RESERVED_WORDS.filter(word => !['this', 'super', 'true', 'false', 'null', 'const', 'extends'].includes(word)),
       $.this, $.super, $.true, $.false, $.null,
-      ...CONTEXTUAL_KEYWORDS,
     ),
 
     nested_identifier: $ => prec('member', seq(
