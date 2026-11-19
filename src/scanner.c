@@ -12,6 +12,7 @@ enum TokenType {
     ESCAPE_SEQUENCE,
     REGEX_PATTERN,
     JSX_TEXT,
+    RESTRICTED_KEYWORD, // Never returned: only its validity is read (see grammar.js).
 };
 
 void *tree_sitter_javascript_external_scanner_create() { return NULL; }
@@ -58,7 +59,7 @@ typedef enum {
 /**
  * @param consume If false, only consume enough to check if comment indicates semicolon-legality
  */
-static WhitespaceResult scan_whitespace_and_comments(TSLexer *lexer, bool *scanned_comment, bool consume) {
+static WhitespaceResult scan_whitespace_and_comments(TSLexer *lexer, bool *scanned_comment, bool consume, bool cr_ends) {
     bool saw_block_newline = false;
 
     for (;;) {
@@ -91,7 +92,8 @@ static WhitespaceResult scan_whitespace_and_comments(TSLexer *lexer, bool *scann
 
                             break;
                         }
-                    } else if (lexer->lookahead == '\n' || lexer->lookahead == 0x2028 || lexer->lookahead == 0x2029) {
+                    } else if (lexer->lookahead == '\n' || lexer->lookahead == 0x2028 || lexer->lookahead == 0x2029 ||
+                               (cr_ends && lexer->lookahead == '\r')) {
                         saw_block_newline = true;
                         skip(lexer);
                     } else {
@@ -107,7 +109,7 @@ static WhitespaceResult scan_whitespace_and_comments(TSLexer *lexer, bool *scann
     }
 }
 
-static bool scan_automatic_semicolon(TSLexer *lexer, bool comment_condition, bool *scanned_comment) {
+static bool scan_automatic_semicolon(TSLexer *lexer, bool comment_condition, bool lone_cr_ends, bool *scanned_comment) {
     lexer->result_symbol = AUTOMATIC_SEMICOLON;
     lexer->mark_end(lexer);
 
@@ -117,7 +119,7 @@ static bool scan_automatic_semicolon(TSLexer *lexer, bool comment_condition, boo
         }
 
         if (lexer->lookahead == '/') {
-            WhitespaceResult result = scan_whitespace_and_comments(lexer, scanned_comment, false);
+            WhitespaceResult result = scan_whitespace_and_comments(lexer, scanned_comment, false, lone_cr_ends);
             if (result == REJECT) {
                 return false;
             }
@@ -135,7 +137,10 @@ static bool scan_automatic_semicolon(TSLexer *lexer, bool comment_condition, boo
             return true;
         }
 
-        if (lexer->lookahead == '\n' || lexer->lookahead == 0x2028 || lexer->lookahead == 0x2029) {
+        // After `return`, `break`, `continue` and a label a CR is a line terminator on its own (before an LF, the LF
+        // follows), and so is one in a block comment.
+        if (lexer->lookahead == '\n' || lexer->lookahead == 0x2028 || lexer->lookahead == 0x2029 ||
+            (lone_cr_ends && lexer->lookahead == '\r')) {
             break;
         }
 
@@ -148,7 +153,7 @@ static bool scan_automatic_semicolon(TSLexer *lexer, bool comment_condition, boo
 
     skip(lexer);
 
-    if (scan_whitespace_and_comments(lexer, scanned_comment, true) == REJECT) {
+    if (scan_whitespace_and_comments(lexer, scanned_comment, true, lone_cr_ends) == REJECT) {
         return false;
     }
 
@@ -390,7 +395,7 @@ bool tree_sitter_javascript_external_scanner_scan(void *payload, TSLexer *lexer,
 
     if (valid_symbols[AUTOMATIC_SEMICOLON]) {
         bool scanned_comment = false;
-        bool ret = scan_automatic_semicolon(lexer, !valid_symbols[LOGICAL_OR], &scanned_comment);
+        bool ret = scan_automatic_semicolon(lexer, !valid_symbols[LOGICAL_OR], valid_symbols[RESTRICTED_KEYWORD], &scanned_comment);
         if (!ret && !scanned_comment && valid_symbols[TERNARY_QMARK] && lexer->lookahead == '?') {
             return scan_ternary_qmark(lexer);
         }

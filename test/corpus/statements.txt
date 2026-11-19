@@ -360,6 +360,140 @@ export { "string import" as "string export" } from 'foo';
       (string_fragment))))
 
 ============================================
+Anonymous export default declarations end without a semicolon
+============================================
+
+export default function () {};
+export default class {};
+export default function* () {}
+export default async function () {}
+export default function () {}{}
+export default class extends A {}if (x) {}
+export default function () {}
+(1);
+export default class {}
+[1];
+export default class {} class B {}
+
+---
+
+(program
+  (export_statement
+    value: (function_expression
+      parameters: (formal_parameters)
+      body: (statement_block)))
+  (empty_statement)
+  (export_statement
+    value: (class
+      body: (class_body)))
+  (empty_statement)
+  (export_statement
+    value: (generator_function
+      parameters: (formal_parameters)
+      body: (statement_block)))
+  (export_statement
+    value: (function_expression
+      parameters: (formal_parameters)
+      body: (statement_block)))
+  (export_statement
+    value: (function_expression
+      parameters: (formal_parameters)
+      body: (statement_block)))
+  (statement_block)
+  (export_statement
+    value: (class
+      (class_heritage
+        (identifier))
+      body: (class_body)))
+  (if_statement
+    condition: (parenthesized_expression
+      (identifier))
+    consequence: (statement_block))
+  (export_statement
+    value: (function_expression
+      parameters: (formal_parameters)
+      body: (statement_block)))
+  (expression_statement
+    (parenthesized_expression
+      (number)))
+  (export_statement
+    value: (class
+      body: (class_body)))
+  (expression_statement
+    (array
+      (number)))
+  (export_statement
+    value: (class
+      body: (class_body)))
+  (class_declaration
+    name: (identifier)
+    body: (class_body)))
+
+============================================
+Export default expressions keep the semicolon
+============================================
+
+export default (function () {});
+export default async () => {};
+export default (class {}).x;
+
+---
+
+(program
+  (export_statement
+    value: (parenthesized_expression
+      (function_expression
+        parameters: (formal_parameters)
+        body: (statement_block))))
+  (export_statement
+    value: (arrow_function
+      parameters: (formal_parameters)
+      body: (statement_block)))
+  (export_statement
+    value: (member_expression
+      object: (parenthesized_expression
+        (class
+          body: (class_body)))
+      property: (property_identifier))))
+
+============================================
+Export followed by a line break
+============================================
+
+export
+{ a };
+export
+var b;
+export
+default 1;
+export
+{} from 'x';
+export
+{}
+{}
+
+---
+
+(program
+  (export_statement
+    (export_clause
+      (export_specifier
+        name: (identifier))))
+  (export_statement
+    declaration: (variable_declaration
+      (variable_declarator
+        name: (identifier))))
+  (export_statement
+    value: (number))
+  (export_statement
+    (export_clause)
+    source: (string
+      (string_fragment)))
+  (export_statement
+    (export_clause))
+  (statement_block))
+
+============================================
 Decorators before exports
 ============================================
 
@@ -1031,6 +1165,59 @@ of y);
     body: (empty_statement)))
 
 ============================================
+Using in a for…of head is an identifier before 'of'
+============================================
+
+for (using of of[0]) {}
+for (using of of [1, 2]);
+for (await using of of y);
+for (let of of y);
+
+---
+
+(program
+  (for_in_statement
+    left: (identifier)
+    right: (subscript_expression
+      object: (identifier)
+      index: (number))
+    body: (statement_block))
+  (for_in_statement
+    left: (identifier)
+    right: (subscript_expression
+      object: (identifier)
+      index: (sequence_expression
+        (number)
+        (number)))
+    body: (empty_statement))
+  (for_in_statement
+    left: (identifier)
+    right: (identifier)
+    body: (empty_statement))
+  (for_in_statement
+    left: (identifier)
+    right: (identifier)
+    body: (empty_statement)))
+
+============================================
+A using declaration cannot bind 'of' in a for…of head
+:error
+============================================
+
+for (using of of y);
+
+---
+
+============================================
+A using declaration cannot bind 'of' in a for…in head
+:error
+============================================
+
+for (using of in y);
+
+---
+
+============================================
 Line break after using in a plain for loop
 :error
 ============================================
@@ -1678,3 +1865,18 @@ let x = { a: //  3
           (property_identifier)
           (comment)
           (number))))))
+
+============================================
+Hash bang lines end at any line terminator
+============================================
+
+#!/usr/bin/env node a b
+
+---
+
+(program
+  (hash_bang_line)
+  (expression_statement
+    (identifier))
+  (expression_statement
+    (identifier)))
