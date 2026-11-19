@@ -459,3 +459,55 @@ instanceof_d
     (identifier))
   (expression_statement
     (identifier)))
+
+============================================================
+White space after in or instanceof on the next line
+============================================================
+
+a
+in﻿b
+c /*
+*/ instanceof﻿d
+e
+iné
+
+---
+
+(program
+  (expression_statement
+    (binary_expression
+      left: (identifier)
+      right: (identifier)))
+  (expression_statement
+    (binary_expression
+      left: (identifier)
+      (comment)
+      right: (identifier)))
+  (expression_statement
+    (identifier))
+  (expression_statement
+    (identifier)))
+
+============================================================
+Comments before an async arrow after a line break
+============================================================
+
+async /*
+*/ x /*c*/ => x
+async /*
+*/ y => y
+
+---
+
+(program
+  (expression_statement
+    (arrow_function
+      (comment)
+      parameter: (identifier)
+      (comment)
+      body: (identifier)))
+  (expression_statement
+    (arrow_function
+      (comment)
+      parameter: (identifier)
+      body: (identifier))))

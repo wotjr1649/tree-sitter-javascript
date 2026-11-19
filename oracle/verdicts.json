@@ -32,7 +32,7 @@
    }
   },
   "cases_file": "cases.jsonl",
-  "cases_sha256": "5ff8fbed981afb8e64c743d51fb40d1cca14ecf6da1431d477604551192dcbcc",
+  "cases_sha256": "4a7d1ede919c8ac3be9fb0b7f0ca6b34195d9159a21011701d02d16f4f7ffb5f",
   "runner": "run.mjs",
   "runner_sha256": "06cfe49cd56d0bac9b5c672b1f62fc0f44b37de02c0a2bf04c557e5354c5c24d"
  },
@@ -3321,6 +3321,51 @@
       "at": 0
      }
     ]
+   }
+  },
+  {
+   "id": "j7/in-before-bom-operand",
+   "sha256": "3b21d682467ce172ff9b7ab09197fb875a19b8316e9acb49bd60bef37793aeac",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j7/comment-instanceof-before-bom-operand",
+   "sha256": "88fdb4060ef3d927cc2e05e876945159163fa1ca2504853a32df230a8c2152cf",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j7/in-prefix-unicode-identifier",
+   "sha256": "39e25c7767287f7ca9015f437d433ddf8ecce7f244052545bbd509a29d0cd378",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
    }
   }
  ]
