@@ -2,7 +2,8 @@
 //   node cluster.mjs [--dir build/discovery]
 // Reads DIR/min.jsonl (A1, valid input that tree-sitter does not parse clean), DIR/min-reject.jsonl (B1, grammar
 // errors that tree-sitter accepts) and DIR/min-structure.jsonl (S, valid input with a clean tree whose ranges disagree with Babel). A reproducer goes to the first rule whose regular expression matches its text; the
-// rest are listed as `other`, grouped by identical text. The rules are the author's judgement (README.md).
+// rest are listed as `other`, grouped by identical text. The rules are the author's judgement (README.md). Counts are per original
+// input (a reduction can drift to another defect of the same kind), so a cluster is a candidate cause, not a confirmed one.
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -36,7 +37,7 @@ for (const [kind, file, ruleList] of [["accept", "min.jsonl", rules.accept], ["r
 }
 out.sort((a, b) => (a.kind === b.kind ? b.count - a.count : a.kind < b.kind ? -1 : 1));
 writeFileSync(join(dir, "clusters.json"), JSON.stringify(out, null, 1) + "\n");
-const md = [];
+const md = ["Counts are per original input, and a cluster is a candidate cause: the reproducer of an input is a reduction under a predicate that keeps the original's cause (README.md), but a reduction can still drift to another defect. Treat a count as a number of inputs, not of confirmed distinct causes, until the originals have been checked against their reproducers."];
 const TITLE = { accept: "A1: valid input, tree-sitter not clean", reject: "B1: grammar error accepted by tree-sitter", structure: "S: valid input, clean tree, but Babel and the tree disagree on a range (structure.mjs)" };
 for (const kind of ["accept", "reject", "structure"]) {
   if (!out.some((x) => x.kind === kind)) continue;

@@ -3,7 +3,8 @@
 // accept (default; defects.jsonl -> min.jsonl): the predicate keeps all three of: the tree is still not clean, Babel still
 // accepts and oxc still accepts (same source type, semantic errors counted), so a reproducer is always valid JavaScript.
 // reject (rejects.jsonl -> min-reject.jsonl, the B1 inputs): the tree has no ERROR/MISSING while Babel and oxc both still
-// report a syntax error, so a reproducer is always a grammar error that this grammar misses. The predicates are in
+// report a syntax error, so a reproducer is always a grammar error that this grammar misses. Each predicate also keeps the
+// original input's cause (A1: kind and parent of the first problem node; B1: both messages and the token class at the error). The predicates are in
 // predicate.mjs, the reduction in reduce.mjs (a window around the first error for big files, then ddmin over lines, then
 // over tokens, then a simplification pass). One `tsparse -serve` child per run.
 import { appendFileSync, readFileSync, writeFileSync } from "node:fs";
@@ -12,6 +13,7 @@ import { fileURLToPath } from "node:url";
 import { babel, oxc } from "./tools.mjs";
 import { makePredicate } from "./predicate.mjs";
 import { reduce } from "./reduce.mjs";
+import { readVerified } from "./inputs.mjs";
 import { startTs } from "./tsserve.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -31,7 +33,7 @@ const pred = makePredicate(mode, { ts: tsAsk, babel, oxc });
 let calls = 0;
 
 async function minimize(src, type, errRow) {
-  const cause = pred.cause(src, type);
+  const cause = await pred.cause(src, type);
   const test = (s) => (calls++, pred.test(s, type, cause));
   if (!(await test(src))) return { src, ok: false, why: "the input is not a reproducer for this predicate" };
   const cur = await reduce(src, test, { budgetMs, errRow });
@@ -45,9 +47,17 @@ const resultsById = new Map(readFileSync(join(dirname(defectsPath), "results.jso
 writeFileSync(outPath, "");
 const t0 = Date.now();
 let done = 0;
+let inputErrors = 0;
 for (const d of defects) {
   const res = resultsById.get(d.id);
-  const text = d.prefix + readFileSync(join(data, d.id), "utf8");
+  let text;
+  try {
+    text = d.prefix + readVerified(join(data, d.id), d.sha256);
+  } catch (e) {
+    appendFileSync(outPath, JSON.stringify({ id: d.id, set: d.set, type: d.type, ok: false, why: `input-error: ${e.message}`, group: res.group }) + "\n");
+    inputErrors++;
+    continue;
+  }
   const t1 = Date.now();
   const c0 = calls;
   const r = await minimize(text, d.type, res.ts.row + (d.prefix ? 1 : 0));
@@ -56,4 +66,5 @@ for (const d of defects) {
   if (++done % 20 === 0) console.error(`shard ${shard}: ${done}/${defects.length}, ${((Date.now() - t0) / 1000).toFixed(0)} s`);
 }
 ts.close();
+if (inputErrors) { console.error(`minimize: ${inputErrors} inputs were unreadable or changed since collect`); process.exitCode = 3; }
 console.log(`minimize shard ${shard}/${shards}: ${done} inputs, ${calls} predicate calls, ${((Date.now() - t0) / 1000).toFixed(0)} s`);

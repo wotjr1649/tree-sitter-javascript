@@ -1,5 +1,6 @@
 // Step 1 of the discovery run: enumerate the inputs and ask Babel and oxc about each one.
-//   node collect.mjs [--data DIR] [--out FILE] [--only test262|npm] [--limit N]
+//   node collect.mjs [--data DIR] [--out FILE] [--only test262|babel-jsx|npm] [--limit N] [--ids FILE]
+// --ids takes a file of input ids (one per line, paths under DIR) and collects only those: a small run to compare with an earlier one.
 // Writes one JSON record per input to FILE (default build/discovery/oracle.jsonl); see README.md for the fields.
 // Tool versions and options are those of ../package.json and ../run.mjs (the oracle's pins), so the two stay one oracle.
 import { createHash } from "node:crypto";
@@ -7,6 +8,7 @@ import { createWriteStream, existsSync, readFileSync, readdirSync, statSync } fr
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { babel, oxc } from "./tools.mjs";
+import { checkoutDiffers } from "./pinned.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 
@@ -16,6 +18,8 @@ const data = resolve(flag("--data", join(here, "../../build/discovery/data")));
 const outPath = resolve(flag("--out", join(here, "../../build/discovery/oracle.jsonl")));
 const only = flag("--only", "");
 const limit = Number(flag("--limit", "0"));
+const idsFile = flag("--ids", "");
+const ids = idsFile ? new Set(readFileSync(resolve(idsFile), "utf8").split("\n").map((l) => l.trim()).filter(Boolean)) : null;
 const manifest = JSON.parse(readFileSync(join(here, "manifest.json"), "utf8"));
 
 const sha256 = (b) => createHash("sha256").update(b).digest("hex");
@@ -32,6 +36,12 @@ function* walk(dir) {
 
 // ---- test262 -------------------------------------------------------------------------------------------------------
 const t262 = join(data, "test262");
+// the files are judged as the pinned commits have them (fetch.mjs checks this too; a CRLF checkout would change the bytes)
+for (const [repo, commit, paths] of [[t262, manifest.test262.commit, ["features.txt", ...manifest.test262.roots]], [join(data, "babel-fixtures"), manifest.babel_jsx.commit, [manifest.babel_jsx.path]]]) {
+  if (!existsSync(repo)) continue;
+  const diff = checkoutDiffers(repo, commit, paths);
+  if (diff.length) { console.error(`collect: ${diff.length} files of ${repo} differ from the blobs of ${commit} (first: ${diff.slice(0, 3).join(", ")}); fetch again`); process.exit(2); }
+}
 const unstable = new Set();
 {
   const lines = readFileSync(join(t262, "features.txt"), "utf8").split("\n");
@@ -89,7 +99,7 @@ function* npmInputs() {
       if (!/\.(js|jsx|mjs|cjs)$/.test(p)) continue;
       const inPkg = relative(root, p).replaceAll("\\", "/");
       if (pkg.include && !pkg.include.some((i) => inPkg.startsWith(i))) continue;
-      yield { set: "npm", pkg: `${pkg.name}@${pkg.version}`, abs: p, rel: relative(data, p).replaceAll("\\", "/"), inPkg };
+      yield { set: "npm", pkg: `${pkg.name}@${pkg.version}`, abs: p, rel: relative(data, p).replaceAll("\\", "/") };
     }
   }
 }
@@ -161,6 +171,7 @@ const tally = {};
 for (const gen of [test262Inputs, babelJsxInputs, npmInputs]) {
   for (const inp of gen()) {
     if (only && inp.set !== only) continue;
+    if (ids && !ids.has(inp.rel)) continue;
     if (limit && n >= limit) break;
     const rec = describe(inp);
     out.write(JSON.stringify(rec) + "\n");

@@ -34,3 +34,9 @@ test("the deciding source type is the first one both tools accept", () => {
   const rec = { truth: "unknown", b: { script: { c: "syntax" }, module: { c: "accept" } }, o: { script: { c: "syntax" }, module: { c: "accept" } } };
   assert.equal(classify(rec, broken).type, "module");
 });
+
+test("an input that was unreadable or changed since collect is X, never a defect, whatever the tree says", () => {
+  const bad = { bad: "hash-mismatch", clean: false, err: false };
+  assert.equal(classify({ truth: "valid", ...verdict("accept", "accept") }, bad).cat, "X");
+  assert.equal(classify({ truth: "invalid", ...verdict("syntax", "syntax") }, { ...bad, err: true }).cat, "X");
+});

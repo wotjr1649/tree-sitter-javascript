@@ -1,7 +1,7 @@
 // Reduce each input of structure.jsonl (a range mismatch between Babel's AST and this grammar's tree) to a short valid reproducer.
 //   node structure-min.mjs [--in FILE] [--out FILE] [--data DIR] [--oracle FILE] [--tsparse BIN] [--shard i/n] [--budget-s 20] [--limit N]
 // The predicate (predicate.mjs, mode structure) keeps: tree-sitter tree clean, Babel and oxc both accept, and a mismatch with the
-// same side, family and kind as the input's first mismatch. Reduction is reduce.mjs, as for the other modes.
+// same side, family, kind and parent kind as the input's first mismatch. An input whose sha256 is no longer the recorded one is `ok: false`. Reduction is reduce.mjs, as for the other modes.
 // Writes OUT (default build/structure/min-structure.jsonl): id, set, type, min, ok, the mismatches of the reduced text.
 import { appendFileSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
@@ -10,7 +10,7 @@ import { babel, oxc } from "./tools.mjs";
 import { makePredicate } from "./predicate.mjs";
 import { reduce } from "./reduce.mjs";
 import { makeChecker } from "./structure-check.mjs";
-import { readPrefixes } from "./inputs.mjs";
+import { readPrefixes, readVerified } from "./inputs.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
@@ -40,9 +40,17 @@ writeFileSync(outPath, "");
 const t0 = Date.now();
 let done = 0;
 let calls = 0;
+let inputErrors = 0;
 for (const r of rows) {
-  const text = r.set === "corpus" || r.set === "files" ? null : (prefixes.get(r.id) ?? "") + readFileSync(join(data, r.id), "utf8");
-  if (text === null) continue; // corpus/files runs are small: their inputs are already short
+  if (r.set === "corpus" || r.set === "files") continue; // corpus/files runs are small: their inputs are already short
+  let text;
+  try {
+    text = (prefixes.get(r.id) ?? "") + readVerified(join(data, r.id), r.sha256);
+  } catch (e) {
+    appendFileSync(outPath, JSON.stringify({ id: r.id, set: r.set, type: r.type, ok: false, why: `input-error: ${e.message}`, min: "", diffs: [] }) + "\n");
+    inputErrors++;
+    continue;
+  }
   const cause = pred.cause(r.diffs[0]);
   const test = (s) => (calls++, pred.test(s, r.type, cause));
   let min = text;
@@ -57,4 +65,5 @@ for (const r of rows) {
   if (++done % 25 === 0) console.error(`shard ${shard}: ${done}/${rows.length}, ${((Date.now() - t0) / 1000).toFixed(0)} s`);
 }
 checker.close();
+if (inputErrors) { console.error(`structure-min: ${inputErrors} inputs were unreadable or changed since collect`); process.exitCode = 3; }
 console.log(`structure-min shard ${shard}/${shards}: ${done} inputs, ${calls} predicate calls, ${((Date.now() - t0) / 1000).toFixed(0)} s`);

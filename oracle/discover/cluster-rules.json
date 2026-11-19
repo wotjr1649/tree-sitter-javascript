@@ -30,7 +30,7 @@
     {"id": "B-hashbang-position", "re": "#!", "construct": "hashbang accepted after whitespace or a comment (only valid at the very start)", "issues": [], "tree_change": "n/a", "difficulty": "low"},
     {"id": "B-number-then-ident", "re": "^3in", "construct": "numeric literal directly followed by an identifier start (`3in[]`)", "issues": [], "tree_change": "n/a", "difficulty": "low"},
     {"id": "B-line-terminator-restriction", "re": "(?=[\\s\\S]*\\n)[\\s\\S]*(=>|yield|async)", "construct": "[no LineTerminator here] restrictions accepted: before `=>`, after `async`, between `yield` and `*`", "issues": [], "tree_change": "n/a", "difficulty": "medium"},
-    {"id": "B-arrow-class-heritage", "re": "class extends", "construct": "arrow function (or `async`-prefixed) as a class heritage without parentheses", "issues": [], "tree_change": "n/a", "difficulty": "low"},
+    {"id": "B-arrow-class-heritage", "re": "class( a)? extends", "construct": "arrow function (or `async`-prefixed) as a class heritage without parentheses", "issues": [], "tree_change": "n/a", "difficulty": "low"},
     {"id": "B-coalesce-mix", "re": "\\?\\?", "construct": "`??` mixed with `||` or `&&` without parentheses", "issues": [], "tree_change": "n/a", "difficulty": "low"},
     {"id": "B-arrow-body-operand", "re": "=>\\{\\}=|in\\(\\)=>", "construct": "arrow function used as a binary operand (`()=>{} == a`, `()=>{} = a`, `a in () => {}`)", "issues": [], "tree_change": "n/a", "difficulty": "low"},
     {"id": "B-yield-operand", "re": "yield\\?", "construct": "`yield` as the condition of `?:`", "issues": [], "tree_change": "n/a", "difficulty": "low"},

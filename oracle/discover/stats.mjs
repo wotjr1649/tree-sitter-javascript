@@ -1,4 +1,4 @@
-// Tables for the report: counts per set, test262 root, skip reason and npm package. Reads build/discovery/{oracle,results}.jsonl.
+// Tables for the report: counts per set, test262 root, skip reason and npm package. Reads build/discovery/results.jsonl.
 //   node stats.mjs [--dir build/discovery]
 import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
@@ -8,24 +8,22 @@ const here = dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
 const dir = resolve(args.includes("--dir") ? args[args.indexOf("--dir") + 1] : join(here, "../../build/discovery"));
 const jsonl = (f) => readFileSync(join(dir, f), "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l));
-const oracle = new Map(jsonl("oracle.jsonl").map((r) => [r.id, r]));
 const res = jsonl("results.jsonl");
 const data = join(dir, "data");
 const inc = (o, k, n = 1) => (o[k] = (o[k] ?? 0) + n);
 const stats = { sets: {}, test262Roots: {}, skipReasons: {}, packages: {} };
 
 for (const r of res) {
-  const o = oracle.get(r.id);
   if (r.skip) { inc(stats.skipReasons, r.skip.replace(/:.*/, "")); continue; }
-  const s = (stats.sets[r.set] ??= { inputs: 0, bytes: 0, valid: 0, invalid: 0, unknown: 0, A1: 0, A2: 0, B1: 0, B2: 0, B3: 0, C: 0, T: 0, ok: 0 });
+  const s = (stats.sets[r.set] ??= { inputs: 0, bytes: 0, valid: 0, invalid: 0, unknown: 0, A1: 0, A2: 0, B1: 0, B2: 0, B3: 0, C: 0, T: 0, X: 0, ok: 0 });
   s.inputs++; s.bytes += r.size; s[r.truth]++; s[r.cat]++;
   if (r.set === "test262") {
     const root = r.id.split("/").slice(1, 3).join("/");
-    const t = (stats.test262Roots[root] ??= { inputs: 0, A1: 0, A2: 0, B1: 0, B2: 0, B3: 0, C: 0, ok: 0 });
+    const t = (stats.test262Roots[root] ??= { inputs: 0, A1: 0, A2: 0, B1: 0, B2: 0, B3: 0, C: 0, T: 0, X: 0, ok: 0 });
     t.inputs++; t[r.cat]++;
   }
   if (r.set === "npm") {
-    const p = (stats.packages[r.pkg] ??= { files: 0, bytes: 0, valid: 0, invalid: 0, jsxLike: 0, clean: 0, invalidFiles: [] });
+    const p = (stats.packages[r.pkg] ??= { files: 0, bytes: 0, valid: 0, invalid: 0, unknown: 0, jsxLike: 0, clean: 0, invalidFiles: [] });
     p.files++; p.bytes += r.size; p[r.truth]++;
     if (r.ts.clean) p.clean++;
     if (r.truth === "invalid") p.invalidFiles.push(r.id.replace(/^pkgs\/[^/]+\/package\//, ""));

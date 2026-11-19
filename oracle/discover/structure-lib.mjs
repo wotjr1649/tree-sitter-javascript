@@ -103,11 +103,14 @@ export function wantedIds(kinds) {
 const HEAD_PARENT = new Set(["if_statement", "while_statement", "do_statement", "switch_statement", "with_statement"]);
 
 // dump: tsparse's flat quintuples (kind id, start, end, parent index, field id); kinds/fields: its id tables.
-// Returns {items: [[f, s, e, kind, parentKind]...], lists: Map(ownerKey -> statement count)}.
+// Returns {items: [[f, s, e, kind, parentKind]...], lists: Map(ownerKey -> statement count)}. An owner of a statement list
+// (program, block, static block, switch case) gets its entry, with 0, the moment it is met; its key is built from the same
+// (trimmed) range as its item, as on Babel's side (ownerKey), so that an empty or odd owner is compared as well.
 export function tsItems(dump, kinds, fields, buf, norm = {}) {
   const bump = (k) => (norm[k] = (norm[k] ?? 0) + 1);
   const items = [];
   const lists = new Map();
+  const owner = new Map(); // dump index -> list key
   const n = dump.length / 5;
   const cm = new Map(); // comment end -> start
   for (let i = 0; i < n; i++) if (COMMENT.has(kinds[dump[i * 5]])) cm.set(dump[i * 5 + 2], dump[i * 5 + 1]);
@@ -117,9 +120,16 @@ export function tsItems(dump, kinds, fields, buf, norm = {}) {
     const pk = p >= 0 ? kinds[dump[p * 5]] : "";
     const field = fields[dump[i * 5 + 4]] ?? "";
     let f = T_FAMILY[kind];
+    if (kind === "program") { owner.set(i, "program"); lists.set("program", 0); }
     if (!f) continue;
     if ((kind === "expression_statement" || kind === "empty_statement") && pk === "for_statement" && field !== "body") { bump("forHeaderStatement"); continue; }
-    if (kind === "statement_block" && pk === "class_static_block") { bump("staticBlockBlock"); continue; } // Babel's StaticBlock has no block inside
+    if (kind === "statement_block" && pk === "class_static_block") { // Babel's StaticBlock has no block inside: its statements are the static block's
+      bump("staticBlockBlock");
+      const key = ownerKey("static_block", dump[p * 5 + 1], dump[p * 5 + 2]);
+      owner.set(i, key);
+      lists.set(key, 0);
+      continue;
+    }
     if (kind === "spread_element" && pk.startsWith("jsx_")) { bump("jsxSpread"); continue; } // Babel: JSXSpreadAttribute/JSXSpreadChild, braces included
     if (kind === "parenthesized_expression" && HEAD_PARENT.has(pk) && p >= 0) { bump("headParen"); continue; }
     if (kind === "object" && pk === "import_statement") { bump("importAttributes"); continue; } // `with { type: "json" }` is an object here
@@ -128,16 +138,18 @@ export function tsItems(dump, kinds, fields, buf, norm = {}) {
     let e = dump[i * 5 + 2];
     if (STRIP(f)) e = trimEnd(buf, s, e, cm);
     items.push([f, s, e, kind, pk]);
-    if (f.startsWith("S:") && p >= 0) {
-      const ok = kinds[dump[p * 5]];
-      if (ok === "program" || ok === "statement_block" || ok === "switch_case" || ok === "switch_default") {
-        const key = ok === "program" ? "program" : `${ok === "switch_default" ? "switch_case" : ok}:${dump[p * 5 + 1]}:${dump[p * 5 + 2]}`;
-        lists.set(key, (lists.get(key) ?? 0) + 1);
-      }
+    if (f === "S:block" || f === "M:case") {
+      const key = ownerKey(f === "S:block" ? "statement_block" : "switch_case", s, e);
+      owner.set(i, key);
+      lists.set(key, 0);
     }
+    if (f.startsWith("S:") && owner.has(p)) lists.set(owner.get(p), lists.get(owner.get(p)) + 1);
   }
   return { items, lists };
 }
+
+// The key of a statement-list owner on either side: its kind name and its (trimmed) byte range; the program has no range.
+const ownerKey = (name, s, e) => `${name}:${s}:${e}`;
 
 const STRIP = (f) => (f.startsWith("S:") && f !== "S:empty") || f === "M:field" || f === "M:case";
 // The end of a statement or field: without trailing white space and comments (this grammar keeps a trailing comment
@@ -203,10 +215,8 @@ export function babelItems(file, src, buf, norm = {}) {
     const [node, parent, key] = stack.pop();
     const type = node.type;
     let f = B_FAMILY[type];
-    if (node.type === "Program") {
-      const cnt = node.body.length + (node.directives?.length ?? 0);
-      lists.set("program", cnt);
-    }
+    if (type === "Program") lists.set("program", node.body.length + (node.directives?.length ?? 0));
+    if (type === "StaticBlock") lists.set(ownerKey("static_block", at(node.start), at(node.end)), node.body.length);
     if (f) {
       const pt = parent?.type ?? "";
       let drop = false;
@@ -223,11 +233,10 @@ export function babelItems(file, src, buf, norm = {}) {
         if (STRIP(f)) e = trimEnd(buf, s, e, cm);
         items.push([f, s, e, type, pt]);
       }
-      if (f === "S:block" || type === "SwitchCase") {
+      if (f === "S:block" || type === "SwitchCase") { // the key is the item's range (the one just pushed), as on the grammar's side
+        const [, s, e] = items[items.length - 1];
         const list = type === "SwitchCase" ? node.consequent : node.body;
-        const cnt = list.length + (node.directives?.length ?? 0);
-        const keyName = type === "SwitchCase" ? "switch_case" : "statement_block";
-        lists.set(`${keyName}:${at(node.start)}:${at(node.end)}`, cnt);
+        lists.set(ownerKey(type === "SwitchCase" ? "switch_case" : "statement_block", s, e), list.length + (node.directives?.length ?? 0));
       }
     }
     for (const k of Object.keys(node)) {

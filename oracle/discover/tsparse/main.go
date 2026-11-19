@@ -6,10 +6,13 @@
 //	tsparse -serve                                                 reads {"s":"source"} lines, answers {"e":..,"at":..}
 //
 // Offsets are UTF-8 bytes of the file (a `prefix` of the record is parsed but not counted). See README.md.
+// A file that cannot be read, or whose sha256 is not the record's, is not parsed: its result has `bad` set, and the exit code is 3.
 package main
 
 import (
 	"bufio"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -30,6 +33,7 @@ type record struct {
 	ID     string `json:"id"`
 	Skip   string `json:"skip"`
 	Prefix string `json:"prefix"`
+	Sha256 string `json:"sha256"` // of the file bytes, as collect.mjs judged them
 }
 
 // Result is one parse. Err means an ERROR or MISSING node or has_error; Clean is the stricter faithful-tree rule.
@@ -39,6 +43,7 @@ type Result struct {
 	Clean   bool   `json:"clean"`
 	Err     bool   `json:"err"`
 	Timeout bool   `json:"timeout,omitempty"`
+	Bad     string `json:"bad,omitempty"`     // "read-error" or "hash-mismatch": not the input collect judged, nothing was parsed
 	Errors  int    `json:"errors,omitempty"`  // ERROR nodes
 	Missing int    `json:"missing,omitempty"` // MISSING nodes
 	Zero    int    `json:"zero,omitempty"`    // zero-width nodes other than MISSING
@@ -129,9 +134,9 @@ func (s *scan) walk(n *tree_sitter.Node, depth int) {
 	}
 }
 
-func parseOne(p *tree_sitter.Parser, src []byte, prefix int) Result {
-	t0 := time.Now()
-	deadline := t0.Add(parseTimeout)
+// parseTree parses src within parseTimeout; nil means the time ran out.
+func parseTree(p *tree_sitter.Parser, src []byte) *tree_sitter.Tree {
+	deadline := time.Now().Add(parseTimeout)
 	tree := p.ParseWithOptions(func(off int, _ tree_sitter.Point) []byte {
 		if off >= len(src) {
 			return nil
@@ -139,10 +144,21 @@ func parseOne(p *tree_sitter.Parser, src []byte, prefix int) Result {
 		return src[off:]
 	}, nil, &tree_sitter.ParseOptions{ProgressCallback: func(tree_sitter.ParseState) bool { return time.Now().After(deadline) }})
 	p.Reset()
+	return tree
+}
+
+func parseOne(p *tree_sitter.Parser, src []byte, prefix int) Result {
+	t0 := time.Now()
+	tree := parseTree(p, src)
 	if tree == nil {
 		return Result{N: len(src) - prefix, Timeout: true, Err: true, Uncov: -1, US: time.Since(t0).Microseconds()}
 	}
 	defer tree.Close()
+	return judge(tree, src, prefix, t0)
+}
+
+// judge applies the faithfulness rule to a parsed tree.
+func judge(tree *tree_sitter.Tree, src []byte, prefix int, t0 time.Time) Result {
 	root := tree.RootNode()
 	s := &scan{src: src, uncov: -1}
 	s.walk(root, 0)
@@ -219,7 +235,7 @@ func serve() int {
 			S string `json:"s"`
 			T bool   `json:"t"` // also return the S-expression
 			// {"kinds":true} answers the kind and field id tables; {"want":[ids]} limits later dumps to those kinds;
-			// {"s":..,"x":true} answers {"n":[kind,start,end,parent,field,...]} (see dump) instead of the verdict.
+			// {"s":..,"x":true} answers {"n":[kind,start,end,parent,field,...],"c":clean,"e":error} (see dump) instead of the verdict.
 			Kinds bool  `json:"kinds"`
 			Want  []int `json:"want"`
 			X     bool  `json:"x"`
@@ -252,14 +268,17 @@ func serve() int {
 		}
 		if req.X {
 			src := []byte(req.S)
-			t := p.Parse(src, nil)
+			t := parseTree(p, src)
 			nodes := []int{}
+			clean, hasErr := false, true // a timeout is not clean
 			if t != nil {
+				r := judge(t, src, 0, time.Now())
+				clean, hasErr = r.Clean, r.Err
 				nodes = dump(t, want)
 				t.Close()
 			}
 			b, _ := json.Marshal(nodes)
-			fmt.Fprintf(out, "{\"n\":%s}\n", b)
+			fmt.Fprintf(out, "{\"n\":%s,\"c\":%t,\"e\":%t}\n", b, clean, hasErr)
 			out.Flush()
 			continue
 		}
@@ -271,7 +290,7 @@ func serve() int {
 				t.Close()
 			}
 		}
-		fmt.Fprintf(out, "{\"e\":%t,\"c\":%t,\"at\":%d,\"k\":%q,\"t\":%q}\n", r.Err, r.Clean, r.Start, r.Kind, tree)
+		fmt.Fprintf(out, "{\"e\":%t,\"c\":%t,\"at\":%d,\"k\":%q,\"p\":%q,\"t\":%q}\n", r.Err, r.Clean, r.Start, r.Kind, r.Parent, tree)
 		out.Flush()
 	}
 }
@@ -326,7 +345,11 @@ func main() {
 				rec := recs[i]
 				b, err := os.ReadFile(filepath.Join(*data, filepath.FromSlash(rec.ID)))
 				if err != nil {
-					results[i] = Result{ID: rec.ID, Uncov: -1, Err: true, Kind: "READ-ERROR", Txt: err.Error()}
+					results[i] = Result{ID: rec.ID, Uncov: -1, Bad: "read-error", Txt: err.Error()}
+					continue
+				}
+				if sum := sha256.Sum256(b); hex.EncodeToString(sum[:]) != rec.Sha256 {
+					results[i] = Result{ID: rec.ID, Uncov: -1, Bad: "hash-mismatch", Txt: "sha256 differs from the collected " + rec.Sha256}
 					continue
 				}
 				src := append([]byte(rec.Prefix), b...)
@@ -354,14 +377,20 @@ func main() {
 	}
 	w := bufio.NewWriterSize(o, 1<<20)
 	enc := json.NewEncoder(w)
-	nerr := 0
+	nerr, nbad := 0, 0
 	for _, r := range results {
 		if r.Err {
 			nerr++
+		}
+		if r.Bad != "" {
+			nbad++
 		}
 		enc.Encode(r)
 	}
 	w.Flush()
 	o.Close()
-	fmt.Printf("tsparse: %d parsed, %d with error, %.0f s\n", len(results), nerr, time.Since(t0).Seconds())
+	fmt.Printf("tsparse: %d parsed, %d with error, %d unreadable or changed, %.0f s\n", len(results), nerr, nbad, time.Since(t0).Seconds())
+	if nbad > 0 {
+		os.Exit(3) // the results are written, but a changed input is no parser result: analyze.mjs sets it apart
+	}
 }

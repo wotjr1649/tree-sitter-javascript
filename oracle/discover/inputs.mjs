@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
@@ -22,4 +23,14 @@ export function readPrefixes(oraclePath) {
     if (r.prefix) prefix.set(r.id, r.prefix);
   }
   return prefix;
+}
+
+// The text of a discovery input, only when its bytes are the ones collect.mjs judged (the sha256 of its record): a changed or
+// unreadable file is an error here, never a parser result.
+export function readVerified(path, sha256) {
+  if (!sha256) throw new Error(`no sha256 recorded for ${path}; run collect and analyze again`);
+  const buf = readFileSync(path);
+  const got = createHash("sha256").update(buf).digest("hex");
+  if (got !== sha256) throw new Error(`sha256 ${got} differs from the collected ${sha256}`);
+  return new TextDecoder("utf-8", { ignoreBOM: true }).decode(buf);
 }

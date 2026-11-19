@@ -1,19 +1,20 @@
 // Structure run: valid inputs on which this grammar's tree is clean, compared with Babel's AST by ranges (see structure-lib.mjs).
-//   node structure.mjs [--results FILE] [--data DIR] [--out FILE] [--tsparse BIN] [--workers 1..3] [--max-bytes N] [--limit N]
+//   node structure.mjs [--results FILE] [--data DIR] [--out FILE] [--tsparse BIN] [--workers 1|2|3] [--max-bytes N] [--limit N]
 //                      [--corpus DIR] [--files FILE...]
 // Default input: the valid, clean inputs of DIR/results.jsonl (analyze.mjs): test262 positives, and the other sets' inputs
 // that Babel and oxc both accept. --corpus takes the `test/corpus/*.txt` inputs (no `:error`, both tools accept), --files plain
 // source files (the source type is the first one both tools accept). Babel runs without errorRecovery; an input it rejects
-// is counted, not compared. Writes one JSON line per input that has a mismatch to OUT (structure.jsonl) and a summary to
+// is counted, not compared, and so is an input whose tree is not clean (the same condition on every input path). A file of
+// DIR must still have the sha256 that collect.mjs recorded (an input that does not is "input-error", exit code 3). Writes one JSON line per input that has a mismatch to OUT (structure.jsonl) and a summary to
 // OUT's `.summary.json`. Heavy job on the shared machine: take a slot, 3 workers at most (one Node thread and one
 // `tsparse -serve` child each).
-import { appendFileSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { appendFileSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { Worker, isMainThread, parentPort, workerData } from "node:worker_threads";
 import { fileURLToPath } from "node:url";
 import { makeChecker } from "./structure-check.mjs";
 import { babel, oxc } from "./tools.mjs";
-import { corpusInputs, readPrefixes } from "./inputs.mjs";
+import { corpusInputs, readPrefixes, readVerified } from "./inputs.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 
@@ -22,16 +23,17 @@ async function worker() {
   const checker = await makeChecker(workerData.bin);
   parentPort.on("message", async (job) => {
     if (job === null) return checker.close(), process.exit(0);
-    const { id, set, type, size } = job;
-    const base = { id, set, type, size };
+    const { id, set, type, size, sha256 } = job;
+    const base = { id, set, type, size, sha256 };
     let src;
     try {
-      src = job.text ?? job.prefix + new TextDecoder("utf-8", { ignoreBOM: true }).decode(readFileSync(join(workerData.data, id)));
+      src = job.text ?? job.prefix + readVerified(join(workerData.data, id), sha256);
     } catch (e) {
-      return parentPort.postMessage({ ...base, status: "read-error", msg: e.message });
+      return parentPort.postMessage({ ...base, status: "input-error", msg: e.message });
     }
     const r = await checker.check(src, type);
     if (r.reject) return parentPort.postMessage({ ...base, status: "babel-reject", msg: r.reject });
+    if (r.notClean) return parentPort.postMessage({ ...base, status: "not-clean" });
     const bad = r.diffs.length || r.lists.length;
     parentPort.postMessage({ ...base, status: bad ? "diff" : "ok", nb: r.nb, nt: r.nt, norm: r.norm, nd: r.diffs.length, diffs: r.diffs.slice(0, 40), lists: r.lists.slice(0, 10) });
   });
@@ -56,21 +58,26 @@ async function main() {
   const nWorkers = Number(flag("--workers", "3"));
   const maxBytes = Number(flag("--max-bytes", String(4 * 1024 * 1024)));
   const limit = Number(flag("--limit", "0"));
-  if (!(nWorkers >= 1 && nWorkers <= 3)) throw new Error("--workers must be 1..3 (RESOURCES.md)");
+  if (![1, 2, 3].includes(nWorkers)) throw new Error("--workers must be 1, 2 or 3 (RESOURCES.md)");
+  if (!(Number.isInteger(maxBytes) && maxBytes > 0) || !(Number.isInteger(limit) && limit >= 0)) throw new Error("--max-bytes must be a positive integer, --limit a non-negative one");
+  const tooBig = () => (skipped["too-big"] = (skipped["too-big"] ?? 0) + 1);
 
   const jobs = [];
   const skipped = {};
   if (args.includes("--corpus")) {
     for (const j of corpusInputs(resolve(flag("--corpus")))) {
+      const size = Buffer.byteLength(j.text);
+      if (size > maxBytes) { tooBig(); continue; }
       const type = typeFor(j.text);
-      if (type) jobs.push({ ...j, type, size: j.text.length, prefix: "" });
+      if (type) jobs.push({ ...j, type, size, prefix: "" });
       else skipped["corpus-tools-disagree"] = (skipped["corpus-tools-disagree"] ?? 0) + 1;
     }
   } else if (args.includes("--files")) {
     for (const f of args.slice(args.indexOf("--files") + 1).filter((a) => !a.startsWith("--"))) {
+      if (statSync(f).size > maxBytes) { tooBig(); continue; }
       const text = readFileSync(f, "utf8");
       const type = typeFor(text);
-      if (type) jobs.push({ id: f, set: "files", text, type, size: text.length, prefix: "" });
+      if (type) jobs.push({ id: f, set: "files", text, type, size: Buffer.byteLength(text), prefix: "" });
       else skipped["files-tools-disagree"] = (skipped["files-tools-disagree"] ?? 0) + 1;
     }
   } else {
@@ -81,8 +88,8 @@ async function main() {
       if (r.skip) continue;
       if (r.truth !== "valid" || !r.ts.clean) { skipped["not-valid-or-not-clean"] = (skipped["not-valid-or-not-clean"] ?? 0) + 1; continue; }
       if (r.set !== "test262" && !(r.babel === "accept" && r.oxc === "accept")) { skipped["tools-disagree"] = (skipped["tools-disagree"] ?? 0) + 1; continue; }
-      if (r.size > maxBytes) { skipped["too-big"] = (skipped["too-big"] ?? 0) + 1; continue; }
-      jobs.push({ id: r.id, set: r.set, type: r.type, size: r.size, prefix: prefix.get(r.id) ?? "" });
+      if (r.size > maxBytes) { tooBig(); continue; }
+      jobs.push({ id: r.id, set: r.set, type: r.type, size: r.size, sha256: r.sha256, prefix: prefix.get(r.id) ?? "" });
     }
   }
   if (limit) jobs.length = Math.min(jobs.length, limit);
@@ -117,6 +124,8 @@ async function main() {
   const summary = { inputs: jobs.length, skipped, tally, norm, seconds: Math.round((Date.now() - t0) / 1000) };
   writeFileSync(out.replace(/\.jsonl$/, "") + ".summary.json", JSON.stringify(summary, null, 1) + "\n");
   console.log(JSON.stringify(summary));
+  const bad = Object.entries(tally).filter(([k]) => k.endsWith(":input-error")).reduce((n, [, v]) => n + v, 0);
+  if (bad) { console.error(`structure: ${bad} inputs were unreadable or changed since collect (input-error); fetch and collect again`); process.exitCode = 3; }
 }
 
 if (isMainThread) await main();

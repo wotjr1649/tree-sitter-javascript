@@ -9,7 +9,9 @@ import { compare, wantedIds } from "./structure-lib.mjs";
 const require = createRequire(join(dirname(fileURLToPath(import.meta.url)), "../run.mjs")); // the oracle's pinned Babel
 
 // Starts a `tsparse -serve` child (binary `bin`) and returns {ts, check(src, type), close()}.
-// check returns {diffs, lists, nb, nt, norm}, or {reject: message} when Babel (no errorRecovery) rejects the source.
+// check returns {diffs, lists, nb, nt, norm}; {reject: message} when Babel (no errorRecovery) rejects the source; {notClean: true}
+// (no diffs) when this grammar's tree is not clean (ERROR, MISSING, zero-width node, uncovered input: tsparse's rule), so every
+// input path (results, corpus, files) compares trees under the same condition.
 export async function makeChecker(bin) {
   const { parse } = require("@babel/parser");
   const ts = startTs(bin);
@@ -25,6 +27,7 @@ export async function makeChecker(bin) {
         return { reject: String(e.message).slice(0, 120) };
       }
       const d = await ts.ask({ s: src, x: true });
+      if (!d.c) return { notClean: true, diffs: [], lists: [] };
       return compare(file, src, d.n, tab.kinds, tab.fields);
     },
     close: () => ts.close(),

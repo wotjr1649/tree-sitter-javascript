@@ -1,5 +1,9 @@
 // Babel and oxc verdicts for one source, with the options of oracle/run.mjs (the oracle's pins in ../package.json).
 // Class: accept (no error), early (only recoverable/semantic errors), syntax (a parse error).
+// This repeats the options, the error classes and the UTF-16 to UTF-8 conversion of ../run.mjs on purpose: run.mjs is a script
+// whose own sha256 is recorded in ../verdicts.json, so it cannot be split into a module without regenerating that file. The
+// plan: when run.mjs is next changed for another reason, move these functions to a module both import. Until then
+// test/tools-parity.test.mjs runs run.mjs on a few cases and fails when the two disagree.
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createRequire } from "node:module";

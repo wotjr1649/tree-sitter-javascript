@@ -7,6 +7,7 @@
 //                                                         B3 tools disagree or both accept = oracle could not tell)
 //   C  Babel and oxc disagree (recorded, not judged)
 //   ok valid and clean, or invalid and rejected by tree-sitter
+//   X  the input was unreadable or its sha256 differs from collect's (exit code 3): no verdict, never counted as a defect
 import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -41,16 +42,16 @@ for (const rec of lines(join(dir, "oracle.jsonl"))) {
   if (cat === "ok" && cls === "disagree") bump("disagree-but-ok");
   const dir2 = rec.id.startsWith("test262/") ? rec.id.split("/").slice(2, 4).join("/") : rec.pkg;
   const row = {
-    id: rec.id, set: rec.set, pkg: rec.pkg, type, truth, cat, babel: bc, oxc: oc,
+    id: rec.id, set: rec.set, pkg: rec.pkg, sha256: rec.sha256, type, truth, cat, babel: bc, oxc: oc,
     bAt: rec.b[type].at ?? null, oAt: rec.o[type].at ?? null, bMsg: rec.b[type].m, oMsg: rec.o[type].m,
     negative: rec.negative, features: rec.features, group: dir2, size: rec.size,
-    ts: { err: t.err, clean: t.clean, kind: t.kind, parent: t.parent, start: t.start, row: t.row, col: t.col, txt: t.txt, errors: t.errors, missing: t.missing, zero: t.zero, uncov: t.uncov, timeout: t.timeout },
+    ts: { err: t.err, clean: t.clean, kind: t.kind, parent: t.parent, start: t.start, row: t.row, col: t.col, txt: t.txt, errors: t.errors, missing: t.missing, zero: t.zero, uncov: t.uncov, timeout: t.timeout, bad: t.bad },
   };
   out.push(row);
   bump(`${rec.set}:${cat}`);
   bump(`${rec.set}:total`);
-  if (cat === "A1") defects.push({ id: rec.id, set: rec.set, type, size: rec.size, prefix: rec.prefix ?? "" });
-  if (cat === "B1") rejects.push({ id: rec.id, set: rec.set, type, size: rec.size, prefix: rec.prefix ?? "" });
+  if (cat === "A1") defects.push({ id: rec.id, set: rec.set, sha256: rec.sha256, type, size: rec.size, prefix: rec.prefix ?? "" });
+  if (cat === "B1") rejects.push({ id: rec.id, set: rec.set, sha256: rec.sha256, type, size: rec.size, prefix: rec.prefix ?? "" });
 }
 
 writeFileSync(join(dir, "results.jsonl"), out.map((r) => JSON.stringify(r)).join("\n") + "\n");
@@ -58,3 +59,7 @@ writeFileSync(join(dir, "defects.jsonl"), defects.map((r) => JSON.stringify(r)).
 writeFileSync(join(dir, "rejects.jsonl"), rejects.map((r) => JSON.stringify(r)).join("\n") + (rejects.length ? "\n" : ""));
 writeFileSync(join(dir, "summary.json"), JSON.stringify({ tally }, null, 1) + "\n");
 console.log(JSON.stringify(tally, null, 1));
+if (out.some((r) => r.ts?.bad)) {
+  console.error(`analyze: ${out.filter((r) => r.ts?.bad).length} inputs were unreadable or changed since collect (category X); fetch and collect again`);
+  process.exitCode = 3;
+}

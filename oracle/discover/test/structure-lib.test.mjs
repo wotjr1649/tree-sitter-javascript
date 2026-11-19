@@ -9,7 +9,8 @@ import { byteMap, compare, diffItems, uncoveredKinds, wantedIds } from "../struc
 const here = dirname(fileURLToPath(import.meta.url));
 const { parse } = createRequire(join(here, "../../run.mjs"))("@babel/parser");
 const KINDS = ["end", "program", "expression_statement", "call_expression", "arrow_function", "identifier", "for_statement", "empty_statement",
-  "if_statement", "parenthesized_expression", "comment", "statement_block", "number", "yield_expression"];
+  "if_statement", "parenthesized_expression", "comment", "statement_block", "number", "yield_expression",
+  "switch_case", "class_declaration", "class_body", "class_static_block"];
 const FIELDS = ["", "body", "condition", "initializer"];
 // a fake tsparse dump: rows of [kind name, start, end, parent index, field name]
 const dump = (rows) => rows.flatMap(([k, s, e, p, f]) => [KINDS.indexOf(k), s, e, p, FIELDS.indexOf(f ?? "")]);
@@ -74,4 +75,21 @@ test("every kind of the statement, declaration, expression and pattern supertype
 
 test("wantedIds lists every id of a wanted kind name (alias kinds have several)", () => {
   assert.deepEqual(wantedIds(["end", "identifier", "x", "identifier", "program"]), [1, 3, 4]);
+});
+
+test("a block with a statement on Babel's side and none in the dump is a list mismatch (the owner counts from 0)", () => {
+  const r = run("{;}", [["program", 0, 3, -1], ["statement_block", 0, 3, 0]]);
+  assert.deepEqual(r.lists, [{ owner: "statement_block:0:3", babel: 1, ts: 0 }]);
+});
+
+test("a switch case and a static block are list owners on both sides, with the same range basis", () => {
+  const src = "switch(a){case 1: b; // c\n}";
+  const at = src.indexOf("case");
+  const cm = src.indexOf("//");
+  const c = run(src, [["program", 0, src.length, -1], ["switch_case", at, src.length - 2, 0], ["comment", cm, src.length - 2, 1]]); // the grammar's case keeps the trailing comment
+  assert.deepEqual(c.lists.filter((l) => l.owner !== "program"), [{ owner: `switch_case:${at}:${src.indexOf("b;") + 1}`, babel: 1, ts: 0 }]);
+  const s2 = "class A{static{a;}}";
+  const st = s2.indexOf("static");
+  const r = run(s2, [["program", 0, 19, -1], ["class_declaration", 0, 19, 0], ["class_body", 7, 19, 1], ["class_static_block", st, 18, 2], ["statement_block", st + 6, 18, 3]]);
+  assert.deepEqual(r.lists, [{ owner: `static_block:${st}:18`, babel: 1, ts: 0 }]);
 });

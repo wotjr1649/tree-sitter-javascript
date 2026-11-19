@@ -1,7 +1,8 @@
 // The category of one input (see README.md): the join of the oracle verdicts with the tree-sitter result.
 //   A1 valid, tree not clean, both tools accept (reducible)     A2 valid (test262), tree not clean, a tool rejects
 //   B1/B2/B3 invalid, tree clean: both tools syntax / both early / the oracle cannot tell     C no truth, tools disagree
-//   T parse timeout     ok otherwise
+//   T parse timeout     X the input was unreadable or changed since collect (tsparse `bad`): no verdict, never a defect
+//   ok otherwise
 // rec: oracle.jsonl record (b/o per source type); t: tsparse result ({clean, err, timeout}).
 const consensus = (b, o) => (b === o ? b : "disagree");
 
@@ -18,7 +19,8 @@ export function classify(rec, t) {
   let truth = rec.truth;
   if (truth === "unknown") truth = cls === "accept" ? "valid" : cls === "disagree" ? "unknown" : "invalid";
   let cat;
-  if (t.timeout) cat = "T";
+  if (t.bad) cat = "X";
+  else if (t.timeout) cat = "T";
   else if (truth === "valid" && !t.clean) cat = bc === "accept" && oc === "accept" ? "A1" : "A2";
   else if (truth === "invalid" && !t.err) cat = cls === "syntax" ? "B1" : cls === "early" ? "B2" : "B3";
   else if (truth === "unknown") cat = "C";
