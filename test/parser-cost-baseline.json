@@ -1,0 +1,16 @@
+{
+  "label": "v1.0.0 d6501de",
+  "metrics": {
+    "parser_c_bytes": 2855926,
+    "state_count": 1870,
+    "large_state_count": 387,
+    "symbol_count": 261,
+    "alias_count": 4,
+    "token_count": 134,
+    "field_count": 36,
+    "parse_table_entries": 101007,
+    "small_parse_table_entries": 58050,
+    "small_parse_table_map_entries": 1483,
+    "parse_action_entries": 3738
+  }
+}

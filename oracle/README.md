@@ -72,6 +72,25 @@ Exit codes of the replay:
 
 CI (`oracle` job of `.github/workflows/ci.yml`, `ubuntu-24.04`): `npm ci`, regenerate `verdicts.json` and fail on any difference from the committed file, the self-check, then the replay.
 
+## Tree dumps for reviews and release notes
+
+`replay -dump OUT.jsonl [-root DIR] [INPUT...]` parses inputs without judging them and writes one JSON line per input: `id`, `sha256` of the source, `error` (the root's `has_error`), the `errors` and `missing` node counts, and `tree`, every node named and anonymous as `(field:kind@start:end ...)` (anonymous kinds quoted, `MISSING ` before a missing node's kind, UTF-8 byte offsets). Inputs are glob patterns relative to `-root` (default `../..`): a `*.jsonl` file holds `{id, source}` records (other fields ignored, so `oracle/cases.jsonl` works as is); a `.txt` file under `corpus/` is split into its tests (`test/corpus/x.txt#name`, the text between the header and the last `---`, trailing line breaks removed); any other file is one input named by its path. Without inputs it dumps the corpus, `examples/`, `test/highlight/`, `test/tags/` and `oracle/cases.jsonl`. Ids must be unique.
+
+`node scripts/tree-diff.mjs BASE.jsonl HEAD.jsonl [--trees]` compares two dumps by id: same, changed-clean (no ERROR or MISSING on either side), clean-to-error, error-to-clean, error-changed, only-base, only-head, as a markdown table and the list of changed ids (`--trees` adds both trees). It refuses an id whose source differs between the dumps.
+
+To compare two commits, build the dump of each against that commit's grammar and the same inputs. The binding `#include`s the commit's `src/parser.c`, so each build needs its own checkout and `go build -a` (or a fresh `GOCACHE`):
+
+```sh
+for rev in v1.0.0 HEAD; do
+  git worktree add --detach build/cmp/$rev $rev
+  rm -rf build/cmp/$rev/oracle/replay && cp -r oracle/replay build/cmp/$rev/oracle/replay  # this dump tool, that grammar
+  (cd build/cmp/$rev/oracle/replay && go build -a -o ../../../replay-$rev .)
+  build/cmp/replay-$rev -root . -dump build/cmp/$rev.jsonl     # -root .: the inputs of this checkout for both
+done
+node scripts/tree-diff.mjs build/cmp/v1.0.0.jsonl build/cmp/HEAD.jsonl --trees
+git worktree remove --force build/cmp/v1.0.0 && git worktree remove --force build/cmp/HEAD
+```
+
 ## Adding cases in a fix pull request
 
 1. Write the failing input (corpus case or here) first. Append the record to `cases.jsonl` with the correct `sourceType`; leave `sha256` empty or wrong.
