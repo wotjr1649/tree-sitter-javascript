@@ -1,0 +1,538 @@
+field	arrow_function	body	expression
+field	arrow_function	body	statement_block
+field	arrow_function	parameter	identifier
+field	arrow_function	parameters	formal_parameters
+field	assignment_expression	left	array_pattern
+field	assignment_expression	left	identifier
+field	assignment_expression	left	member_expression
+field	assignment_expression	left	object_pattern
+field	assignment_expression	left	parenthesized_expression
+field	assignment_expression	left	subscript_expression
+field	assignment_expression	left	undefined
+field	assignment_expression	right	expression
+field	assignment_pattern	left	pattern
+field	assignment_pattern	right	expression
+field	augmented_assignment_expression	left	identifier
+field	augmented_assignment_expression	left	member_expression
+field	augmented_assignment_expression	left	parenthesized_expression
+field	augmented_assignment_expression	left	subscript_expression
+field	augmented_assignment_expression	operator	"%="
+field	augmented_assignment_expression	operator	"&&="
+field	augmented_assignment_expression	operator	"&="
+field	augmented_assignment_expression	operator	"**="
+field	augmented_assignment_expression	operator	"*="
+field	augmented_assignment_expression	operator	"+="
+field	augmented_assignment_expression	operator	"-="
+field	augmented_assignment_expression	operator	"/="
+field	augmented_assignment_expression	operator	"<<="
+field	augmented_assignment_expression	operator	">>="
+field	augmented_assignment_expression	operator	">>>="
+field	augmented_assignment_expression	operator	"??="
+field	augmented_assignment_expression	operator	"^="
+field	augmented_assignment_expression	operator	"|="
+field	augmented_assignment_expression	operator	"||="
+field	augmented_assignment_expression	right	expression
+field	binary_expression	left	expression
+field	binary_expression	left	private_property_identifier
+field	binary_expression	operator	"!="
+field	binary_expression	operator	"!=="
+field	binary_expression	operator	"%"
+field	binary_expression	operator	"&"
+field	binary_expression	operator	"&&"
+field	binary_expression	operator	"*"
+field	binary_expression	operator	"**"
+field	binary_expression	operator	"+"
+field	binary_expression	operator	"-"
+field	binary_expression	operator	"/"
+field	binary_expression	operator	"<"
+field	binary_expression	operator	"<<"
+field	binary_expression	operator	"<="
+field	binary_expression	operator	"=="
+field	binary_expression	operator	"==="
+field	binary_expression	operator	">"
+field	binary_expression	operator	">="
+field	binary_expression	operator	">>"
+field	binary_expression	operator	">>>"
+field	binary_expression	operator	"??"
+field	binary_expression	operator	"^"
+field	binary_expression	operator	"in"
+field	binary_expression	operator	"instanceof"
+field	binary_expression	operator	"|"
+field	binary_expression	operator	"||"
+field	binary_expression	right	expression
+field	break_statement	label	statement_identifier
+field	call_expression	arguments	arguments
+field	call_expression	arguments	template_string
+field	call_expression	function	expression
+field	call_expression	function	import
+field	call_expression	optional_chain	optional_chain
+field	catch_clause	body	statement_block
+field	catch_clause	parameter	array_pattern
+field	catch_clause	parameter	identifier
+field	catch_clause	parameter	object_pattern
+field	class	body	class_body
+field	class	decorator	decorator
+field	class	name	identifier
+field	class_body	member	class_static_block
+field	class_body	member	field_definition
+field	class_body	member	method_definition
+field	class_declaration	body	class_body
+field	class_declaration	decorator	decorator
+field	class_declaration	name	identifier
+field	class_static_block	body	statement_block
+field	continue_statement	label	statement_identifier
+field	do_statement	body	statement
+field	do_statement	condition	parenthesized_expression
+field	export_specifier	alias	"default"
+field	export_specifier	alias	identifier
+field	export_specifier	alias	string
+field	export_specifier	name	"default"
+field	export_specifier	name	identifier
+field	export_specifier	name	string
+field	export_statement	declaration	declaration
+field	export_statement	decorator	decorator
+field	export_statement	source	string
+field	export_statement	value	expression
+field	field_definition	decorator	decorator
+field	field_definition	property	computed_property_name
+field	field_definition	property	number
+field	field_definition	property	private_property_identifier
+field	field_definition	property	property_identifier
+field	field_definition	property	string
+field	field_definition	value	expression
+field	finally_clause	body	statement_block
+field	for_in_statement	body	statement
+field	for_in_statement	kind	"await"
+field	for_in_statement	kind	"const"
+field	for_in_statement	kind	"let"
+field	for_in_statement	kind	"using"
+field	for_in_statement	kind	"var"
+field	for_in_statement	left	array_pattern
+field	for_in_statement	left	identifier
+field	for_in_statement	left	member_expression
+field	for_in_statement	left	object_pattern
+field	for_in_statement	left	parenthesized_expression
+field	for_in_statement	left	subscript_expression
+field	for_in_statement	left	undefined
+field	for_in_statement	operator	"in"
+field	for_in_statement	operator	"of"
+field	for_in_statement	right	expression
+field	for_in_statement	right	sequence_expression
+field	for_in_statement	value	expression
+field	for_statement	body	statement
+field	for_statement	condition	";"
+field	for_statement	condition	empty_statement
+field	for_statement	condition	expression
+field	for_statement	condition	sequence_expression
+field	for_statement	increment	expression
+field	for_statement	increment	sequence_expression
+field	for_statement	initializer	empty_statement
+field	for_statement	initializer	expression
+field	for_statement	initializer	lexical_declaration
+field	for_statement	initializer	sequence_expression
+field	for_statement	initializer	using_declaration
+field	for_statement	initializer	variable_declaration
+field	function_declaration	body	statement_block
+field	function_declaration	name	identifier
+field	function_declaration	parameters	formal_parameters
+field	function_expression	body	statement_block
+field	function_expression	name	identifier
+field	function_expression	parameters	formal_parameters
+field	generator_function	body	statement_block
+field	generator_function	name	identifier
+field	generator_function	parameters	formal_parameters
+field	generator_function_declaration	body	statement_block
+field	generator_function_declaration	name	identifier
+field	generator_function_declaration	parameters	formal_parameters
+field	if_statement	alternative	else_clause
+field	if_statement	condition	parenthesized_expression
+field	if_statement	consequence	statement
+field	import_specifier	alias	identifier
+field	import_specifier	name	"default"
+field	import_specifier	name	identifier
+field	import_specifier	name	string
+field	import_statement	source	string
+field	jsx_closing_element	name	identifier
+field	jsx_closing_element	name	jsx_namespace_name
+field	jsx_closing_element	name	member_expression
+field	jsx_element	close_tag	jsx_closing_element
+field	jsx_element	open_tag	jsx_opening_element
+field	jsx_opening_element	attribute	jsx_attribute
+field	jsx_opening_element	attribute	jsx_expression
+field	jsx_opening_element	name	identifier
+field	jsx_opening_element	name	jsx_namespace_name
+field	jsx_opening_element	name	member_expression
+field	jsx_self_closing_element	attribute	jsx_attribute
+field	jsx_self_closing_element	attribute	jsx_expression
+field	jsx_self_closing_element	name	identifier
+field	jsx_self_closing_element	name	jsx_namespace_name
+field	jsx_self_closing_element	name	member_expression
+field	labeled_statement	body	statement
+field	labeled_statement	label	statement_identifier
+field	lexical_declaration	kind	"const"
+field	lexical_declaration	kind	"let"
+field	member_expression	object	expression
+field	member_expression	object	import
+field	member_expression	optional_chain	optional_chain
+field	member_expression	property	private_property_identifier
+field	member_expression	property	property_identifier
+field	method_definition	body	statement_block
+field	method_definition	decorator	decorator
+field	method_definition	name	computed_property_name
+field	method_definition	name	number
+field	method_definition	name	private_property_identifier
+field	method_definition	name	property_identifier
+field	method_definition	name	string
+field	method_definition	parameters	formal_parameters
+field	new_expression	arguments	arguments
+field	new_expression	constructor	new_expression
+field	new_expression	constructor	primary_expression
+field	object_assignment_pattern	left	array_pattern
+field	object_assignment_pattern	left	object_pattern
+field	object_assignment_pattern	left	shorthand_property_identifier_pattern
+field	object_assignment_pattern	right	expression
+field	pair	key	computed_property_name
+field	pair	key	number
+field	pair	key	private_property_identifier
+field	pair	key	property_identifier
+field	pair	key	string
+field	pair	value	expression
+field	pair_pattern	key	computed_property_name
+field	pair_pattern	key	number
+field	pair_pattern	key	private_property_identifier
+field	pair_pattern	key	property_identifier
+field	pair_pattern	key	string
+field	pair_pattern	value	assignment_pattern
+field	pair_pattern	value	pattern
+field	regex	flags	regex_flags
+field	regex	pattern	regex_pattern
+field	subscript_expression	index	expression
+field	subscript_expression	index	sequence_expression
+field	subscript_expression	object	expression
+field	subscript_expression	optional_chain	optional_chain
+field	switch_case	body	statement
+field	switch_case	value	expression
+field	switch_case	value	sequence_expression
+field	switch_default	body	statement
+field	switch_statement	body	switch_body
+field	switch_statement	value	parenthesized_expression
+field	ternary_expression	alternative	expression
+field	ternary_expression	condition	expression
+field	ternary_expression	consequence	expression
+field	try_statement	body	statement_block
+field	try_statement	finalizer	finally_clause
+field	try_statement	handler	catch_clause
+field	unary_expression	argument	expression
+field	unary_expression	operator	"!"
+field	unary_expression	operator	"+"
+field	unary_expression	operator	"-"
+field	unary_expression	operator	"delete"
+field	unary_expression	operator	"typeof"
+field	unary_expression	operator	"void"
+field	unary_expression	operator	"~"
+field	update_expression	argument	expression
+field	update_expression	operator	"++"
+field	update_expression	operator	"--"
+field	using_declaration	kind	"await"
+field	using_declaration	kind	"using"
+field	variable_declarator	name	array_pattern
+field	variable_declarator	name	identifier
+field	variable_declarator	name	object_pattern
+field	variable_declarator	value	expression
+field	while_statement	body	statement
+field	while_statement	condition	parenthesized_expression
+field	with_statement	body	statement
+field	with_statement	object	parenthesized_expression
+kind	"!"
+kind	"!="
+kind	"!=="
+kind	"${"
+kind	"%"
+kind	"%="
+kind	"&"
+kind	"&&"
+kind	"&&="
+kind	"&="
+kind	"'"
+kind	"("
+kind	")"
+kind	"*"
+kind	"**"
+kind	"**="
+kind	"*="
+kind	"+"
+kind	"++"
+kind	"+="
+kind	","
+kind	"-"
+kind	"--"
+kind	"-="
+kind	"."
+kind	"..."
+kind	"/"
+kind	"/="
+kind	"/>"
+kind	":"
+kind	";"
+kind	"<"
+kind	"</"
+kind	"<<"
+kind	"<<="
+kind	"<="
+kind	"="
+kind	"=="
+kind	"==="
+kind	"=>"
+kind	">"
+kind	">="
+kind	">>"
+kind	">>="
+kind	">>>"
+kind	">>>="
+kind	"?"
+kind	"??"
+kind	"??="
+kind	"@"
+kind	"["
+kind	"\""
+kind	"]"
+kind	"^"
+kind	"^="
+kind	"`"
+kind	"as"
+kind	"async"
+kind	"await"
+kind	"break"
+kind	"case"
+kind	"catch"
+kind	"class"
+kind	"const"
+kind	"continue"
+kind	"debugger"
+kind	"default"
+kind	"delete"
+kind	"do"
+kind	"else"
+kind	"export"
+kind	"extends"
+kind	"finally"
+kind	"for"
+kind	"from"
+kind	"function"
+kind	"get"
+kind	"if"
+kind	"import"
+kind	"in"
+kind	"instanceof"
+kind	"let"
+kind	"meta"
+kind	"new"
+kind	"of"
+kind	"return"
+kind	"set"
+kind	"static get"
+kind	"static"
+kind	"switch"
+kind	"target"
+kind	"throw"
+kind	"try"
+kind	"typeof"
+kind	"using"
+kind	"var"
+kind	"void"
+kind	"while"
+kind	"with"
+kind	"yield"
+kind	"{"
+kind	"|"
+kind	"|="
+kind	"||"
+kind	"||="
+kind	"}"
+kind	"~"
+kind	arguments
+kind	array
+kind	array_pattern
+kind	arrow_function
+kind	assignment_expression
+kind	assignment_pattern
+kind	augmented_assignment_expression
+kind	await_expression
+kind	binary_expression
+kind	break_statement
+kind	call_expression
+kind	catch_clause
+kind	class
+kind	class_body
+kind	class_declaration
+kind	class_heritage
+kind	class_static_block
+kind	comment
+kind	computed_property_name
+kind	continue_statement
+kind	debugger_statement
+kind	declaration
+kind	decorator
+kind	do_statement
+kind	else_clause
+kind	empty_statement
+kind	escape_sequence
+kind	export_clause
+kind	export_specifier
+kind	export_statement
+kind	expression
+kind	expression_statement
+kind	false
+kind	field_definition
+kind	finally_clause
+kind	for_in_statement
+kind	for_statement
+kind	formal_parameters
+kind	function_declaration
+kind	function_expression
+kind	generator_function
+kind	generator_function_declaration
+kind	hash_bang_line
+kind	html_character_reference
+kind	html_comment
+kind	identifier
+kind	if_statement
+kind	import
+kind	import_attribute
+kind	import_clause
+kind	import_specifier
+kind	import_statement
+kind	jsx_attribute
+kind	jsx_closing_element
+kind	jsx_element
+kind	jsx_expression
+kind	jsx_namespace_name
+kind	jsx_opening_element
+kind	jsx_self_closing_element
+kind	jsx_text
+kind	labeled_statement
+kind	lexical_declaration
+kind	member_expression
+kind	meta_property
+kind	method_definition
+kind	named_imports
+kind	namespace_export
+kind	namespace_import
+kind	new_expression
+kind	null
+kind	number
+kind	object
+kind	object_assignment_pattern
+kind	object_pattern
+kind	optional_chain
+kind	pair
+kind	pair_pattern
+kind	parenthesized_expression
+kind	pattern
+kind	primary_expression
+kind	private_property_identifier
+kind	program
+kind	property_identifier
+kind	regex
+kind	regex_flags
+kind	regex_pattern
+kind	rest_pattern
+kind	return_statement
+kind	sequence_expression
+kind	shorthand_property_identifier
+kind	shorthand_property_identifier_pattern
+kind	spread_element
+kind	statement
+kind	statement_block
+kind	statement_identifier
+kind	string
+kind	string_fragment
+kind	subscript_expression
+kind	super
+kind	switch_body
+kind	switch_case
+kind	switch_default
+kind	switch_statement
+kind	template_string
+kind	template_substitution
+kind	ternary_expression
+kind	this
+kind	throw_statement
+kind	true
+kind	try_statement
+kind	unary_expression
+kind	undefined
+kind	update_expression
+kind	using_declaration
+kind	variable_declaration
+kind	variable_declarator
+kind	while_statement
+kind	with_statement
+kind	yield_expression
+subtype	declaration	class_declaration
+subtype	declaration	function_declaration
+subtype	declaration	generator_function_declaration
+subtype	declaration	lexical_declaration
+subtype	declaration	using_declaration
+subtype	declaration	variable_declaration
+subtype	expression	assignment_expression
+subtype	expression	augmented_assignment_expression
+subtype	expression	await_expression
+subtype	expression	binary_expression
+subtype	expression	jsx_element
+subtype	expression	jsx_self_closing_element
+subtype	expression	new_expression
+subtype	expression	primary_expression
+subtype	expression	ternary_expression
+subtype	expression	unary_expression
+subtype	expression	update_expression
+subtype	expression	yield_expression
+subtype	pattern	array_pattern
+subtype	pattern	identifier
+subtype	pattern	member_expression
+subtype	pattern	object_pattern
+subtype	pattern	rest_pattern
+subtype	pattern	subscript_expression
+subtype	pattern	undefined
+subtype	primary_expression	array
+subtype	primary_expression	arrow_function
+subtype	primary_expression	call_expression
+subtype	primary_expression	class
+subtype	primary_expression	false
+subtype	primary_expression	function_expression
+subtype	primary_expression	generator_function
+subtype	primary_expression	identifier
+subtype	primary_expression	member_expression
+subtype	primary_expression	meta_property
+subtype	primary_expression	null
+subtype	primary_expression	number
+subtype	primary_expression	object
+subtype	primary_expression	parenthesized_expression
+subtype	primary_expression	regex
+subtype	primary_expression	string
+subtype	primary_expression	subscript_expression
+subtype	primary_expression	super
+subtype	primary_expression	template_string
+subtype	primary_expression	this
+subtype	primary_expression	true
+subtype	primary_expression	undefined
+subtype	statement	break_statement
+subtype	statement	continue_statement
+subtype	statement	debugger_statement
+subtype	statement	declaration
+subtype	statement	do_statement
+subtype	statement	empty_statement
+subtype	statement	export_statement
+subtype	statement	expression_statement
+subtype	statement	for_in_statement
+subtype	statement	for_statement
+subtype	statement	if_statement
+subtype	statement	import_statement
+subtype	statement	labeled_statement
+subtype	statement	return_statement
+subtype	statement	statement_block
+subtype	statement	switch_statement
+subtype	statement	throw_statement
+subtype	statement	try_statement
+subtype	statement	while_statement
+subtype	statement	with_statement
