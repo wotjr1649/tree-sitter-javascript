@@ -90,3 +90,35 @@ jobs:
         run: swift test --skip-build -q
       - name: Check Package.resolved is unchanged
         run: cmp Package.resolved "$RUNNER_TEMP/Package.resolved"
+
+  oracle:
+    name: Oracle replay
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version: "1.23"
+          # No restored build cache: the Go binding #includes ../../src/parser.c and scanner.c, which the Go build
+          # cache does not track, so a cache from another commit would replay that commit's grammar.
+          cache: false
+      - name: Install the reference parsers
+        working-directory: oracle
+        run: npm ci --ignore-scripts
+      - name: Regenerate verdicts
+        shell: bash
+        run: |-
+          node oracle/run.mjs
+          git diff --exit-code -- oracle/verdicts.json
+      - name: Self-check the replay
+        working-directory: oracle/replay
+        run: go test -count=1 .
+      - name: Replay verdicts against the grammar
+        working-directory: oracle/replay
+        run: go run . -oracle ..
