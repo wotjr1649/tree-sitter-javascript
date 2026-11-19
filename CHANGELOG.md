@@ -65,6 +65,11 @@ also change. See [docs/migrating-from-1.0.md](docs/migrating-from-1.0.md).
 - Generated size: `src/parser.c` is 3,135,009 bytes with 2,048 parse states (2,855,926 bytes and 1,870 states at
   `v1.0.0`, +9.8 %). #24 shares the plain `for` header states between the declaration initializers (a hidden rule
   `_for_declaration`), which takes 4.4 % off the J5 grammar with identical trees; the rest of J5's cost is kept.
+- Parse time and memory, one shared Windows machine (Intel Core Ultra 9 285H), v1.0.0 and 2.0.0 alternating in 20
+  paired rounds of the same run: parsing `typescript.js` (TypeScript 6.0.3, 9.1 MB) took 1.46 % longer (median
+  1.722 s against 1.697 s), the three files of `examples/` 1.30 % longer; the observed ranges overlap. Peak working
+  set changed by less than 0.5 %. CPU load (10-second average) was 57.6 % at the start and 68.7 % at the end. These
+  are one-machine comparison numbers, not a benchmark.
 - CI action bumps (#2, #4, #5: `tree-sitter/parse-action` 5, `actions/setup-node` 7, `actions/checkout` 7) and README
   (#6): the CI badge points at this repository, the origin's crates/npm/PyPI badges are removed (this repository does
   not publish packages), and a paragraph states what the repository is.
