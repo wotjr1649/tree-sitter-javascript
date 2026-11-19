@@ -73,6 +73,7 @@ module.exports = grammar({
     $._jsx_identifier,
     $._lhs_expression,
     $._keyword_identifier,
+    $._jsx_keyword_identifier,
   ],
 
   precedences: $ => [
@@ -677,18 +678,35 @@ module.exports = grammar({
 
     jsx_identifier: _ => /[a-zA-Z_$][a-zA-Z\d_$]*-[a-zA-Z\d_$\-]*/,
 
+    // JSX names may be reserved words (`<class />`, `<Foo.class />`, `<C in={x} />`) and keep the node kinds of other
+    // names. TSX refers to nested_identifier directly, so its property takes them too; its object does not, because
+    // TypeScript's `namespace a.b` uses nested_identifier and a keyword there conflicts with `namespace in x`.
     _jsx_identifier: $ => choice(
       alias($.jsx_identifier, $.identifier),
       $.identifier,
+      alias($._jsx_keyword_identifier, $.identifier),
+    ),
+
+    // `const` and `extends` are left out: in TSX they would conflict with the type parameters of a generic arrow
+    // function (`<const T,>() => {}`, `<T extends U>() => {}`). Attribute names add `const` back. Contextual keywords
+    // are left out too: they already lex as identifier here, and as keyword tokens `<async.A />` would fail, because
+    // a member's object takes only identifier.
+    _jsx_keyword_identifier: $ => choice(
+      ...RESERVED_WORDS.filter(word => !['this', 'super', 'true', 'false', 'null', 'const', 'extends'].includes(word)),
+      $.this, $.super, $.true, $.false, $.null,
     ),
 
     nested_identifier: $ => prec('member', seq(
       field('object', choice($.identifier, alias($.nested_identifier, $.member_expression))),
       '.',
-      field('property', alias($.identifier, $.property_identifier)),
+      field('property', alias(choice($.identifier, $._keyword_identifier), $.property_identifier)),
     )),
 
-    jsx_namespace_name: $ => seq($._jsx_identifier, ':', $._jsx_identifier),
+    // No reserved words in namespace names: in TSX, `<a:typeof …` and the like would conflict with type annotations.
+    jsx_namespace_name: $ => {
+      const name = choice(alias($.jsx_identifier, $.identifier), $.identifier);
+      return seq(name, ':', name);
+    },
 
     _jsx_element_name: $ => choice(
       $._jsx_identifier,
@@ -711,7 +729,11 @@ module.exports = grammar({
 
     _jsx_attribute: $ => choice($.jsx_attribute, $.jsx_expression),
 
-    _jsx_attribute_name: $ => choice(alias($._jsx_identifier, $.property_identifier), $.jsx_namespace_name),
+    // Only an element name conflicts with `<const T,>`, so attribute names take `const`.
+    _jsx_attribute_name: $ => choice(
+      alias(choice($._jsx_identifier, 'const'), $.property_identifier),
+      $.jsx_namespace_name,
+    ),
 
     jsx_attribute: $ => seq(
       $._jsx_attribute_name,
