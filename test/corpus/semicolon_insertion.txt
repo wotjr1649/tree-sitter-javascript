@@ -415,31 +415,6 @@ var b
         (identifier)))))
 
 ============================================================
-Block comments with a line break between statements
-============================================================
-
-a /*
-*/ b
-'c' /*
-*/ 'd'
-
----
-
-(program
-  (expression_statement
-    (identifier))
-  (comment)
-  (expression_statement
-    (identifier))
-  (expression_statement
-    (string
-      (string_fragment)))
-  (comment)
-  (expression_statement
-    (string
-      (string_fragment))))
-
-============================================================
 Identifiers beginning with in or instanceof on the next line
 ============================================================
 

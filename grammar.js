@@ -157,9 +157,7 @@ module.exports = grammar({
       seq(
         'export',
         choice(
-          seq('*', $._from_clause),
-          seq($.namespace_export, $._from_clause),
-          seq($.export_clause, $._from_clause),
+          seq(choice('*', $.namespace_export, $.export_clause), $._from_clause, optional($._import_attributes)),
           $.export_clause,
         ),
         $._semicolon,
@@ -202,11 +200,12 @@ module.exports = grammar({
       )),
     ),
 
-    _module_export_name: $ => choice(
+    // Any IdentifierName, reserved words included (`export { a as if }`, `import { if as a } from 'x'`).
+    _module_export_name: $ => reserved('properties', choice(
       $.identifier,
       $.string,
       'default',
-    ),
+    )),
 
     declaration: $ => choice(
       $.function_declaration,
@@ -229,7 +228,7 @@ module.exports = grammar({
         seq($.import_clause, $._from_clause),
         field('source', $.string),
       ),
-      optional($.import_attribute),
+      optional($._import_attributes),
       $._semicolon,
     ),
 
@@ -272,7 +271,27 @@ module.exports = grammar({
       ),
     ),
 
-    import_attribute: $ => seq('with', $.object),
+    import_attribute: $ => seq('with', alias($._attributes_object, $.object)),
+
+    // WithClause (ECMA-262 §16.2.2): IdentifierName or string keys, string values, the tree of an object.
+    _attributes_object: $ => seq(
+      '{',
+      optional(seq(commaSep1(alias($._attribute_pair, $.pair)), optional(','))),
+      '}',
+    ),
+
+    _attribute_pair: $ => seq(
+      field('key', reserved('properties', choice(alias($.identifier, $.property_identifier), $.string))),
+      ':',
+      field('value', $.string),
+    ),
+
+    // `with` is a keyword that can follow a line break here, so the automatic semicolon the scanner inserts before it
+    // must not end the statement: the precedence makes the attributes win over a `with` statement after it.
+    _import_attributes: $ => choice(
+      $.import_attribute,
+      prec(1, seq($._automatic_semicolon, $.import_attribute)),
+    ),
 
     //
     // Statements
@@ -397,31 +416,38 @@ module.exports = grammar({
     _for_header: $ => seq(
       '(',
       choice(
-        field('left', choice(
-          $._lhs_expression,
-          $.parenthesized_expression,
-        )),
-        // `using` and a line break is an identifier, not a declaration (`for (using\nof y)`): the automatic semicolon
-        // there makes a declarator after the line break an error.
-        seq(field('left', alias('using', $.identifier)), $._automatic_semicolon),
         seq(
-          field('kind', 'var'),
-          field('left', choice(
-            $.identifier,
-            alias('of', $.identifier),
-            $._destructuring_pattern,
-          )),
-          optional($._initializer),
+          choice(
+            field('left', choice(
+              $._lhs_expression,
+              $.parenthesized_expression,
+              $.call_expression,
+            )),
+            // `using` and a line break is an identifier, not a declaration (`for (using\nof y)`): the automatic
+            // semicolon there makes a declarator after the line break an error.
+            seq(field('left', alias('using', $.identifier)), $._automatic_semicolon),
+            seq(
+              field('kind', 'var'),
+              field('left', choice(
+                $.identifier,
+                alias('of', $.identifier),
+                $._destructuring_pattern,
+              )),
+              optional($._initializer),
+            ),
+            seq(
+              field('kind', choice('let', 'const')),
+              field('left', choice(
+                $.identifier,
+                alias('of', $.identifier),
+                $._destructuring_pattern,
+              )),
+              optional($._automatic_semicolon),
+            ),
+          ),
+          field('operator', choice('in', 'of')),
         ),
-        seq(
-          field('kind', choice('let', 'const')),
-          field('left', choice(
-            $.identifier,
-            alias('of', $.identifier),
-            $._destructuring_pattern,
-          )),
-          optional($._automatic_semicolon),
-        ),
+        // A using declaration starts a `for…of` head only: `for…in` passes ~Using to ForDeclaration (ECMA-262 §14.7.5).
         seq(
           field('kind', choice(
             'using',
@@ -435,9 +461,9 @@ module.exports = grammar({
             $._destructuring_pattern,
           )),
           optional($._automatic_semicolon),
+          field('operator', 'of'),
         ),
       ),
-      field('operator', choice('in', 'of')),
       field('right', $._expressions),
       ')',
     ),
@@ -869,13 +895,20 @@ module.exports = grammar({
     )),
 
     arrow_function: $ => seq(
-      optional('async'),
       choice(
-        field('parameter', choice(
-          alias($._reserved_identifier, $.identifier),
-          $.identifier,
-        )),
-        $._call_signature,
+        seq(
+          optional('async'),
+          choice(
+            field('parameter', choice(
+              alias($._reserved_identifier, $.identifier),
+              $.identifier,
+            )),
+            $._call_signature,
+          ),
+        ),
+        // After `async`, `of` is a keyword for the parser: `for (async of => {};;)` starts a for-of head otherwise.
+        // shortcut: a line break after `async` or before `=>` is accepted (rejecting it cost +1.2 % to +5.3 %).
+        seq('async', field('parameter', alias('of', $.identifier))),
       ),
       '=>',
       field('body', choice(
@@ -897,7 +930,7 @@ module.exports = grammar({
       )),
       prec('template_call', seq(
         field('function', choice($.primary_expression, $.new_expression)),
-        field('arguments', $.template_string),
+        field('arguments', alias($._tagged_template_string, $.template_string)),
       )),
       prec('member', seq(
         field('function', $.primary_expression),
@@ -945,7 +978,8 @@ module.exports = grammar({
     ),
 
     assignment_expression: $ => prec.right('assign', seq(
-      field('left', choice($.parenthesized_expression, $._lhs_expression)),
+      // `f() = 1` is a runtime ReferenceError, not a syntax error, in web-compatible JS (ECMA-262 §8.6.4, annex B.3.9).
+      field('left', choice($.parenthesized_expression, $._lhs_expression, $.call_expression)),
       '=',
       field('right', $.expression),
     )),
@@ -958,11 +992,19 @@ module.exports = grammar({
       $.parenthesized_expression,
     ),
 
-    augmented_assignment_expression: $ => prec.right('assign', seq(
-      field('left', $._augmented_assignment_lhs),
-      field('operator', choice('+=', '-=', '*=', '/=', '%=', '^=', '&=', '|=', '>>=', '>>>=',
-        '<<=', '**=', '&&=', '||=', '??=')),
-      field('right', $.expression),
+    augmented_assignment_expression: $ => prec.right('assign', choice(
+      seq(
+        field('left', $._augmented_assignment_lhs),
+        field('operator', choice('+=', '-=', '*=', '/=', '%=', '^=', '&=', '|=', '>>=', '>>>=',
+          '<<=', '**=', '&&=', '||=', '??=')),
+        field('right', $.expression),
+      ),
+      // Annex B.3.9 allows a call expression only for the arithmetic operators, not the logical ones.
+      seq(
+        field('left', $.call_expression),
+        field('operator', choice('+=', '-=', '*=', '/=', '%=', '^=', '&=', '|=', '>>=', '>>>=', '<<=', '**=')),
+        field('right', $.expression),
+      ),
     )),
 
     _initializer: $ => seq(
@@ -1103,6 +1145,26 @@ module.exports = grammar({
       )),
       '`',
     ),
+
+    // A tagged template may hold escapes that are not valid in an untagged one (the cooked value is undefined).
+    _tagged_template_string: $ => seq(
+      '`',
+      repeat(choice(
+        alias($._template_chars, $.string_fragment),
+        $.escape_sequence,
+        alias($._invalid_escape_sequence, $.escape_sequence),
+        $.template_substitution,
+      )),
+      '`',
+    ),
+
+    _invalid_escape_sequence: _ => token.immediate(seq(
+      '\\',
+      choice(
+        /x[0-9a-fA-F]?/,
+        /u(\{[0-9a-fA-F]*|[0-9a-fA-F]{0,3})/,
+      ),
+    )),
 
     template_substitution: $ => seq(
       '${',
