@@ -20,12 +20,12 @@ origin's v0.25.0 is commit `44c892e` in this history, kept as `refs/upstream/v0.
 - Manifests, their lockfiles' own entries and `tree-sitter.json` `metadata.version` carry the release version (2.0.0
   now); CLI 0.27.2 compiles `metadata.version` into `parser.c` (`.metadata`), so regenerate `src/` after changing it.
 - Releases are `vMAJOR.MINOR.PATCH` (first independent `v2.0.0` after the `v1.0.0` baseline), each an annotated tag plus
-  a GitHub Release without binaries (ADR-0001 amendment 2026-11-19). SemVer: breaking (major) means a node kind,
-  field or supertype subtype removed or renamed, or a changed tree for valid input (input that `@babel/parser` and
-  `oxc-parser`, as pinned in `oracle/`, both accept) that the previous release parsed without an error. Minor: accepted invalid input that
-  becomes an error, input that gave an error and parses now, and any change to the tree of input that is an error
-  before and after (recovery trees, `ERROR` and `MISSING` nodes included); the CHANGELOG lists them all. Major changes
-  are batched into one major release.
+  a GitHub Release without binaries (ADR-0001 amendment 2026-11-19). SemVer: breaking (major) means a node kind, field
+  or supertype subtype removed or renamed, or a changed tree for valid input (input that `@babel/parser` and
+  `oxc-parser`, as pinned in `oracle/`, both accept) that the previous release parsed without an error. Minor: accepted
+  invalid input that becomes an error, input that gave an error and parses now, and any change to the tree of input that
+  is an error before and after (recovery trees, `ERROR` and `MISSING` nodes included); the CHANGELOG lists them all.
+  Major changes are batched into one major release.
 - The grammar checks syntax, not early errors (static semantics, e.g. a `using` declaration without an initializer,
   `for (using x;;);`); those are a non-goal and stay accepted (owner decision, 2026-11-19). Grammar restrictions such
   as `for (using x in o);` or `await using` in a non-async function are defects, not early errors (#26).

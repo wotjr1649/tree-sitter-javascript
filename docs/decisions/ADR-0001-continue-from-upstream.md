@@ -39,19 +39,19 @@ identical).
    only in a later, separately approved pin move to a release that contains the fix (its ADR-0024 7.6, ADR-0023).
 
    Amendment (owner-approved, 2026-11-19, release versions): versions after the `v1.0.0` baseline follow Semantic
-   Versioning, starting with `v2.0.0`, the first independent release (the model of tree-sitter-mssql ADR-0007
-   decision 3). A release is a `vMAJOR.MINOR.PATCH` annotated tag plus a GitHub Release made by hand without
-   binaries, each separately approved by the owner; `CHANGELOG.md` (Keep a Changelog) records it, and
-   `docs/migrating-from-1.0.md` covers the move from 1.0.0. A major version marks a breaking change: a node kind,
-   field or supertype subtype removed or renamed, or a changed tree for valid input that the previous release parsed
-   without an error; valid input is input that `@babel/parser` and `oxc-parser` (the versions pinned in `oracle/`) both accept. Minor
-   changes, each listed in the CHANGELOG: accepted invalid input that becomes an error, input that gave an error and
-   parses now, and any change to the tree of input that is an error before and after (recovery trees, `ERROR` and
-   `MISSING` nodes included). Releases follow as fixes are ready; major changes are batched into one major release.
-   Early errors (static semantics, such as a `using` declaration without an initializer) are a non-goal: the grammar
-   checks syntax only (owner decision, 2026-11-19). Grammar restrictions it does not enforce are defects. Manifests and
-   `tree-sitter.json` `metadata.version` carry the release version, so `src/parser.c` (`.metadata`) changes with it;
-   the `0.25.0` exception above ended with v1.0.0. Decision 4 still excludes registry publishing and automation.
+   Versioning, starting with `v2.0.0`, the first independent release (the model of tree-sitter-mssql ADR-0007 decision
+   3). A release is a `vMAJOR.MINOR.PATCH` annotated tag plus a GitHub Release made by hand without binaries, each
+   separately approved by the owner; `CHANGELOG.md` (Keep a Changelog) records it, and `docs/migrating-from-1.0.md`
+   covers the move from 1.0.0. A major version marks a breaking change: a node kind, field or supertype subtype removed
+   or renamed, or a changed tree for valid input that the previous release parsed without an error; valid input is input
+   that `@babel/parser` and `oxc-parser` (the versions pinned in `oracle/`) both accept. Minor changes, each listed in
+   the CHANGELOG: accepted invalid input that becomes an error, input that gave an error and parses now, and any change
+   to the tree of input that is an error before and after (recovery trees, `ERROR` and `MISSING` nodes included).
+   Releases follow as fixes are ready; major changes are batched into one major release. Early errors (static semantics,
+   such as a `using` declaration without an initializer) are a non-goal: the grammar checks syntax only (owner decision,
+   2026-11-19). Grammar restrictions it does not enforce are defects. Manifests and `tree-sitter.json`
+   `metadata.version` carry the release version, so `src/parser.c` (`.metadata`) changes with it; the `0.25.0` exception
+   above ended with v1.0.0. Decision 4 still excludes registry publishing and automation.
 4. No registry publishing (npm, crates.io, PyPI) and no automated tagging or release workflow. Consumers pin commits.
    Manual tagged releases follow the release amendment to decision 3.
 5. The grammar name `javascript` and the C symbol `tree_sitter_javascript` stay. Node kinds and fields stay unless a
