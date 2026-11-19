@@ -185,3 +185,12 @@
 {"id":"v3b/hashbang-ls","sha256":"cab91b05cfa39962c3557db9d7380f2f8f5d4f394ef349961f04ae14de5e6a9d","source":"#! x","sourceType":"script","expect":["0-2:hash_bang_line","5-6:identifier"]}
 {"id":"v3b/hashbang-ps","sha256":"31b7059cebd48c252480a8decef0795a4e61a18d578ca18c1f9dc5843fb52c69","source":"#! x","sourceType":"script","expect":["0-2:hash_bang_line","5-6:identifier"]}
 {"id":"v3b/hashbang-cr","sha256":"66b1ae05ab005e5550696cad2839b950b677203538afee9882999bfc93fc5078","source":"#!/usr/bin/env node\rx","sourceType":"script","expect":["0-19:hash_bang_line","20-21:identifier"]}
+{"id":"v3b/return-lf-paren","sha256":"ca282a5c324a7e01054728200c6f6c338d4339104375e08a4c510055ffbcdc04","source":"(function(){return\n(0)})","sourceType":"script","expect":["12-22:statement_block"]}
+{"id":"v3b/return-cr-array","sha256":"7a66926a076103aa24fce73aac17df1a0bb01d0074d0c1b54f804bc84a20be92","source":"(function(){return\r[0]})","sourceType":"script","expect":["12-22:statement_block"]}
+{"id":"v3b/return-ls-plus","sha256":"4c32f1a25ec22a720b8ac25b3956a89393cb19a845c3a86bc1318864df03ad2c","source":"(function(){return +a})","sourceType":"script","expect":["12-23:statement_block"]}
+{"id":"v3b/break-lf-array","sha256":"6c7670d61d0f1c101ea7a8614e9ab76daf837852f52d984291556aa152a81c8b","source":"a:for(;;){break\n[0]}","sourceType":"script","expect":["10-19:statement_block"]}
+{"id":"v3b/continue-label-cr-plus","sha256":"b4fdbf056d1fdc428d6e331fb7b80dfd4d976b5dc26382ea7ffc6dae4a6794d4","source":"a:for(;;){continue a\r+a}","sourceType":"script","expect":["10-23:statement_block"]}
+{"id":"v3b/return-block-cr-semi","sha256":"d283c9b33ef16365fff5ef2de1f48c62ff60f3f04b2c934b5a1638bbb823a7da","source":"(function(){return/*\r*/;})","sourceType":"script","expect":["12-24:return_statement"]}
+{"id":"v3b/break-block-cr-semi","sha256":"6523aca7e2a7082ab8b9d17e9a3eaa3fe83facfc2c82c733a0306a5510291975","source":"a:for(;;){break/*\r*/;}","sourceType":"script","expect":["10-21:break_statement"]}
+{"id":"v3b/return-block-cr-regex","sha256":"b8e2ade64b3f2ff3c851322457d6174b75a8e043cd7f0d42d4565947e5469f06","source":"(function(){return/*\r*/ /x/})","sourceType":"script","expect":["12-27:statement_block"]}
+{"id":"v3b/return-lf-semi","sha256":"037c2a9d316e8165fa068ea2a91354f225d58d60c9720c98a14fe5edca6217a7","source":"(function(){return\n;})","sourceType":"script","expect":["12-20:return_statement"]}
