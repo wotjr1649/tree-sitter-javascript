@@ -29,8 +29,8 @@ identical).
    origin's (go-treesitter's ADR-0023 patch to it stays in go-treesitter). Manifest versions are 1.0.0 except
    `tree-sitter.json` `metadata.version`, which the generator compiles into `parser.c` (`.metadata`) and which stays
    `0.25.0` so `src/` stays identical (owner decision; the real version is set in the first behaviour-changing release,
-   v1.1 or later [superseded by the release amendment below: that release is v2.0.0]); nothing is tagged or published
-   here [for v1.0.0; later releases: the release amendment below]. Later versions change behaviour only through fixes that start from a failing case.
+   v2.0.0 by the release amendment below). `v1.0.0` is an annotated tag on that baseline commit, without a GitHub
+   Release; nothing is published. Later versions change behaviour only through fixes that start from a failing case.
 
    Amendment (owner-approved, 2026-11-19): the v1.0.0 baseline above kept go-treesitter's ADR-0023 JSX patch in
    go-treesitter, with `src/scanner.c` equal to the origin's. From the change that adds this amendment on, this

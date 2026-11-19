@@ -10,10 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 The first release of this independent repository after the `v1.0.0` baseline (origin `tree-sitter/tree-sitter-javascript`
 v0.25.0 behaviour, `src/` byte-identical to it). Every fix below makes inputs that `@babel/parser` 8.1.2 and
 `oxc-parser` 0.159.0 both accept parse without `ERROR` or `MISSING` nodes, in standalone JavaScript and, where it
-applies, in the TypeScript/TSX grammars built on this `grammar.js` (tree-sitter-typescript `59fc4ed` + #357).
-Breaking: 18 of the 533 distinct inputs that 1.0.0 parsed without an error get a different tree, mostly where 1.0.0
-read them wrongly (`using [a] = b`, `using` followed by a line break and a name); one more form that 1.0.0 accepted is
-now an error (`for (using` + line break + `x of y)`). No node kind or field is removed or renamed, the grammar name and
+applies, in the TypeScript/TSX grammars built on this `grammar.js` (tree-sitter-typescript `59fc4ed` + #357). In
+TS/TSX the scanner fixes (J1, J1b) need the same change in tree-sitter-typescript's own scanner, and J3b and J4's
+type-annotated form need the patches handed over to it.
+Breaking: 18 of the 533 distinct inputs that 1.0.0 parsed without an error get a different tree. 16 still parse without
+an error, mostly where 1.0.0 read them wrongly (`using [a] = b`, `using` followed by a line break and a name); 2 that
+1.0.0 accepted are now errors (`for (using` + line break + `x of y)` and `... of of y)`). No node kind or field is removed or renamed, the grammar name and
 the C symbol are unchanged, and `src/node-types.json` gains one entry (`using_declaration` in
 `for_statement.initializer`). The numeric symbol ids and the underlying grammar names (`GrammarName()`) of some nodes
 also change. See [docs/migrating-from-1.0.md](docs/migrating-from-1.0.md).
@@ -24,8 +26,12 @@ also change. See [docs/migrating-from-1.0.md](docs/migrating-from-1.0.md).
   (exact versions in `oracle/package.json` and its own lockfile), and a CI job `Oracle replay` that regenerates the
   verdicts and replays them against this grammar through the tree-sitter API (accepted inputs must have no `ERROR`,
   `MISSING` or zero-width node and the expected node kinds; rejected inputs must have an error at the expected place).
-  Each fix below adds its failing inputs as passing oracle cases (158 cases at the tag).
+  Each fix below adds its inputs as oracle cases, passing cases and regression expectations (158 cases at the tag:
+  118 accept, 29 syntax, 6 early, 5 disagree). J2's error shows only in the TS/TSX grammar; the standalone oracle
+  checks the JavaScript tree of those inputs.
 - Corpus entries for every fix below in `test/corpus/` (`tree-sitter test`: 144/144 at the tag, 116 at `v1.0.0`).
+- `examples/components.jsx`, a JSX example of the J1, J3 and J3b forms, parsed by CI in standalone JavaScript. In TSX
+  it still needs tree-sitter-typescript's bare-ampersand scanner fix and the J3b patch.
 
 ### Changed
 
@@ -108,8 +114,9 @@ Not fixed in 2.0.0; tracked as GitHub Issues where a number is given:
   tag (`<super.Foo />`, `<class.Foo />`). The grammar does not compare opening and closing tag names (#20).
 - In a `for` header or a block, a line break after `await using` or between `await` and `using`, and inside a block
   comment after `using`, is accepted; so is `for (using of of y);` (#18).
-- `for (using x in o);`, `for (using x;;)` and `await using` outside an async function are accepted (no early-error
-  checks; Babel and oxc reject them).
+- `for (using x in o);`, `for (using x;;)` and `await using` in a non-async function
+  (`function f() { await using x = g(); }`) are accepted (no early-error checks; Babel and oxc reject them).
+  `await using` at module top level is valid.
 - The scanner's automatic-semicolon rules accept a lone CR after `using` and names such as `in_` and `instanceof_`
   after a line break, and the TS/TSX grammars accept U+2028/U+2029 there (#17).
 - Other `isw*` calls in `src/scanner.c` (`iswspace` in `scan_jsx_text` and the calls on the automatic-semicolon,
@@ -117,3 +124,9 @@ Not fixed in 2.0.0; tracked as GitHub Issues where a number is given:
 - `a?.b = 1;` is accepted (#19).
 - TypeScript: `import x = a.class;` (and `export import`, `import x = a.class.b;`) is accepted, although TypeScript
   rejects it (TS1359); the fix belongs in tree-sitter-typescript.
+- The Go binding test job in CI can reuse a restored Go build cache, which does not track the included `src/parser.c`
+  (#21; the `Oracle replay` job already starts without one, #14).
+- Inherited build templates: a fresh CMake build needs the tree-sitter CLI, `setup.py` tags a free-threaded CPython
+  build as `cp310-abi3`, and `make install` leaves the pkg-config description empty and prefixes absolute paths (#22).
+
+[2.0.0]: https://github.com/wotjr1649/tree-sitter-javascript/compare/v1.0.0...v2.0.0

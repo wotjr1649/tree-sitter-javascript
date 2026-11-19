@@ -31,21 +31,22 @@ All of them involve `using`:
 | `for (using` + line break + `of of y);` | `for_in_statement` with `kind: using`, `left: of` | an error | same (J5) |
 | `<class></for>` (element pair with reserved-word names) | an error | no error: two `jsx_opening_element`/`jsx_closing_element` names, not compared | tag names were never compared (`<a></b>` parses in 1.0.0 and 2.0.0); the reserved words now parse as names (J3) |
 
-The last row is an error input that became valid; it is listed because tools that report `<class></for>` as invalid
-no longer see an error. In the comparisons recorded for each fix (corpus, `examples/`, highlight and tags inputs, `typescript.js`, Korean
+The last row is not valid JSX: Babel, oxc and TypeScript report the mismatched tags. 2.0.0 reads it without an
+`ERROR` node, as it reads `<a></b>`; it is listed because tools that relied on the tree-sitter error for it no longer
+see one. In the comparisons recorded for each fix (corpus, `examples/`, highlight and tags inputs, `typescript.js`, Korean
 samples, and 2,000 to 2,600 probe inputs for the later fixes) no other input that parsed cleanly was reported to change
 its tree, and none was reported to get an error except the `for (using` + line break + `of` forms above. Those
 comparisons are against each fix's own base; the count above compares `v1.0.0` with the release directly (see below).
 
 Forms that keep their trees: block and `await using` declarations, `using x = a, y = b;`, `for (using x of y)`,
 `for await (using x of y)`, `for (await using x of y)`, `using` on the same line as its name, a type annotation
-(`using x: Disposable = f();` in TypeScript), a same-line comment after `using`, and `for (using` + line break +
-`of y);` (an identifier `using`).
+(`using x: Disposable = f();` in TypeScript) and a same-line comment after `using`.
 
 ### Where the count comes from
 
-The 1.0.0 parser (`v1.0.0`, `d6501de`) and the release grammar (`d4d699d`; the release commit differs only in
-`parser.c` `.metadata`) parsed, through the tree-sitter API, 1,068 distinct inputs (deduplicated by UTF-8 bytes): the
+The 1.0.0 parser (`v1.0.0`, `d6501de`) and the fixes at `d4d699d` parsed (#24, merged after it, keeps every tree,
+field, range and query capture on 2,040 inputs in JS, TS and TSX; the release commit differs from `78abf56` only in
+`parser.c` `.metadata`), through the tree-sitter API, 1,068 distinct inputs (deduplicated by UTF-8 bytes): the
 corpus, highlight and tags inputs, `examples/*.js`, the 158 `oracle/cases.jsonl` sources, the seven go-treesitter
 Korean samples and the J1-J5/J3b probe inputs, without TypeScript-only inputs. S-expressions with fields and byte ranges
 were compared (numeric symbol ids excluded). Of the 1,068 inputs, 533 parsed without an error in 1.0.0: 515 keep their
@@ -64,7 +65,7 @@ inputs no longer fail. Trees follow the kinds other names already use.
 | `a?.delete(b)`, `a?.class` in the TS/TSX grammar built on this one (J2) | `ERROR` | `property_identifier` (standalone JavaScript already parsed them) |
 | `<class />`, `<Foo.class />`, `<a.delete />`, `<C in={x} />` (J3) | `ERROR` | element name `identifier`, member `property_identifier`, attribute name `property_identifier` |
 | `<this.props.Foo />`, `<this.Foo />` (J3b) | `ERROR` | `member_expression` (`object: this`, `property: property_identifier`) |
-| `using = 1`, `using(x)`, `using.x`, `using++`, `for (using of x)` (J4) | `ERROR` | `using` as `identifier`, like any other name |
+| `using = 1`, `using(x)`, `using.x`, `using++`, `for (using of x)`, `for (using` + line break + `of y);` (J4) | `ERROR` | `using` as `identifier`, like any other name |
 | `for (using x = f();;) {}`, `for (await using x = f();;) {}` in an async function (J5) | `ERROR` | `for_statement` with `initializer: (using_declaration ...)` |
 
 ## Recovery trees of invalid input
@@ -86,8 +87,10 @@ Public kinds and fields are unchanged, but the underlying grammar symbols are no
   corpus inputs with names and ranges equal, and J3b moved `member_expression` from 211 to 212,
   `jsx_self_closing_element` from 197 to 198 and `property_identifier` from 264 to 265 (JS; TSX 251/234/397 to
   252/235/398). In the TS/TSX grammar built on this one, numeric symbols shift too.
-- Queries that capture by name and range are unaffected: node, capture and range comparisons over the corpus,
-  examples and Korean samples showed no difference. A consumer that stores or compares numeric symbol ids
+- Query files load unchanged, because no kind or field is removed, but their captures follow the tree: where a tree
+  changes (the `using` rows above), captures change with it. `queries/highlights.scm` on `using [a] = b;` now also
+  captures `using` as `@variable` `[0,5)`, and `(using_declaration) @d` matches that input once in 1.0.0 and not in
+  2.0.0. On the corpus, examples and Korean samples, node, capture and range comparisons showed no difference. A consumer that stores or compares numeric symbol ids
   (`KindId()`, `ts_node_symbol`) or the grammar name (`ts_node_grammar_symbol`, `GrammarName()`) must recompute them
   against the 2.0.0 parser.
 
@@ -118,12 +121,14 @@ this release (`ts-using-keyword-declarator.patch`, `ts-jsx-this-member.patch`):
   ADR-0024 7.5 comparison against the old pin and 7.6).
 - Pin comparison inputs: the node-types change above; trees that change for 1.0.0-clean input; symbol ids and
   `GrammarName()`; `src/parser.c` regenerated with CLI 0.27.2.
-- go-treesitter's native dumps and `tsg-query` output record `ts_node_symbol`: expect numeric differences, none in
-  kinds, fields or ranges.
+- go-treesitter's default `dump_tree` records `ts_node_type`, fields and ranges: expect differences only for the
+  changed trees above. `tsg-query` output and some field diagnostics record `ts_node_symbol`: expect numeric
+  differences there as well.
 
 ## What else changes for a consumer
 
-- **No new node kind or field.** Existing queries (`queries/*.scm`) run unchanged.
+- **No new node kind or field.** Existing query files (`queries/*.scm`) load unchanged; their captures change only
+  where the tree changes (see above).
 - **Oracle.** The `oracle/` directory (Babel 8.1.2 and oxc 0.159.0 consensus) and its CI replay are new; they do not
   affect the parser.
 - **Generated size.** `src/parser.c` is 3,135,009 bytes at `v2.0.0` with 2,048 parse states and 266 symbols, against
