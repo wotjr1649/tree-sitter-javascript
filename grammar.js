@@ -107,6 +107,8 @@ module.exports = grammar({
     [$.import_statement, $.import],
     [$.export_statement, $.primary_expression],
     [$.lexical_declaration, $.primary_expression],
+    // `for await (let [a] of b)` has no lexical_declaration item to outrank `let` as an identifier: the declaration wins.
+    ['for_let', $.primary_expression],
     // Unlike `let [`, `using [` starts an expression: a using declaration binds identifiers only.
     [$.primary_expression, $.using_declaration],
     [$.primary_expression, $._for_using_declaration],
@@ -406,7 +408,7 @@ module.exports = grammar({
           )),
           optional($._initializer),
         ),
-        seq(
+        prec('for_let', seq(
           field('kind', choice('let', 'const')),
           field('left', choice(
             $.identifier,
@@ -414,7 +416,7 @@ module.exports = grammar({
             $._destructuring_pattern,
           )),
           optional($._automatic_semicolon),
-        ),
+        )),
         seq(
           field('kind', choice(
             'using',
@@ -902,10 +904,12 @@ module.exports = grammar({
       field('arguments', optional(prec.dynamic(1, $.arguments))),
     )),
 
-    await_expression: $ => prec('unary_void', seq(
+    // The grammar cannot tell async code from a script, so `await (x)(y)` parses both as a call of the identifier `await` and
+    // as an await expression. The dynamic precedence makes the await expression win, as it already did for `await (a)`.
+    await_expression: $ => prec.dynamic(1, prec('unary_void', seq(
       'await',
       $.expression,
-    )),
+    ))),
 
     member_expression: $ => prec('member', seq(
       field('object', choice($.expression, $.primary_expression, $.import)),

@@ -1678,3 +1678,43 @@ let x = { a: //  3
           (property_identifier)
           (comment)
           (number))))))
+
+============================================
+For-await-of statements with let and const patterns
+============================================
+
+async function f() {
+  for await (let [a] of b) {}
+  for await (let { a } of b) {}
+  for await (const [a] of b) {}
+}
+
+for await (let [a] of b);
+
+---
+
+(program
+  (function_declaration
+    (identifier)
+    (formal_parameters)
+    (statement_block
+      (for_in_statement
+        (array_pattern
+          (identifier))
+        (identifier)
+        (statement_block))
+      (for_in_statement
+        (object_pattern
+          (shorthand_property_identifier_pattern))
+        (identifier)
+        (statement_block))
+      (for_in_statement
+        (array_pattern
+          (identifier))
+        (identifier)
+        (statement_block))))
+  (for_in_statement
+    (array_pattern
+      (identifier))
+    (identifier)
+    (empty_statement)))

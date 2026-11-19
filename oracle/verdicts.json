@@ -32,7 +32,7 @@
    }
   },
   "cases_file": "cases.jsonl",
-  "cases_sha256": "42d40254143d0231121f26f5f2bb5681b928bb91f3c87707c473419d6d5629b1",
+  "cases_sha256": "7b42b70bc3eff5fd624672eda336a9a6ea65ff7571d60b547ec5cb53a8c91d7b",
   "runner": "run.mjs",
   "runner_sha256": "06cfe49cd56d0bac9b5c672b1f62fc0f44b37de02c0a2bf04c557e5354c5c24d"
  },
@@ -2975,6 +2975,246 @@
       "at": 5
      }
     ]
+   }
+  },
+  {
+   "id": "v3a/await-paren-call",
+   "sha256": "92a25e9c89c35504fb671492e68935e3c05efac4b9b9f8fd7aa6f9395230e7c4",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3a/await-paren-member-call",
+   "sha256": "d97f1260ff210a08ccbfae18dd0f72ce6f846178c25f295fdaa7db97dbd1afa2",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3a/await-sequence-call",
+   "sha256": "11ada1cbad958ea098507db79f947426a546b8f1102cb13b7d99ded59acdecd1",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3a/await-array-optional-subscript",
+   "sha256": "ec7199290a76254c337efead7baff873c8725cba130936bc65f615842b079c62",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3a/await-array-member",
+   "sha256": "132292a2d0de3ad9d6511d7e240178ac87c64ee851cb5bddccd2eac4ecdf572e",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3a/await-paren-tagged-template",
+   "sha256": "ac297c11f3a2b018a73dd1b45344228dfdd72f7b8787b4859bf2e27bbb3d86d6",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3a/await-call-async-arrow",
+   "sha256": "8fcf15bf6ce8c5cdacff73d577ff770986245c9140fc227fcd042f50c8b83d12",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3a/await-call-module-top-level",
+   "sha256": "ee2623500c5148953a9b8bca6420cba5e5fc0985a200daf7ac166dde7b0454bc",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3a/for-await-let-array-pattern",
+   "sha256": "0a44283d95299297441566bf39a5ae4f27b6dbb93042e63a201ff38d94cf6798",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3a/for-await-let-array-pattern-module",
+   "sha256": "c4f6f50699f80578b1d04df9ad4b926819c1bc1b7bbaa1272b508e250c055584",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3a/for-await-let-array-pattern-body",
+   "sha256": "aacde5301cfebfafd8ef13e765fc546173f996ab9a7cac726f5859b316f576ac",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3a/script-await-identifier-divide",
+   "sha256": "529588999d50df0e3b035dab00855aaf0b8dc8305c724a0dfe081ee9a9d12684",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3a/script-await-identifier-member",
+   "sha256": "0e5b7a130e322b78c820e12200f047e8e6faa71a58f858b48575545ac7de8946",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3a/script-await-identifier-assignment",
+   "sha256": "5da3f56b75a1347d18392198ee0ea724e39d78930d89d71b29ebdb2789632ad8",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3a/for-await-const-array-pattern",
+   "sha256": "fc68d11fd4b644c96363fcd151938e09844f376bb136ae01fa1ae55db06e9703",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3a/script-for-in-let-identifier",
+   "sha256": "5788cdd6cbe2332565c82ef717cfc996bdbf966becddb72687735cae757e9a85",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
    }
   }
  ]
