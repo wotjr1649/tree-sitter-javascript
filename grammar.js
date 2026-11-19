@@ -319,6 +319,14 @@ module.exports = grammar({
     // A plain `for` initializer ends at a real `;`: the automatic semicolon is never inserted in a `for` header.
     _for_using_declaration: $ => usingDeclaration($, ';'),
 
+    // One symbol for the declaration initializers of a plain `for`: the parse states of the rest of the header and
+    // the body are built once for all three, not once per declaration rule.
+    _for_declaration: $ => choice(
+      $.lexical_declaration,
+      $.variable_declaration,
+      alias($._for_using_declaration, $.using_declaration),
+    ),
+
     _using_keyword_declarator: $ => seq(
       field('name', alias(choice('as', 'satisfies'), $.identifier)),
       optional($._initializer),
@@ -359,11 +367,7 @@ module.exports = grammar({
       'for',
       '(',
       choice(
-        field('initializer', choice(
-          $.lexical_declaration,
-          $.variable_declaration,
-          alias($._for_using_declaration, $.using_declaration),
-        )),
+        field('initializer', $._for_declaration),
         seq(field('initializer', $._expressions), ';'),
         field('initializer', $.empty_statement),
       ),
