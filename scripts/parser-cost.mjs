@@ -1,4 +1,5 @@
-// Generated-parser cost of src/parser.c against a committed release baseline (test/parser-cost-baseline.json).
+// Generated-parser cost of src/parser.c against the last release (test/parser-cost-baseline.json; each release PR
+// moves it with --update, like test/node-types-snapshot.txt).
 // Report only: it prints a markdown table (also to $GITHUB_STEP_SUMMARY) and never fails on growth.
 //
 // Usage: node scripts/parser-cost.mjs [--parser FILE] [--baseline FILE] [--update LABEL]

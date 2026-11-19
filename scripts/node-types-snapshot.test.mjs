@@ -40,13 +40,18 @@ test('a renamed field fails, an added kind is only a note', () => {
   assert.ok(notes.includes('added field call callee identifier'));
 });
 
-test('a removed field type, a removed kind and a removed anonymous kind fail; a removed subtype does not', () => {
+test('a removed field type, kind, anonymous kind and subtype all fail', () => {
   const next = structuredClone(types);
   next[1].fields.arguments.types.pop();
   next[0].subtypes.pop();
   next.splice(4, 1);
   next.splice(2, 1);
   const { failures, notes } = compare(snapshot(types), snapshot(next));
-  assert.deepEqual(failures.sort(), ['removed kind "this"', 'removed kind identifier', 'removed type "(" of field call.arguments']);
-  assert.deepEqual(notes, ['removed subtype call of expression']);
+  assert.deepEqual(failures.sort(), [
+    'removed kind "this"',
+    'removed kind identifier',
+    'removed subtype call of expression',
+    'removed type "(" of field call.arguments',
+  ]);
+  assert.deepEqual(notes, []);
 });

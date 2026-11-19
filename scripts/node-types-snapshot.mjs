@@ -4,8 +4,9 @@
 // Named kinds are bare, anonymous kinds are JSON-quoted (`"="`), so `this` and `"this"` differ.
 //
 // Usage: node scripts/node-types-snapshot.mjs [--update] [--node-types FILE] [--snapshot FILE]
-//   check (default): exit 1 when a kind, a field or a field type of the snapshot is gone (a rename is a removal);
-//   additions and removed subtypes are reported only. --update rewrites the snapshot. Exit 2: unreadable input.
+//   check (default): exit 1 when a kind, a field, a field type or a supertype's subtype of the snapshot is gone (a
+//   rename is a removal; a removed subtype changes what a supertype query such as `(expression)` matches); additions
+//   are reported only. --update rewrites the snapshot. Exit 2: unreadable input.
 import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
@@ -32,7 +33,7 @@ export function compare(before, after) {
     if (now.has(l)) continue;
     const [cat, a, b, c] = l.split('\t');
     if (cat === 'kind') failures.push(`removed kind ${a}`);
-    else if (cat === 'subtype') notes.push(`removed subtype ${b} of ${a}`);
+    else if (cat === 'subtype') failures.push(`removed subtype ${b} of ${a}`);
     else if (fields.has(`field\t${a}\t${b}`)) failures.push(`removed type ${c} of field ${a}.${b}`);
     else if (!failures.includes(`removed field ${a}.${b}`)) failures.push(`removed field ${a}.${b}`);
   }
@@ -57,7 +58,7 @@ function main(argv) {
   for (const f of failures) console.log(`::error::${f}`);
   console.log(`${snapshotPath}: ${failures.length} breaking removal(s), ${notes.length} other change(s)`);
   if (failures.length)
-    console.error('A node kind or field is a public contract: removing or renaming one needs a major release.');
+    console.error('Node kinds, fields and supertypes are a public contract: removing or renaming one needs a major release.');
   return failures.length ? 1 : 0;
 }
 
