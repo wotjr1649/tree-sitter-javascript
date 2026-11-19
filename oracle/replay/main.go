@@ -1,7 +1,9 @@
 // Command replay judges the oracle's verdicts against this grammar through the tree-sitter API.
 //
 //	replay [-oracle DIR] [-tree]
+//	replay -dump OUT.jsonl [-root DIR] [INPUT...]
 //
+// The second form writes every input's tree as JSONL (see dump.go and oracle/README.md); exit 2 on any failure.
 // Exit codes: 0 every gated case is consistent; 1 a result differs (listed); 2 the inputs are inconsistent
 // (hash mismatch, verdicts made from other cases, another runner or other tool versions, a case that does not fit its
 // verdict, a malformed record, an empty case set) or nothing could be judged. See oracle/README.md.
@@ -233,10 +235,47 @@ func load(dir string) (cases []Case, verdicts map[string]string, problems []stri
 
 func main() { os.Exit(run()) }
 
+func runDump(to, root string, patterns []string) error {
+	if len(patterns) == 0 {
+		patterns = defaultInputs
+	}
+	inputs, err := loadInputs(root, patterns)
+	if err != nil {
+		return err
+	}
+	parser := tree_sitter.NewParser()
+	defer parser.Close()
+	if err := parser.SetLanguage(tree_sitter.NewLanguage(tree_sitter_javascript.Language())); err != nil {
+		return err
+	}
+	w := os.Stdout
+	if to != "-" {
+		if w, err = os.Create(to); err != nil {
+			return err
+		}
+	}
+	if err := dump(parser, inputs, w); err != nil {
+		w.Close()
+		return err
+	}
+	fmt.Fprintf(os.Stderr, "dumped %d inputs\n", len(inputs))
+	return w.Close()
+}
+
 func run() int {
 	dir := flag.String("oracle", "..", "the oracle directory (cases.jsonl, verdicts.json, run.mjs, package-lock.json)")
 	showTree := flag.Bool("tree", false, "print every case's tree with byte ranges (for writing expect entries)")
+	dumpTo := flag.String("dump", "", "write the tree of every input as JSONL to this file (- for stdout) instead of judging")
+	root := flag.String("root", "../..", "the repository root, for -dump inputs")
 	flag.Parse()
+
+	if *dumpTo != "" {
+		if err := runDump(*dumpTo, *root, flag.Args()); err != nil {
+			fmt.Fprintln(os.Stderr, "replay:", err)
+			return 2
+		}
+		return 0
+	}
 
 	cases, verdicts, problems, err := load(*dir)
 	if err != nil {
