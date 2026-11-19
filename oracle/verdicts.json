@@ -32,7 +32,7 @@
    }
   },
   "cases_file": "cases.jsonl",
-  "cases_sha256": "42d40254143d0231121f26f5f2bb5681b928bb91f3c87707c473419d6d5629b1",
+  "cases_sha256": "bf0b6cfa5021a8ce8765fdceef5c8de8a1de0ac5a38bcc524387652a5d5c1acf",
   "runner": "run.mjs",
   "runner_sha256": "06cfe49cd56d0bac9b5c672b1f62fc0f44b37de02c0a2bf04c557e5354c5c24d"
  },
@@ -2975,6 +2975,51 @@
       "at": 5
      }
     ]
+   }
+  },
+  {
+   "id": "j6/disagree-for-await-using-in",
+   "sha256": "e342fa27841455016c775990e3262385c5927dba374cf657eaa5f007750ae750",
+   "sourceType": "module",
+   "verdict": "disagree",
+   "babel": {
+    "class": "early",
+    "errors": [
+     {
+      "message": "For-in loop may not start with 'using' declaration. (1:26)",
+      "at": 26
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "The left-hand side of a for...in statement cannot be an await using declaration.",
+      "at": 26
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "The left-hand side of a for...in statement cannot be an await using declaration.",
+      "at": 26
+     }
+    ]
+   }
+  },
+  {
+   "id": "j6/using-member-for-in",
+   "sha256": "78edef8a9fa9618db1aaafc988eb10e5fec1ed53ac29ecc82a4ae4c564c6e63a",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
    }
   }
  ]

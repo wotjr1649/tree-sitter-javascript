@@ -1,0 +1,16 @@
+{
+  "label": "v2.0.0 befa45d",
+  "metrics": {
+    "parser_c_bytes": 3135009,
+    "state_count": 2048,
+    "large_state_count": 400,
+    "symbol_count": 266,
+    "alias_count": 4,
+    "token_count": 135,
+    "field_count": 36,
+    "parse_table_entries": 106400,
+    "small_parse_table_entries": 67863,
+    "small_parse_table_map_entries": 1648,
+    "parse_action_entries": 4120
+  }
+}

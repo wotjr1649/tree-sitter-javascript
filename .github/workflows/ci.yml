@@ -40,8 +40,17 @@ jobs:
           test-rust: true
           test-node: true
           test-python: true
-          test-go: true
+          # The action's Go test restores a Go build cache and has no input to turn it off (#21); see the steps below.
+          test-go: false
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
           go-version: "1.23"
+          # No restored build cache: the Go binding #includes ../../src/parser.c and scanner.c, which the Go build
+          # cache does not track, so a cache from another commit would test that commit's grammar.
+          cache: false
+      - name: Test Go binding
+        run: go test -count=1 -v ./bindings/go
       - name: Check Python runtime pin
         shell: bash
         run: python -c "import importlib.metadata as m; v = m.version('tree-sitter'); print(v); assert v == '0.26.1'"
@@ -90,6 +99,25 @@ jobs:
         run: swift test --skip-build -q
       - name: Check Package.resolved is unchanged
         run: cmp Package.resolved "$RUNNER_TEMP/Package.resolved"
+
+  gates:
+    name: Node kinds and parser cost
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+      - name: Test the gate scripts
+        run: node --test scripts/*.test.mjs
+      - name: Check node kinds and fields against test/node-types-snapshot.txt
+        # Fails on a removed or renamed kind, field, field type or subtype (a major change); additions are notices.
+        run: node scripts/node-types-snapshot.mjs
+      - name: Report the parser cost against the last release
+        # Report only, into the job summary; there is no budget yet.
+        run: node scripts/parser-cost.mjs
 
   oracle:
     name: Oracle replay

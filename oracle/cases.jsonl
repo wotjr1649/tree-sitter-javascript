@@ -156,3 +156,5 @@
 {"id":"j3b/reject-this-dot","sha256":"43579faae196c5f18385ec9d1fa651111bc6a4b8f77bb0f94c0c20223a2d69bc","source":"<this. />;","sourceType":"module","errorAt":7}
 {"id":"j3b/reject-this-index","sha256":"40610d9f86707cf4be6f834811bfd6314f111cd290acc3f7fe1bac485e0dc7f5","source":"<this[0] />;","sourceType":"module","errorAt":5}
 {"id":"j3b/reject-this-optional","sha256":"fcc29906d6d40f34bd7f44f1f39b433129da75165789313987dabac06acbdd5b","source":"<this?.a />;","sourceType":"module","errorAt":5}
+{"id":"j6/disagree-for-await-using-in","sha256":"e342fa27841455016c775990e3262385c5927dba374cf657eaa5f007750ae750","source":"async function g() { for (await using x in o); }","sourceType":"module","reason":"Babel reports a recoverable error, oxc a syntax error; ECMA-262 14.7.5 passes ~Using to the ForDeclaration of for-in, so this is a grammar restriction (an error in tree-sitter since J6)"}
+{"id":"j6/using-member-for-in","sha256":"78edef8a9fa9618db1aaafc988eb10e5fec1ed53ac29ecc82a4ae4c564c6e63a","source":"for (using.x in o);","sourceType":"module","expect":["5-12:member_expression"]}
