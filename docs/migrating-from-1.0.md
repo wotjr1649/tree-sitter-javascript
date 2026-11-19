@@ -45,8 +45,8 @@ Forms that keep their trees: block and `await using` declarations, `using x = a,
 ### Where the count comes from
 
 The 1.0.0 parser (`v1.0.0`, `d6501de`) and the fixes at `d4d699d` parsed (#24, merged after it, keeps every tree,
-field, range and query capture on 2,040 inputs in JS, TS and TSX; the release commit differs from `78abf56` only in
-`parser.c` `.metadata`), through the tree-sitter API, 1,068 distinct inputs (deduplicated by UTF-8 bytes): the
+field, range and query capture on 2,040 inputs in JS, TS and TSX; under `src/` the release commit differs from `78abf56` only
+in `parser.c` `.metadata`), through the tree-sitter API, 1,068 distinct inputs (deduplicated by UTF-8 bytes): the
 corpus, highlight and tags inputs, `examples/*.js`, the 158 `oracle/cases.jsonl` sources, the seven go-treesitter
 Korean samples and the J1-J5/J3b probe inputs, without TypeScript-only inputs. S-expressions with fields and byte ranges
 were compared (numeric symbol ids excluded). Of the 1,068 inputs, 533 parsed without an error in 1.0.0: 515 keep their
@@ -90,7 +90,8 @@ Public kinds and fields are unchanged, but the underlying grammar symbols are no
 - Query files load unchanged, because no kind or field is removed, but their captures follow the tree: where a tree
   changes (the `using` rows above), captures change with it. `queries/highlights.scm` on `using [a] = b;` now also
   captures `using` as `@variable` `[0,5)`, and `(using_declaration) @d` matches that input once in 1.0.0 and not in
-  2.0.0. On the corpus, examples and Korean samples, node, capture and range comparisons showed no difference. A consumer that stores or compares numeric symbol ids
+  2.0.0. Captures also change where input that gave an `ERROR` now parses: in `a = <class />;` 2.0.0 captures
+  `class` as `@variable`. A consumer that stores or compares numeric symbol ids
   (`KindId()`, `ts_node_symbol`) or the grammar name (`ts_node_grammar_symbol`, `GrammarName()`) must recompute them
   against the 2.0.0 parser.
 
