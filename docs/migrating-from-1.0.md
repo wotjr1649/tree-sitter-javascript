@@ -20,9 +20,8 @@ The grammar name `javascript`, the C symbol `tree_sitter_javascript`, ABI 15 and
 This is why the version is 2.0.0. 18 of the 533 distinct inputs that 1.0.0 parsed without an error (3.4 %) get a
 different tree: 16 are valid code (Babel 8.1.2 and oxc 0.159.0 accept them; `await using` + line break + `x = 1;` at
 top level only as a module) and still parse without an error, which is a breaking change; 2 are invalid code (both
-reject them) and now give an error. 373 inputs that gave an error in 1.0.0 no longer do.
-Most of them 1.0.0 had read wrongly. A query or walker written against the old tree of these forms stops matching.
-All of them involve `using`:
+reject them) and now give an error. 373 inputs that gave an error in 1.0.0 no longer do (next section).
+A query or walker written against the old tree of these forms stops matching. All of them involve `using`:
 
 | form | 1.0.0 | 2.0.0 | why |
 | --- | --- | --- | --- |
@@ -31,11 +30,8 @@ All of them involve `using`:
 | `async function f() { await using` + line break + `x = 1; }` (also at module top level) | `using_declaration` | an `await_expression` of `using` (an `identifier`), then the assignment as its own statement | same rule (J4) |
 | `for (using` + line break + `x of y);` | `for_in_statement` with `kind: using`, `left: x` | an error (`ERROR` node) | no line terminator after `using` (J5) |
 | `for (using` + line break + `of of y);` | `for_in_statement` with `kind: using`, `left: of` | an error | same (J5) |
-| `<class></for>` (element pair with reserved-word names) | an error | no error: two `jsx_opening_element`/`jsx_closing_element` names, not compared | tag names were never compared (`<a></b>` parses in 1.0.0 and 2.0.0); the reserved words now parse as names (J3) |
 
-The last row is not valid JSX: Babel, oxc and TypeScript report the mismatched tags. 2.0.0 reads it without an
-`ERROR` node, as it reads `<a></b>`; it is listed because tools that relied on the tree-sitter error for it no longer
-see one. In the comparisons recorded for each fix (corpus, `examples/`, highlight and tags inputs, `typescript.js`, Korean
+In the comparisons recorded for each fix (corpus, `examples/`, highlight and tags inputs, `typescript.js`, Korean
 samples, and 2,000 to 2,600 probe inputs for the later fixes) no other input that parsed cleanly was reported to change
 its tree, and none was reported to get an error except the `for (using` + line break + `of` forms above. Those
 comparisons are against each fix's own base; the count above compares `v1.0.0` with the release directly (see below).
@@ -55,10 +51,10 @@ were compared (numeric symbol ids excluded). Of the 1,068 inputs, 533 parsed wit
 tree, 16 change and stay error-free (J4), 2 change to an error (J5). Of the 535 that gave an error, 373 parse without
 one now. `typescript.js` (TypeScript 6.0.3, 9,144,216 bytes) gives the same tree in both.
 
-## Previously invalid input that parses now
+## Input that gave a parse error in 1.0.0 and parses now
 
-These gave an `ERROR` or `MISSING` node in 1.0.0 and parse without one; they are fixes, listed so you know which
-inputs no longer fail. Trees follow the kinds other names already use.
+These gave an `ERROR` or `MISSING` node in 1.0.0 and parse without one. All rows but the last are valid code; they are
+fixes, listed so you know which inputs no longer fail. Trees follow the kinds other names already use.
 
 | input | 1.0.0 | 2.0.0 |
 | --- | --- | --- |
@@ -69,10 +65,16 @@ inputs no longer fail. Trees follow the kinds other names already use.
 | `<this.props.Foo />`, `<this.Foo />` (J3b) | `ERROR` | `member_expression` (`object: this`, `property: property_identifier`) |
 | `using = 1`, `using(x)`, `using.x`, `using++`, `for (using of x)`, `for (using` + line break + `of y);` (J4) | `ERROR` | `using` as `identifier`, like any other name |
 | `for (using x = f();;) {}`, `for (await using x = f();;) {}` in an async function (J5) | `ERROR` | `for_statement` with `initializer: (using_declaration ...)` |
+| `<class></for>` (element pair with reserved-word names; J3) | `ERROR` | two element names, not compared |
+
+The last row is not valid JSX: Babel, oxc and TypeScript report the mismatched tags. 2.0.0 reads it without an
+`ERROR` node, as it reads `<a></b>` (tag names were never compared, #20); tools that relied on the tree-sitter error
+for it no longer see one.
 
 ## Recovery trees of invalid input
 
-Trees of inputs that are still invalid may differ inside their `ERROR` nodes. They were never a contract. Recorded
+Trees of inputs that give an error before and after may differ anywhere, `ERROR` and `MISSING` nodes included (a minor
+change). Recorded
 examples: `a..class` (`MISSING property_identifier` at `[2,2)` in 1.0.0, `ERROR[2,3)` now), `a?. .class`, `a.?.class`,
 `a.[class]` (J2); `<class />>` (`ERROR(regex_pattern)` becomes `ERROR(jsx_self_closing_element ...)`), `<a class= />`
 (J3); `<this. />` and `<this.#a />` in JS and TSX (J3b); error ranges of invalid `using` forms such as standalone-JavaScript

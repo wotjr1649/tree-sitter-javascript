@@ -22,10 +22,13 @@ origin's v0.25.0 is commit `44c892e` in this history, kept as `refs/upstream/v0.
 - Releases are `vMAJOR.MINOR.PATCH` (first independent `v2.0.0` after the `v1.0.0` baseline), each an annotated tag plus
   a GitHub Release without binaries (ADR-0001 amendment 2026-11-19). SemVer: breaking (major) means a node kind or
   field removed or renamed, or a changed tree for valid input (input that `@babel/parser` and `oxc-parser`, as pinned
-  in `oracle/`, both accept). Making accepted invalid input an error, changing recovery trees and parsing input that
-  gave an error are minor; the CHANGELOG lists them all. Tree-changing fixes are batched into one major release.
-- The grammar checks syntax, not early errors (static semantics such as `await using` in a non-async function or
-  `for (using x in o)`); those are a non-goal and stay accepted (owner decision, 2026-11-19).
+  in `oracle/`, both accept) that the previous release parsed without an error. Minor: accepted invalid input that
+  becomes an error, input that gave an error and parses now, and any change to the tree of input that is an error
+  before and after (recovery trees, `ERROR` and `MISSING` nodes included); the CHANGELOG lists them all. Major changes
+  are batched into one major release.
+- The grammar checks syntax, not early errors (static semantics, e.g. a `using` declaration without an initializer,
+  `for (using x;;);`); those are a non-goal and stay accepted (owner decision, 2026-11-19). Grammar restrictions such
+  as `for (using x in o);` or `await using` in a non-async function are defects, not early errors (#26).
 - The parser is ABI 15. Binding runtime lower bounds are the 0.25 line (Rust, Node, Python, Go, Swift) and CMake
   defaults to ABI 15; do not lower them without the owner's approval. `Package.swift` declares `swift-tools-version`
   5.9, the minimum SwiftTreeSitter 0.25.0 requires. CI tests Python under `ci/python-constraints.txt` and Swift with
