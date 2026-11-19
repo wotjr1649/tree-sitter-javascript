@@ -9,23 +9,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 A minor release: valid syntax that gave an error now parses (J8), invalid `using` and import-attribute forms that parsed
 are errors now (J6, J8), and the repository gains release gates and defect-discovery tools. No breaking change under the
-SemVer rule in `AGENTS.md`: no node kind, field or supertype subtype is removed or renamed (the node-kind snapshot gate
-reports additions only), and no valid input that 2.0.0 parsed without an error gets a different tree. In the tree
-comparison of `v2.0.0` with this release (`oracle/replay -dump`, `scripts/tree-diff.mjs`) no input that parsed without
-an error changes its tree and stays free of errors (changed-clean 0) over 56,023 inputs: the 359 default inputs (corpus,
-examples, highlight, tags, oracle cases), 1,068 N-of-M inputs and 54,596 valid discovery inputs (test262, Babel JSX,
-npm). The 8 inputs that become an error are invalid (`using` declarations in `for-in` heads, an import attribute
-shorthand); 44 inputs that gave an error parse now; 8 inputs that are an error before and after get a different recovery
-tree. `src/node-types.json` only gains types. The grammar name, the C symbol and ABI 15 are unchanged.
+SemVer rule in `AGENTS.md`, where valid input is input that `@babel/parser` and `oxc-parser`, as pinned in `oracle/`,
+both accept. The comparison with v2.0.0 (`oracle/replay -dump`, `scripts/tree-diff.mjs`) found no changed-clean trees
+over 56,023 inputs: the 359 default inputs (corpus, examples, highlight, tags, oracle cases), 1,068 N-of-M inputs and
+the 54,596 inputs that the discovery run labels valid (test262 positive tests, Babel JSX fixtures, npm files; 7 of them,
+Annex B tests, are accepted by Babel only). The eight inputs that became errors (`using` declarations in `for-in` heads,
+an import attribute shorthand) are rejected by both reference parsers. No node kind, field or supertype subtype was
+removed or renamed; `src/node-types.json` only gains types. 44 inputs that gave an error parse now, and 8 that are an
+error before and after get a different recovery tree. The grammar name, the C symbol and ABI 15 are unchanged.
 
 ### Added
 
-- Release gates (#27, #23): CI fails when a node kind, field, field type or supertype subtype in
-  `src/node-types.json` is removed or renamed (`scripts/node-types-snapshot.mjs` against
-  `test/node-types-snapshot.txt`; additions are notices), and reports the size of the generated parser against the last
-  release (`scripts/parser-cost.mjs`, `test/parser-cost-baseline.json`: `parser.c` bytes, state, symbol, token and
-  field counts, parse-table sizes) in the job summary. Each release PR moves both to the release. Tree dumps for reviews
-  and release notes: `oracle/replay -dump` writes every node with its field and byte range per input, and
+- Release gates (#27, #23): CI fails when a node kind, field, field type or supertype subtype in `src/node-types.json`
+  is removed or renamed (`scripts/node-types-snapshot.mjs` against `test/node-types-snapshot.txt`; additions are
+  notices). That gate does not check the types of `children` or the `multiple` and `required` flags of fields and
+  children ([#38](https://github.com/wotjr1649/tree-sitter-javascript/issues/38)); for this release they come from the
+  full `node-types.json` comparison under Changed. CI also reports the size of the generated parser against the last
+  release (`scripts/parser-cost.mjs`, `test/parser-cost-baseline.json`: `parser.c` bytes, state, symbol, token and field
+  counts, parse-table sizes) in the job summary. Each release PR moves both to the release. Tree dumps for reviews and
+  release notes: `oracle/replay -dump` writes every node with its field and byte range per input, and
   `scripts/tree-diff.mjs` compares two dumps by class (same, changed-clean, clean-to-error, error-to-clean,
   error-changed); see `oracle/README.md`.
 - Defect-discovery and structure-comparison tools in `oracle/discover/` (#30): pinned inputs (tc39/test262 `2e58f87d`,
@@ -68,9 +70,9 @@ tree. `src/node-types.json` only gains types. The grammar name, the C symbol and
 
 ### Fixed
 
-- Accept import attributes on `export … from`, also after a line break before `with` (J8): `export * from 'x' with
-  {type: 'json'}`, `export { a } from 'x' with {type: 'json'}`, and `import a from 'x'` + line break +
-  `with {type: 'json'}` gave `ERROR`.
+- Accept import attributes on `export … from`, also after a line break before `with` (J8):
+  `export * from 'x' with {type: 'json'}`, `export { a } from 'x' with {type: 'json'}`, and `import a from 'x'` + line
+  break + `with {type: 'json'}` gave `ERROR`.
 - Accept reserved words as module export and import names (J8): `export { a as if } from 'x'`,
   `export * as class from 'x'`, `import { if as a } from 'x'` gave `ERROR`.
 - Accept `for (async of => {};;)` (J8): an arrow function with the parameter `of` as a `for` initializer gave `ERROR`.
@@ -94,11 +96,11 @@ Not fixed in 2.1.0; tracked as GitHub Issues where a number is given:
   (#35, upstream #303); statement boundaries such as `export default function(){};`, `export` + line break + `{}`,
   `return` + lone CR or U+2028/U+2029, and `for (using of of [0]);` (#33); a statement that starts with `{a: 0}` is read
   as an object instead of a block (#34, upstream #259).
-- 49 of the 54,596 valid discovery inputs still give an error (69 at `v2.0.0`), all from test262 and one Babel JSX
-  fixture, none from npm. Most are scanner cases that J7 (#29, planned for v2.2.0) addresses: automatic semicolons in
-  class fields before a next-line generator or computed member and after a block comment holding a line terminator, a
-  lone CR (#17), `let a` + line break + JSX, U+0000 in templates. Sloppy-mode `yield` as an identifier, `export default`
-  boundaries and hashbang cases wait for v3.0.0.
+- 49 of the 54,596 inputs that the discovery run labels valid still give an error (69 at `v2.0.0`), all from test262 and
+  one Babel JSX fixture, none from npm. Most are scanner cases that J7 (#29, planned for v2.2.0) addresses: automatic
+  semicolons in class fields before a next-line generator or computed member and after a block comment holding a line
+  terminator, a lone CR (#17), `let a` + line break + JSX, U+0000 in templates. Sloppy-mode `yield` as an identifier,
+  `export default` boundaries and hashbang cases wait for v3.0.0.
 - J8 accepts some invalid input: `import { if } from 'x'` and `export { if }`; call expressions beyond the
   web-compatible form as assignment targets (`import('x') = 1`, `f?.() = 1`, tagged templates, `super() = 1`,
   `typeof f() = 1`), and `f() = 1` also in strict code and modules; in `for (async of => {};;)` a line break after
@@ -111,10 +113,14 @@ Not fixed in 2.1.0; tracked as GitHub Issues where a number is given:
   name, reserved words in namespace names (`<svg:true />`), reserved words other than `this` as the object of a member
   tag (`<super.Foo />`, `<class.Foo />`). The grammar does not compare opening and closing tag names (#20).
 - `using` line breaks (#18): in a `for` header a line break after `await using` or between `await` and `using`, and a
-  line break inside a block comment after `using`, are accepted; so is `for (using of of y);`. In a block,
-  `{ using /*` + line break + `*/ x = f(); }` is valid (`using;` and an assignment, as Babel and oxc read it) but is
-  read as a `using_declaration`. Rejecting `for (using of of y);` changes the tree of the valid
-  `for (using of of [1, 2]);`, and the block-comment fix changes valid trees, so both wait for v3.0.0.
+  line break inside a block comment after `using`, are accepted; so is `for (using of of y);`. In a block in an async
+  function, `{ await` + line break + `using x = g(); }` is accepted and read as `await;` and a `using_declaration`,
+  although the line break is not allowed there (Babel early error, oxc syntax error); in a non-async function in a
+  script the same text is valid and that reading is right. Valid forms with a wrong tree: in a block, `{ using /*` +
+  line break + `*/ x = f(); }` (`using;` and an assignment, as Babel and oxc read it) and, in an async function,
+  `await using /*` + line break + `*/ x = g();` are read as a `using_declaration`, which misses the line break.
+  Rejecting `for (using of of y);` changes the tree of the valid `for (using of of [1, 2]);`, and the block-comment fix
+  changes valid trees, so these wait for v3.0.0.
 - `await using` in a non-async function (`function f() { await using x = g(); }`) is accepted, although the ECMAScript
   grammar excludes it; Babel and oxc reject it (#26). It needs the await context of the v3.0.0 work (#35).
   `await using` at module top level and in async functions is valid.
