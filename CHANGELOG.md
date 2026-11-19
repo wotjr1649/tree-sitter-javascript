@@ -5,6 +5,133 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2026-11-20
+
+A minor release: valid syntax that gave an error now parses (J8), invalid `using` and import-attribute forms that parsed
+are errors now (J6, J8), and the repository gains release gates and defect-discovery tools. No breaking change under the
+SemVer rule in `AGENTS.md`: no node kind, field or supertype subtype is removed or renamed (the node-kind snapshot gate
+reports additions only), and no valid input that 2.0.0 parsed without an error gets a different tree. In the tree
+comparison of `v2.0.0` with this release (`oracle/replay -dump`, `scripts/tree-diff.mjs`) no input that parsed without
+an error changes its tree and stays free of errors (changed-clean 0) over 56,023 inputs: the 359 default inputs (corpus,
+examples, highlight, tags, oracle cases), 1,068 N-of-M inputs and 54,596 valid discovery inputs (test262, Babel JSX,
+npm). The 8 inputs that become an error are invalid (`using` declarations in `for-in` heads, an import attribute
+shorthand); 44 inputs that gave an error parse now; 8 inputs that are an error before and after get a different recovery
+tree. `src/node-types.json` only gains types. The grammar name, the C symbol and ABI 15 are unchanged.
+
+### Added
+
+- Release gates (#27, #23): CI fails when a node kind, field, field type or supertype subtype in
+  `src/node-types.json` is removed or renamed (`scripts/node-types-snapshot.mjs` against
+  `test/node-types-snapshot.txt`; additions are notices), and reports the size of the generated parser against the last
+  release (`scripts/parser-cost.mjs`, `test/parser-cost-baseline.json`: `parser.c` bytes, state, symbol, token and
+  field counts, parse-table sizes) in the job summary. Each release PR moves both to the release. Tree dumps for reviews
+  and release notes: `oracle/replay -dump` writes every node with its field and byte range per input, and
+  `scripts/tree-diff.mjs` compares two dumps by class (same, changed-clean, clean-to-error, error-to-clean,
+  error-changed); see `oracle/README.md`.
+- Defect-discovery and structure-comparison tools in `oracle/discover/` (#30): pinned inputs (tc39/test262 `2e58f87d`,
+  Babel JSX parser fixtures `24f41d12`, 29 npm packages by version and tarball hash, used as data only), verdicts of
+  `@babel/parser` 8.1.2 and `oxc-parser` 0.159.0 against this grammar, minimisation and clustering, and a comparison of
+  Babel's AST ranges with the tree of valid, error-free input to find wrong trees without an `ERROR` node. Outputs go to
+  the git-ignored `build/`. The J8 fixes and the Known limitations below come from its first run.
+- Corpus entries and oracle cases for J6 and J8 (`tree-sitter test`: 165/165 at the tag, 144 at `v2.0.0`; 184 oracle
+  cases at the tag, 133 accept, 35 syntax, 6 early, 10 disagree; 158 at `v2.0.0`).
+
+### Changed
+
+- `for (using x in o);` and `for (await using x in o);` are errors now (J6, #28, #26): ECMA-262 §14.7.5 passes `~Using`
+  to the `for-in` declaration, and Babel and oxc reject both. `for (using in o)`, `for (using.x in o)`,
+  `for (using of x)`, `for (using x of y)`, `for await (using x of y)` and `for (await using x of y)` in async code keep
+  their trees.
+- Import attributes are restricted to a WithClause on every import and export path (J8, #31): keys are an
+  IdentifierName or a string and values a string, so `import a from 'x' with {type: 1}`, numeric or computed keys,
+  spread, shorthand properties and methods are errors now; 2.0.0 parsed the one-line import forms without an error.
+  The tree is still `import_attribute` → `object` → `pair`.
+- A `with` statement on the line after an import or export, `import a from 'x'` + line break + `with (o) {}` or
+  `export * from 'x'` + line break + `with (o) {}`, is an error now (it is invalid in a module): the line break before
+  `with` starts import attributes (J8).
+- Recovery trees of invalid input change, all still errors (J8): exports with invalid attributes, imports with a line
+  break before invalid attributes, invalid escapes in untagged templates, and logical assignments (`&&=`, `||=`, `??=`)
+  to a call expression.
+- `src/node-types.json` gains types and no node kind (J8): `call_expression` in `assignment_expression.left`,
+  `augmented_assignment_expression.left` and `for_in_statement.left`; `string` in `pair.value`; `import_attribute` in
+  the children of `export_statement`, which therefore become `multiple` (an export clause or namespace export can be
+  followed by attributes). Consumers that read a single child of `export_statement`, or assume `left` is never a call,
+  should handle the new types.
+- Numeric symbol ids change, because the grammar gains hidden rules and a token: 107 of the 114 named kinds get a
+  new id (`for_statement` 163 to 167, `member_expression` 195 to 199, `call_expression` 210 to 214,
+  `property_identifier` 266 to 273). Consumers that store numeric `KindId()` values must recompute them.
+- Versions: manifests and `tree-sitter.json` `metadata.version` are `2.1.0` (compiled into `src/parser.c`).
+- Generated size: `src/parser.c` is 3,212,460 bytes with 2,105 parse states and 273 symbols (3,135,009 bytes,
+  2,048 states and 266 symbols at `v2.0.0`, +2.47 %; J6 +0.14 %, J8 +2.33 %).
+- CI: the `Test parser` job runs the Go binding test in its own steps without a Go build cache (#27, #21), and a new
+  `Node kinds and parser cost` job runs the gates above.
+
+### Fixed
+
+- Accept import attributes on `export … from`, also after a line break before `with` (J8): `export * from 'x' with
+  {type: 'json'}`, `export { a } from 'x' with {type: 'json'}`, and `import a from 'x'` + line break +
+  `with {type: 'json'}` gave `ERROR`.
+- Accept reserved words as module export and import names (J8): `export { a as if } from 'x'`,
+  `export * as class from 'x'`, `import { if as a } from 'x'` gave `ERROR`.
+- Accept `for (async of => {};;)` (J8): an arrow function with the parameter `of` as a `for` initializer gave `ERROR`.
+- Accept invalid escape sequences in tagged templates (J8; upstream issue
+  [#337](https://github.com/tree-sitter/tree-sitter-javascript/issues/337)): `` x`\u{0` `` and `` x`\x` `` gave
+  `ERROR`; untagged templates still reject them.
+- Accept call expressions as assignment targets in the web-compatible form (J8; ECMA-262 §8.6.4 and Annex B.3.9, as in
+  test262 and Babel): `f() = 1`, `f() += 1`, `for (f() of x)`, `for (f() in x)` gave `ERROR`. `f() &&= 1`, `||=`,
+  `??=`, `new f() = 1` and `[f()] = x` stay errors.
+- The Go binding test of the `Test parser` CI job no longer reuses a restored Go build cache, which did not track the
+  included `src/parser.c` (#21).
+
+### Known limitations
+
+Not fixed in 2.1.0; tracked as GitHub Issues where a number is given:
+
+- Valid input that parses without an error but with a wrong tree, found by the structure comparison (#30); fixing them
+  changes those trees, so they wait for v3.0.0: `await (x)(y)`, `await (a).b()` and `await[0]` in async code read
+  `await` as a called identifier (#32; seen in 48 npm files); `for await (let [a] of b)` reads `let [a]` as a subscript
+  (#32); sloppy-mode `yield` as an identifier (`yield + 1`) and `await(x)` outside async code are read as keywords
+  (#35, upstream #303); statement boundaries such as `export default function(){};`, `export` + line break + `{}`,
+  `return` + lone CR or U+2028/U+2029, and `for (using of of [0]);` (#33); a statement that starts with `{a: 0}` is read
+  as an object instead of a block (#34, upstream #259).
+- 49 of the 54,596 valid discovery inputs still give an error (69 at `v2.0.0`), all from test262 and one Babel JSX
+  fixture, none from npm. Most are scanner cases that J7 (#29, planned for v2.2.0) addresses: automatic semicolons in
+  class fields before a next-line generator or computed member and after a block comment holding a line terminator, a
+  lone CR (#17), `let a` + line break + JSX, U+0000 in templates. Sloppy-mode `yield` as an identifier, `export default`
+  boundaries and hashbang cases wait for v3.0.0.
+- J8 accepts some invalid input: `import { if } from 'x'` and `export { if }`; call expressions beyond the
+  web-compatible form as assignment targets (`import('x') = 1`, `f?.() = 1`, tagged templates, `super() = 1`,
+  `typeof f() = 1`), and `f() = 1` also in strict code and modules; in `for (async of => {};;)` a line break after
+  `async` or before `=>` (ECMA-262 §15.9 forbids it; rejecting it costs +1.2 % to +5.3 % `parser.c`).
+- Invalid input that stays accepted, found by the discovery run, with the stricter grammar planned for v3.0.0: optional
+  chains as assignment, update or destructuring targets (`a?.b = 1`, `a?.b++`, `[a?.b] = c`; #19), class declarations as
+  the body of `if`, loops and labels, an arrow function as an operand of a binary operator, `??` mixed with `||`/`&&`
+  without parentheses, and `class extends` with an expression that is not a LeftHandSideExpression.
+- JSX names that conflict with TypeScript rules in TSX stay errors: `<const />`, `extends` as an element or attribute
+  name, reserved words in namespace names (`<svg:true />`), reserved words other than `this` as the object of a member
+  tag (`<super.Foo />`, `<class.Foo />`). The grammar does not compare opening and closing tag names (#20).
+- `using` line breaks (#18): in a `for` header a line break after `await using` or between `await` and `using`, and a
+  line break inside a block comment after `using`, are accepted; so is `for (using of of y);`. In a block,
+  `{ using /*` + line break + `*/ x = f(); }` is valid (`using;` and an assignment, as Babel and oxc read it) but is
+  read as a `using_declaration`. Rejecting `for (using of of y);` changes the tree of the valid
+  `for (using of of [1, 2]);`, and the block-comment fix changes valid trees, so both wait for v3.0.0.
+- `await using` in a non-async function (`function f() { await using x = g(); }`) is accepted, although the ECMAScript
+  grammar excludes it; Babel and oxc reject it (#26). It needs the await context of the v3.0.0 work (#35).
+  `await using` at module top level and in async functions is valid.
+- Early errors are a non-goal (ADR-0001): for example a `using` declaration without an initializer,
+  `for (using x;;);`, and duplicate import attribute keys are accepted.
+- The scanner's automatic-semicolon rules accept a lone CR after `using` and names such as `in_` and `instanceof_`
+  after a line break, and the TS/TSX grammars accept U+2028/U+2029 there (#17; J7, #29).
+- Other `isw*` calls in `src/scanner.c` (`iswspace` in `scan_jsx_text` and the calls on the automatic-semicolon,
+  ternary and HTML-comment paths) still use the platform classification (#16).
+- TypeScript: `import x = a.class;` (and `export import`, `import x = a.class.b;`) is accepted, although TypeScript
+  rejects it (TS1359); the fix belongs in tree-sitter-typescript. The J8 fixes for the import line break,
+  tagged-template escapes, `f() = 1` and the attribute restriction need their own changes in tree-sitter-typescript's
+  `define-grammar.js` (handed over); `f() += 1` and the `for` heads follow by inheritance.
+- Inherited build templates: a fresh CMake build needs the tree-sitter CLI, `setup.py` tags a free-threaded CPython
+  build as `cp310-abi3`, and `make install` leaves the pkg-config description empty and prefixes absolute paths
+  ([#22](https://github.com/wotjr1649/tree-sitter-javascript/issues/22)).
+
 ## [2.0.0] - 2026-11-19
 
 The first release of this independent repository after the `v1.0.0` baseline (origin `tree-sitter/tree-sitter-javascript`
@@ -141,4 +268,5 @@ Not fixed in 2.0.0; tracked as GitHub Issues where a number is given:
   build as `cp310-abi3`, and `make install` leaves the pkg-config description empty and prefixes absolute paths
   ([#22](https://github.com/wotjr1649/tree-sitter-javascript/issues/22)).
 
+[2.1.0]: https://github.com/wotjr1649/tree-sitter-javascript/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/wotjr1649/tree-sitter-javascript/compare/v1.0.0...v2.0.0

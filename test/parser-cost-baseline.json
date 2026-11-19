@@ -1,16 +1,16 @@
 {
-  "label": "v2.0.0 befa45d",
+  "label": "v2.1.0 2427a3a",
   "metrics": {
-    "parser_c_bytes": 3135009,
-    "state_count": 2048,
-    "large_state_count": 400,
-    "symbol_count": 266,
+    "parser_c_bytes": 3212460,
+    "state_count": 2105,
+    "large_state_count": 408,
+    "symbol_count": 273,
     "alias_count": 4,
-    "token_count": 135,
+    "token_count": 136,
     "field_count": 36,
-    "parse_table_entries": 106400,
-    "small_parse_table_entries": 67863,
-    "small_parse_table_map_entries": 1648,
-    "parse_action_entries": 4120
+    "parse_table_entries": 111384,
+    "small_parse_table_entries": 69761,
+    "small_parse_table_map_entries": 1697,
+    "parse_action_entries": 4244
   }
 }
