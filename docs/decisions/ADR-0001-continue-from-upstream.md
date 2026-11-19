@@ -42,8 +42,8 @@ identical).
    Versioning, starting with `v2.0.0`, the first independent release (the model of tree-sitter-mssql ADR-0007
    decision 3). A release is a `vMAJOR.MINOR.PATCH` annotated tag plus a GitHub Release made by hand without
    binaries, each separately approved by the owner; `CHANGELOG.md` (Keep a Changelog) records it, and
-   `docs/migrating-from-1.0.md` covers the move from 1.0.0. A major version marks a breaking change: a node kind or
-   field removed or renamed, or a changed tree for valid input that the previous release parsed without an error;
+   `docs/migrating-from-1.0.md` covers the move from 1.0.0. A major version marks a breaking change: a node kind,
+   field or supertype subtype removed or renamed, or a changed tree for valid input that the previous release parsed without an error;
    valid input is input that `@babel/parser` and `oxc-parser` (the versions pinned in `oracle/`) both accept. Minor
    changes, each listed in the CHANGELOG: accepted invalid input that becomes an error, input that gave an error and
    parses now, and any change to the tree of input that is an error before and after (recovery trees, `ERROR` and
