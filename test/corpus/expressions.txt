@@ -212,6 +212,99 @@ f
         (string_fragment)))))
 
 ============================================
+Tagged templates with invalid escape sequences
+============================================
+
+a`\u{0`;
+a`\x`;
+a`\u`;
+a`\u12${b}\xz${c}\u{110000}`;
+a.b`\xg`;
+a()`\ug`;
+new a`\x`;
+a`${b`\u{`}`;
+
+---
+
+(program
+  (expression_statement
+    (call_expression
+      (identifier)
+      (template_string
+        (escape_sequence))))
+  (expression_statement
+    (call_expression
+      (identifier)
+      (template_string
+        (escape_sequence))))
+  (expression_statement
+    (call_expression
+      (identifier)
+      (template_string
+        (escape_sequence))))
+  (expression_statement
+    (call_expression
+      (identifier)
+      (template_string
+        (escape_sequence)
+        (template_substitution
+          (identifier))
+        (escape_sequence)
+        (string_fragment)
+        (template_substitution
+          (identifier))
+        (escape_sequence))))
+  (expression_statement
+    (call_expression
+      (member_expression
+        (identifier)
+        (property_identifier))
+      (template_string
+        (escape_sequence)
+        (string_fragment))))
+  (expression_statement
+    (call_expression
+      (call_expression
+        (identifier)
+        (arguments))
+      (template_string
+        (escape_sequence)
+        (string_fragment))))
+  (expression_statement
+    (new_expression
+      (call_expression
+        (identifier)
+        (template_string
+          (escape_sequence)))))
+  (expression_statement
+    (call_expression
+      (identifier)
+      (template_string
+        (template_substitution
+          (call_expression
+            (identifier)
+            (template_string
+              (escape_sequence))))))))
+
+============================================
+Invalid escape sequence in a template without a tag
+:error
+============================================
+
+`\u{0`;
+
+---
+
+============================================
+Invalid escape sequence in a substitution of a tagged template
+:error
+============================================
+
+a`${`\x`}`;
+
+---
+
+============================================
 Numbers
 ============================================
 
@@ -1944,6 +2037,139 @@ c <<= 1;
       (identifier)
       (number))))
 
+============================================
+Call expressions as assignment targets (annex B)
+============================================
+
+f() = 1;
+f() += 1;
+f() **= 1, g(a)(b) >>>= 2;
+a.b() -= 1;
+async() = 1;
+async() *= 1;
+for (f() in o);
+for (f() of o);
+for (async() of o);
+async function g() {
+  for await (f() of o);
+}
+
+---
+
+(program
+  (expression_statement
+    (assignment_expression
+      (call_expression
+        (identifier)
+        (arguments))
+      (number)))
+  (expression_statement
+    (augmented_assignment_expression
+      (call_expression
+        (identifier)
+        (arguments))
+      (number)))
+  (expression_statement
+    (sequence_expression
+      (augmented_assignment_expression
+        (call_expression
+          (identifier)
+          (arguments))
+        (number))
+      (augmented_assignment_expression
+        (call_expression
+          (call_expression
+            (identifier)
+            (arguments
+              (identifier)))
+          (arguments
+            (identifier)))
+        (number))))
+  (expression_statement
+    (augmented_assignment_expression
+      (call_expression
+        (member_expression
+          (identifier)
+          (property_identifier))
+        (arguments))
+      (number)))
+  (expression_statement
+    (assignment_expression
+      (call_expression
+        (identifier)
+        (arguments))
+      (number)))
+  (expression_statement
+    (augmented_assignment_expression
+      (call_expression
+        (identifier)
+        (arguments))
+      (number)))
+  (for_in_statement
+    (call_expression
+      (identifier)
+      (arguments))
+    (identifier)
+    (empty_statement))
+  (for_in_statement
+    (call_expression
+      (identifier)
+      (arguments))
+    (identifier)
+    (empty_statement))
+  (for_in_statement
+    (call_expression
+      (identifier)
+      (arguments))
+    (identifier)
+    (empty_statement))
+  (function_declaration
+    (identifier)
+    (formal_parameters)
+    (statement_block
+      (for_in_statement
+        (call_expression
+          (identifier)
+          (arguments))
+        (identifier)
+        (empty_statement)))))
+
+============================================
+Logical assignment to a call expression
+:error
+============================================
+
+f() &&= 1;
+
+---
+
+============================================
+Call expression in an array destructuring target
+:error
+============================================
+
+[f()] = a;
+
+---
+
+============================================
+Call expression in an object destructuring target
+:error
+============================================
+
+({ a: f() } = b);
+
+---
+
+============================================
+'new' expression as an assignment target
+:error
+============================================
+
+new f() = 1;
+
+---
+
 ==============================================
 Operator precedence
 ==============================================
@@ -2978,3 +3204,262 @@ i = <Foo:Bar bar={}>{...children}</Foo:Bar>
           name: (jsx_namespace_name
             (identifier)
             (identifier)))))))
+
+================================================================================
+Blocks with calls in the parameters of async and generator functions
+================================================================================
+
+async function f(p = () => {{ f(x); }}) { await x; }
+async function g(p = () => { switch (c) { case 1: { g(x); } } }) { await x; }
+function* h(p = function () { { h(x); } }) { yield x; }
+
+--------------------------------------------------------------------------------
+
+(program
+  (function_declaration
+    (identifier)
+    (formal_parameters
+      (assignment_pattern
+        (identifier)
+        (arrow_function
+          (formal_parameters)
+          (statement_block
+            (statement_block
+              (expression_statement
+                (call_expression
+                  (identifier)
+                  (arguments
+                    (identifier)))))))))
+    (statement_block
+      (expression_statement
+        (await_expression
+          (identifier)))))
+  (function_declaration
+    (identifier)
+    (formal_parameters
+      (assignment_pattern
+        (identifier)
+        (arrow_function
+          (formal_parameters)
+          (statement_block
+            (switch_statement
+              (parenthesized_expression
+                (identifier))
+              (switch_body
+                (switch_case
+                  (number)
+                  (statement_block
+                    (expression_statement
+                      (call_expression
+                        (identifier)
+                        (arguments
+                          (identifier))))))))))))
+    (statement_block
+      (expression_statement
+        (await_expression
+          (identifier)))))
+  (generator_function_declaration
+    (identifier)
+    (formal_parameters
+      (assignment_pattern
+        (identifier)
+        (function_expression
+          (formal_parameters)
+          (statement_block
+            (statement_block
+              (expression_statement
+                (call_expression
+                  (identifier)
+                  (arguments
+                    (identifier)))))))))
+    (statement_block
+      (expression_statement
+        (yield_expression
+          (identifier))))))
+
+================================================================================
+Methods in the computed names of async and generator methods
+================================================================================
+
+const o = { async [({ m() {} })]() { await x; } };
+const p = { *[({ m() {} })]() { yield x; } };
+class C { async *[({ m() {} })]() { await x; yield 1; } }
+
+--------------------------------------------------------------------------------
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (object
+        (method_definition
+          (computed_property_name
+            (parenthesized_expression
+              (object
+                (method_definition
+                  (property_identifier)
+                  (formal_parameters)
+                  (statement_block)))))
+          (formal_parameters)
+          (statement_block
+            (expression_statement
+              (await_expression
+                (identifier))))))))
+  (lexical_declaration
+    (variable_declarator
+      (identifier)
+      (object
+        (method_definition
+          (computed_property_name
+            (parenthesized_expression
+              (object
+                (method_definition
+                  (property_identifier)
+                  (formal_parameters)
+                  (statement_block)))))
+          (formal_parameters)
+          (statement_block
+            (expression_statement
+              (yield_expression
+                (identifier))))))))
+  (class_declaration
+    (identifier)
+    (class_body
+      (method_definition
+        (computed_property_name
+          (parenthesized_expression
+            (object
+              (method_definition
+                (property_identifier)
+                (formal_parameters)
+                (statement_block)))))
+        (formal_parameters)
+        (statement_block
+          (expression_statement
+            (await_expression
+              (identifier)))
+          (expression_statement
+            (yield_expression
+              (number))))))))
+
+================================================================================
+Operands of await that start like something else
+================================================================================
+
+async function f() { return await .5; }
+async function g() { return await of; }
+async function h() { return await as; }
+async function i() { return await satisfies; }
+
+--------------------------------------------------------------------------------
+
+(program
+  (function_declaration
+    (identifier)
+    (formal_parameters)
+    (statement_block
+      (return_statement
+        (await_expression
+          (number)))))
+  (function_declaration
+    (identifier)
+    (formal_parameters)
+    (statement_block
+      (return_statement
+        (await_expression
+          (identifier)))))
+  (function_declaration
+    (identifier)
+    (formal_parameters)
+    (statement_block
+      (return_statement
+        (await_expression
+          (identifier)))))
+  (function_declaration
+    (identifier)
+    (formal_parameters)
+    (statement_block
+      (return_statement
+        (await_expression
+          (identifier))))))
+
+================================================================================
+Expression bodies of async arrow functions end with their statement
+================================================================================
+
+function f() { const g = async () => x; return await / 2; }
+function* h() { const g = async () => yield(x); yield 1; }
+
+--------------------------------------------------------------------------------
+
+(program
+  (function_declaration
+    (identifier)
+    (formal_parameters)
+    (statement_block
+      (lexical_declaration
+        (variable_declarator
+          (identifier)
+          (arrow_function
+            (formal_parameters)
+            (identifier))))
+      (return_statement
+        (binary_expression
+          (identifier)
+          (number)))))
+  (generator_function_declaration
+    (identifier)
+    (formal_parameters)
+    (statement_block
+      (lexical_declaration
+        (variable_declarator
+          (identifier)
+          (arrow_function
+            (formal_parameters)
+            (call_expression
+              (identifier)
+              (arguments
+                (identifier))))))
+      (expression_statement
+        (yield_expression
+          (number))))))
+
+================================================================================
+White space and comments after async
+================================================================================
+
+async function f() { await x; }
+({ async m() { await x; } });
+class C { async/*
+*/m() {} }
+
+--------------------------------------------------------------------------------
+
+(program
+  (function_declaration
+    (identifier)
+    (formal_parameters)
+    (statement_block
+      (expression_statement
+        (await_expression
+          (identifier)))))
+  (expression_statement
+    (parenthesized_expression
+      (object
+        (method_definition
+          (property_identifier)
+          (formal_parameters)
+          (statement_block
+            (expression_statement
+              (await_expression
+                (identifier))))))))
+  (class_declaration
+    (identifier)
+    (class_body
+      (field_definition
+        (property_identifier))
+      (comment)
+      (method_definition
+        (property_identifier)
+        (formal_parameters)
+        (statement_block)))))

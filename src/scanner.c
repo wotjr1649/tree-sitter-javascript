@@ -28,6 +28,8 @@ enum TokenType {
     GENERATOR_STAR_METHOD,
     FUNCTION_PARAMS,
     METHOD_PARAMS,
+    METHOD_ENTRY,
+    EXPLICIT_SEMICOLON,
 };
 
 // Whether `await` and `yield` are keywords depends on the enclosing function, which the parser tells the scanner with
@@ -40,17 +42,18 @@ enum AwaitMode {
 };
 
 #define YIELD_BIT 4
+#define ARROW_EXPRESSION_BIT 8 // the frame of an async arrow function's expression body
 // shortcut: a function nested more than 960 deep reads the context of the 960th; raise this when real code needs it
 // (the state, 3 bytes + the entries + the depth, must fit the 1024-byte serialization buffer).
 #define MAX_FUNCTION_DEPTH 960
 
 // A function or method that is async or a generator says so before its parameters, and a function in the parameters must
 // not take that for itself: the scanner keeps one entry for each function whose parameters are open, and for each method
-// with `async` or `*` (a signature without a body leaves its entry behind: the oldest entries are dropped).
+// (an entry that no body start pops, as of a signature without a body, stays behind: the oldest entries are dropped).
 #define MAX_ENTRIES 32
 #define ENTRY_ASYNC 1
 #define ENTRY_GENERATOR 2
-#define ENTRY_FRESH 4  // noted by `async` or `*`, not yet claimed by the marker after `function`
+#define ENTRY_FRESH 4  // noted by `async` or `*`, not yet claimed by the marker after `function` or the method's own
 #define ENTRY_METHOD 8 // noted by a method's `async` or `*`
 
 typedef struct {
@@ -60,6 +63,8 @@ typedef struct {
     unsigned char entries[MAX_ENTRIES];
     unsigned char frames[MAX_FUNCTION_DEPTH]; // frames[0] is the top level
 } Scanner;
+
+static void pop_arrow_expressions(Scanner *scanner);
 
 static void scanner_reset(Scanner *scanner) {
     scanner->overflow = 0;
@@ -107,6 +112,15 @@ void tree_sitter_javascript_external_scanner_deserialize(void *payload, const ch
 static inline void advance(TSLexer *lexer) { lexer->advance(lexer, false); }
 
 static inline void skip(TSLexer *lexer) { lexer->advance(lexer, true); }
+
+static inline bool is_line_terminator(int32_t c) { return c == '\n' || c == '\r' || c == 0x2028 || c == 0x2029; }
+
+// White space and line terminators as the grammar's `extras` regex has them. Explicit, not iswspace: that differs
+// between C runtimes (U+00A0, U+FEFF).
+static bool is_extra_space(int32_t c) {
+    return (c >= '\t' && c <= '\r') || c == ' ' || c == 0xa0 || c == 0x1680 || (c >= 0x2000 && c <= 0x200b) ||
+           c == 0x2028 || c == 0x2029 || c == 0x202f || c == 0x205f || c == 0x2060 || c == 0x3000 || c == 0xfeff;
+}
 
 static bool scan_template_chars(TSLexer *lexer) {
     lexer->result_symbol = TEMPLATE_CHARS;
@@ -310,7 +324,7 @@ static bool scan_automatic_semicolon(TSLexer *lexer, bool comment_condition, boo
 
 static bool scan_ternary_qmark(TSLexer *lexer) {
     for (;;) {
-        if (!iswspace(lexer->lookahead)) {
+        if (!is_extra_space(lexer->lookahead)) {
             break;
         }
         skip(lexer);
@@ -492,10 +506,22 @@ static void push_function(Scanner *scanner, unsigned char frame) {
     }
 }
 
+// The expression bodies of async arrow functions have no end marker: a marker after every expression body made the parser
+// 33 % larger. They end where the statement around them does (an automatic semicolon, or the `;`, which the scanner returns
+// as its own token then), or at the end of the function that holds them.
+static void pop_arrow_expressions(Scanner *scanner) {
+    while (scanner->depth > 1 && (scanner->frames[scanner->depth - 1] & ARROW_EXPRESSION_BIT)) {
+        scanner->depth--;
+    }
+}
+
 static void pop_function(Scanner *scanner) {
     if (scanner->overflow > 0) {
         scanner->overflow--;
-    } else if (scanner->depth > 1) {
+        return;
+    }
+    pop_arrow_expressions(scanner);
+    if (scanner->depth > 1) {
         scanner->depth--;
     }
 }
@@ -508,11 +534,12 @@ typedef enum {
     FOLLOWED_BY_WORD,        // an identifier, keyword, number or string: only an operand can start so
 } AwaitFollower;
 
-// What comes after `await`, which the lexer has just passed (the token is marked).
-static AwaitFollower scan_await_follower(TSLexer *lexer) {
+// What comes after `await`, which the lexer has just passed (the token is marked). At the top level (`top`) `of` is not an
+// operand: `for (await of x)` in a script.
+static AwaitFollower scan_await_follower(TSLexer *lexer, bool top) {
     // `advance`, not `skip`: skipping would move the start of the `await` token behind it.
     for (;;) {
-        while (iswspace(lexer->lookahead)) {
+        while (is_extra_space(lexer->lookahead)) {
             advance(lexer);
         }
         if (lexer->lookahead != '/') {
@@ -520,8 +547,7 @@ static AwaitFollower scan_await_follower(TSLexer *lexer) {
         }
         advance(lexer);
         if (lexer->lookahead == '/') {
-            while (lexer->lookahead != 0 && lexer->lookahead != '\n' && lexer->lookahead != 0x2028 &&
-                   lexer->lookahead != 0x2029) {
+            while (lexer->lookahead != 0 && !is_line_terminator(lexer->lookahead)) {
                 advance(lexer);
             }
         } else if (lexer->lookahead == '*') {
@@ -537,12 +563,11 @@ static AwaitFollower scan_await_follower(TSLexer *lexer) {
         } else {
             // A regular expression ends with a `/` on the same line, outside a class; `await / 2;` has none.
             bool in_class = false;
-            while (lexer->lookahead != 0 && lexer->lookahead != '\n' && lexer->lookahead != '\r' &&
-                   lexer->lookahead != 0x2028 && lexer->lookahead != 0x2029) {
+            while (lexer->lookahead != 0 && !is_line_terminator(lexer->lookahead)) {
                 int32_t ch = lexer->lookahead;
                 advance(lexer);
                 if (ch == '\\') {
-                    if (lexer->lookahead == 0 || lexer->lookahead == '\n' || lexer->lookahead == '\r') {
+                    if (lexer->lookahead == 0 || is_line_terminator(lexer->lookahead)) {
                         break;
                     }
                     advance(lexer);
@@ -562,7 +587,7 @@ static AwaitFollower scan_await_follower(TSLexer *lexer) {
         return FOLLOWED_BY_WORD;
     }
     if (is_identifier_part(c)) {
-        // Words that follow an identifier: `await in x`, `await of y`.
+        // Words that follow an identifier: `await in x`.
         char word[12];
         unsigned length = 0;
         while (length < sizeof(word) - 1 && is_identifier_part(lexer->lookahead) && lexer->lookahead < 0x80) {
@@ -573,11 +598,18 @@ static AwaitFollower scan_await_follower(TSLexer *lexer) {
         if (is_identifier_part(lexer->lookahead)) {
             return FOLLOWED_BY_WORD;
         }
-        static const char *const operator_words[] = {"in", "instanceof", "of", "as", "satisfies"};
-        for (unsigned i = 0; i < sizeof(operator_words) / sizeof(operator_words[0]); i++) {
-            if (strcmp(word, operator_words[i]) == 0) {
-                return FOLLOWED_BY_NOTHING;
+        if (strcmp(word, "in") == 0 || strcmp(word, "instanceof") == 0) {
+            return FOLLOWED_BY_NOTHING;
+        }
+        if (top && strcmp(word, "of") == 0) {
+            // `for (await of x)` in a script: `of` is the keyword when an operand follows it.
+            while (is_extra_space(lexer->lookahead)) {
+                advance(lexer);
             }
+            int32_t next = lexer->lookahead;
+            bool operand = is_identifier_part(next) || next == '"' || next == '\'' || next == '(' || next == '[' || next == '{' ||
+                           next == '`' || next == '+' || next == '-' || next == '!' || next == '~' || next == '/' || next == '<';
+            return operand ? FOLLOWED_BY_NOTHING : FOLLOWED_BY_WORD;
         }
         return FOLLOWED_BY_WORD;
     }
@@ -585,11 +617,21 @@ static AwaitFollower scan_await_follower(TSLexer *lexer) {
         case '(':
             // `await()` calls the function of that name: empty parentheses are no operand.
             advance(lexer);
-            while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+            while (is_extra_space(lexer->lookahead)) {
                 advance(lexer);
             }
             return lexer->lookahead == ')' ? FOLLOWED_BY_NOTHING : FOLLOWED_BY_PUNCTUATION;
-        case '[': case '{': case '`': case '+': case '-': case '!': case '~': case '<':
+        case '.':
+            // `await .5` awaits a number; `await.x` is a member access.
+            advance(lexer);
+            return lexer->lookahead >= '0' && lexer->lookahead <= '9' ? FOLLOWED_BY_WORD : FOLLOWED_BY_NOTHING;
+        case '<':
+            // JSX (or a TypeScript type assertion) starts with a name or `>`; `await < 1` compares.
+            advance(lexer);
+            return lexer->lookahead == '>' || (is_identifier_part(lexer->lookahead) && !(lexer->lookahead >= '0' && lexer->lookahead <= '9'))
+                       ? FOLLOWED_BY_PUNCTUATION
+                       : FOLLOWED_BY_NOTHING;
+        case '[': case '{': case '`': case '+': case '-': case '!': case '~':
             return FOLLOWED_BY_PUNCTUATION;
         default:
             return FOLLOWED_BY_NOTHING;
@@ -600,21 +642,32 @@ static AwaitFollower scan_await_follower(TSLexer *lexer) {
 // after white space, and nothing has been marked: a keyword ends after the word.
 static bool scan_async_rest(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols);
 
-// White space and block comments after `async`, up to the next token on the line (`advance`: the token before is marked).
-static void advance_over_same_line_trivia(TSLexer *lexer) {
+// White space and block comments after `async`, up to the next token (`advance`: the token before is marked). Returns false
+// when a line terminator comes first: `async` takes none before what follows. The automatic semicolon scan is what then
+// ends the statement, and it knows only LF, LS and PS (a lone CR is white space to it, as it is here), and a block comment
+// holding one only where `||` cannot follow (a class member). shortcut: `async<block comment with LF>function` stays an
+// async function, as before, until that scan reads them (the ASI work of J7 and v3b).
+static bool advance_over_same_line_trivia(TSLexer *lexer, bool comment_ends_line) {
     for (;;) {
-        while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+        while (is_extra_space(lexer->lookahead)) {
+            if (lexer->lookahead == '\n' || lexer->lookahead == 0x2028 || lexer->lookahead == 0x2029) {
+                return false;
+            }
             advance(lexer);
         }
         if (lexer->lookahead != '/') {
-            return;
+            return true;
         }
         advance(lexer);
         if (lexer->lookahead != '*') {
-            return; // a line comment or a `/`: no name follows
+            return true; // a line comment or a `/`: no name follows
         }
         advance(lexer);
         while (lexer->lookahead != 0) {
+            if (comment_ends_line &&
+                (lexer->lookahead == '\n' || lexer->lookahead == 0x2028 || lexer->lookahead == 0x2029)) {
+                return false;
+            }
             bool star = lexer->lookahead == '*';
             advance(lexer);
             if (star && lexer->lookahead == '/') {
@@ -624,6 +677,54 @@ static void advance_over_same_line_trivia(TSLexer *lexer) {
         }
     }
 }
+
+// The first character of the next token, after white space and comments (`skip`: nothing is consumed into a token). The
+// extras are white space, comments and, in a script, HTML comments (`-->` only at the start of a line).
+static int32_t next_token_char(TSLexer *lexer) {
+    bool line_start = false;
+    for (;;) {
+        while (is_extra_space(lexer->lookahead)) {
+            line_start |= is_line_terminator(lexer->lookahead);
+            skip(lexer);
+        }
+        int32_t c = lexer->lookahead;
+        if (c == '/') {
+            skip(lexer);
+            if (lexer->lookahead == '*') {
+                skip(lexer);
+                while (lexer->lookahead != 0) {
+                    line_start |= is_line_terminator(lexer->lookahead);
+                    bool star = lexer->lookahead == '*';
+                    skip(lexer);
+                    if (star && lexer->lookahead == '/') {
+                        skip(lexer);
+                        break;
+                    }
+                }
+                continue;
+            }
+            if (lexer->lookahead != '/') {
+                return c;
+            }
+        } else if (c == '<' || (c == '-' && line_start)) {
+            const char *rest = c == '<' ? "!--" : "->";
+            skip(lexer);
+            for (; *rest; rest++) {
+                if (lexer->lookahead != *rest) {
+                    return c;
+                }
+                skip(lexer);
+            }
+        } else {
+            return c;
+        }
+        while (lexer->lookahead != 0 && !is_line_terminator(lexer->lookahead)) {
+            skip(lexer);
+        }
+    }
+}
+
+static bool brace_follows(TSLexer *lexer) { return next_token_char(lexer) == '{'; }
 
 static bool scan_keyword(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     unsigned char frame = scanner->frames[scanner->depth - 1];
@@ -640,7 +741,7 @@ static bool scan_keyword(Scanner *scanner, TSLexer *lexer, const bool *valid_sym
         // The keyword where an operand follows. Without one `await` is a name (`function g(await) {}` inside an
         // async function reaches here), which the lexer reads. At the top level, which may be a script, a `/` after
         // `await` divides.
-        AwaitFollower follower = scan_await_follower(lexer);
+        AwaitFollower follower = scan_await_follower(lexer, mode == AWAIT_TOP);
         if (follower == FOLLOWED_BY_NOTHING || (follower == FOLLOWED_BY_SLASH && mode == AWAIT_TOP)) {
             return false;
         }
@@ -695,9 +796,7 @@ static ContextResult scan_function_start(Scanner *scanner, TSLexer *lexer, const
     }
 
     lexer->mark_end(lexer);
-    bool scanned_comment = false;
-    bool block = scan_whitespace_and_comments(lexer, &scanned_comment, true) != REJECT && lexer->lookahead == '{';
-    if (block) {
+    if (brace_follows(lexer)) {
         if (valid_symbols[FUNCTION_START]) {
             open_function(scanner);
             lexer->result_symbol = FUNCTION_START;
@@ -713,10 +812,9 @@ static ContextResult scan_function_start(Scanner *scanner, TSLexer *lexer, const
         return CONTEXT_TOKEN;
     }
     if (valid_symbols[ASYNC_ARROW_EXPRESSION_START]) {
-        // The expression body has no end the scanner can see: `await` stays a keyword in the rest of the function
-        // that holds the arrow (or of the top level), where it is a plain identifier only before an operator.
-        unsigned char *frame = &scanner->frames[scanner->depth - 1];
-        *frame = (unsigned char)((*frame & ~3) | AWAIT_KEYWORD);
+        // The expression body has a frame of its own, which the end of the statement or of the function that holds the arrow
+        // pops (`pop_arrow_expressions`).
+        push_function(scanner, AWAIT_KEYWORD | ARROW_EXPRESSION_BIT);
         lexer->result_symbol = ASYNC_ARROW_EXPRESSION_START;
         return CONTEXT_TOKEN;
     }
@@ -726,7 +824,7 @@ static ContextResult scan_function_start(Scanner *scanner, TSLexer *lexer, const
 // `await` and `yield`.
 static ContextResult scan_context(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     lexer->mark_end(lexer);
-    while (iswspace(lexer->lookahead)) {
+    while (is_extra_space(lexer->lookahead)) {
         skip(lexer);
     }
 
@@ -743,7 +841,9 @@ static bool scan_async_rest(Scanner *scanner, TSLexer *lexer, const bool *valid_
     if (!scan_word(lexer, "sync")) {
         return false;
     }
-    advance_over_same_line_trivia(lexer);
+    if (!advance_over_same_line_trivia(lexer, !function)) {
+        return false;
+    }
     bool follows;
     if (function) {
         const char *word = "function";
@@ -772,7 +872,7 @@ static bool scan_generator_star(Scanner *scanner, TSLexer *lexer, const bool *va
     if (!function && !valid_symbols[GENERATOR_STAR_METHOD]) {
         return false;
     }
-    while (iswspace(lexer->lookahead)) {
+    while (is_extra_space(lexer->lookahead)) {
         skip(lexer);
     }
     if (lexer->lookahead != '*') {
@@ -791,18 +891,36 @@ static bool scan_generator_star(Scanner *scanner, TSLexer *lexer, const bool *va
     return true;
 }
 
+// A comment where a marker could be: a `/` starts a comment the lexer reads (1; the caller returns false and the scanner
+// is asked again after it), an HTML comment is scanned here (2; the token is HTML_COMMENT), anything else is not one (0).
+// The scanner looks at an HTML comment's first characters, so the caller has marked the end of its zero-width token.
+static int comment_follows(TSLexer *lexer, const bool *valid_symbols) {
+    if (lexer->lookahead == '/') {
+        return 1;
+    }
+    if ((lexer->lookahead == '<' || lexer->lookahead == '-') && valid_symbols[HTML_COMMENT]) {
+        return scan_html_comment(lexer) ? 2 : 0;
+    }
+    return 0;
+}
+
 // The marker right after `function` or its `*`: it claims the entry that `async` and `*` noted, or pushes a plain one.
-static bool scan_function_params(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
+static bool scan_function_params(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols, bool *comment) {
     if (!valid_symbols[FUNCTION_PARAMS]) {
         return false;
     }
     lexer->mark_end(lexer);
     if (valid_symbols[GENERATOR_STAR_FUNCTION]) {
         // Right after `function`: a comment may hide the `*`; the lexer reads it and the scanner is asked again.
-        while (iswspace(lexer->lookahead)) {
+        while (is_extra_space(lexer->lookahead)) {
             skip(lexer);
         }
-        if (lexer->lookahead == '/') {
+        int found = comment_follows(lexer, valid_symbols);
+        if (found == 2) {
+            return true;
+        }
+        if (found == 1) {
+            *comment = true;
             return false;
         }
     }
@@ -816,26 +934,50 @@ static bool scan_function_params(Scanner *scanner, TSLexer *lexer, const bool *v
     return true;
 }
 
-// The marker before the parameters of a method, where `(` or `<` follows its name. Only inside the parameters of another
-// function, or after a method's `async` or `*` (some entry is open): a method elsewhere needs none, and where the
-// parser could also read a block (`{ f(x); }`) the marker is not wanted.
-static bool scan_method_params(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
-    if (!valid_symbols[METHOD_PARAMS] || scanner->entry_count == 0) {
+// The marker after the `async` or `*` of a method, before its name: the entry they noted is the method's own from here on,
+// so a method in a computed name takes none of it.
+static bool scan_method_entry(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols, bool *comment) {
+    if (!valid_symbols[METHOD_ENTRY]) {
         return false;
     }
     lexer->mark_end(lexer);
-    while (iswspace(lexer->lookahead)) {
+    while (is_extra_space(lexer->lookahead)) {
+        skip(lexer);
+    }
+    int found = comment_follows(lexer, valid_symbols);
+    if (found == 2) {
+        return true;
+    }
+    if (found == 1) {
+        *comment = true; // a comment may hide the `*` of a generator method
+        return false;
+    }
+    if (scanner->entry_count > 0) {
+        unsigned char *top = &scanner->entries[scanner->entry_count - 1];
+        if ((*top & ENTRY_FRESH) && (*top & ENTRY_METHOD)) {
+            *top &= (unsigned char)~ENTRY_FRESH;
+        }
+    }
+    lexer->result_symbol = METHOD_ENTRY;
+    return true;
+}
+
+// The marker before the parameters of a method without `async` or `*`, where `(` or `<` follows its name. Only inside the
+// parameters of another function, or in the computed name of a method with an entry (some entry is open): a method
+// elsewhere needs none. Where the parser could also read a block (`{ f(x); }`) the marker is not wanted, and the state says
+// so: an expression could go on there (`f ? a : b`), which no method name allows.
+static bool scan_method_params(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
+    if (!valid_symbols[METHOD_PARAMS] || valid_symbols[TERNARY_QMARK] || scanner->entry_count == 0) {
+        return false;
+    }
+    lexer->mark_end(lexer);
+    while (is_extra_space(lexer->lookahead)) {
         skip(lexer);
     }
     if (lexer->lookahead != '(' && lexer->lookahead != '<') {
         return false;
     }
-    unsigned char *top = &scanner->entries[scanner->entry_count - 1];
-    if ((*top & ENTRY_FRESH) && (*top & ENTRY_METHOD)) {
-        *top &= (unsigned char)~ENTRY_FRESH;
-    } else {
-        push_entry(scanner, 0);
-    }
+    push_entry(scanner, 0);
     lexer->result_symbol = METHOD_PARAMS;
     return true;
 }
@@ -870,16 +1012,35 @@ bool tree_sitter_javascript_external_scanner_scan(void *payload, TSLexer *lexer,
         return start == CONTEXT_TOKEN;
     }
 
-    if (!valid_symbols[AUTOMATIC_SEMICOLON] &&
-        (scan_generator_star(scanner, lexer, valid_symbols) || scan_function_params(scanner, lexer, valid_symbols) ||
-         scan_method_params(scanner, lexer, valid_symbols))) {
-        return true;
+    // A comment after `function` or `async` may hide a `*`: the scanner has looked at it and says no, and the lexer reads it.
+    bool comment = false;
+    if (!valid_symbols[AUTOMATIC_SEMICOLON]) {
+        if (scan_generator_star(scanner, lexer, valid_symbols) || scan_function_params(scanner, lexer, valid_symbols, &comment) ||
+            scan_method_entry(scanner, lexer, valid_symbols, &comment) || scan_method_params(scanner, lexer, valid_symbols)) {
+            return true;
+        }
+        if (comment) {
+            return false;
+        }
     }
 
     if (valid_symbols[AUTOMATIC_SEMICOLON]) {
         bool scanned_comment = false;
         bool at_token = false;
         bool ret = scan_automatic_semicolon(lexer, !valid_symbols[LOGICAL_OR], &scanned_comment, &at_token);
+        if (ret) {
+            pop_arrow_expressions(scanner);
+        } else if (at_token && !scanned_comment && lexer->lookahead == ';' && valid_symbols[EXPLICIT_SEMICOLON] &&
+                   (scanner->frames[scanner->depth - 1] & ARROW_EXPRESSION_BIT)) {
+            // The `;` that ends the statement ends the expression body of an async arrow function in it. The scanner
+            // returns it only then, to be able to tell: with no state saved, a token the scanner does not return changes
+            // nothing. (Not after a comment: the scanner has passed it, and it would be lost.)
+            pop_arrow_expressions(scanner);
+            advance(lexer);
+            lexer->mark_end(lexer);
+            lexer->result_symbol = EXPLICIT_SEMICOLON;
+            return true;
+        }
         if (!ret && !scanned_comment && valid_symbols[TERNARY_QMARK] && lexer->lookahead == '?') {
             return scan_ternary_qmark(lexer);
         }
