@@ -69,6 +69,16 @@ test('formatting does not change the table sizes', () => {
   assert.deepEqual(sizes(edit('ts_small_parse_table[] = {', 'ts_small_parse_table [ ] =\n{')), [12, 6]);
 });
 
+test('designators and counts are read as C integer literals', () => {
+  assert.deepEqual(sizes(edit('[8] = 1,', '[010] = 1,')), [12, 6]); // octal 8
+  assert.deepEqual(sizes(edit('[8] = 1,', '[0x8u] = 1,')), [12, 6]);
+  assert.deepEqual(sizes(edit('[3] = {.entry = {.count = 2', '[03UL] = {.entry = {.count = 0x2')), [12, 6]);
+  assert.equal(measure(Buffer.from(edit('#define STATE_COUNT 5', '#define STATE_COUNT 05'))).state_count, 5);
+  for (const bad of ['[08] = 1,', '[8x] = 1,', '[0b1000] = 1,', '[8uu] = 1,']) {
+    assert.throws(() => measure(Buffer.from(edit('[8] = 1,', bad))), /is not a C integer literal/, bad);
+  }
+});
+
 test('an initializer without its end or with unexpected entries is refused', () => {
   assert.throws(() => measure(Buffer.from(edit('sym_d,\n};', 'sym_d,\n}'))), /does not end with \};/);
   assert.throws(() => measure(Buffer.from(edit('sym_d,\n};', 'sym_d,\n'))), /ts_small_parse_table: the initializer has no end/);

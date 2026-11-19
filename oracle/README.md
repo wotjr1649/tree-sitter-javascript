@@ -86,7 +86,9 @@ mkdir -p build && cmp=$(mktemp -d "$PWD/build/cmp.XXXXXX")  # fresh per run: no 
 trap 'for w in "$cmp"/*/; do git worktree remove --force "$w"; done' EXIT
 for rev in v1.0.0 HEAD; do
   git worktree add --detach "$cmp/$rev" "$rev"
-  rm -rf "$cmp/$rev/oracle/replay" && cp -r oracle/replay "$cmp/$rev/oracle/replay"  # this dump tool, that grammar
+  rm -rf "$cmp/$rev/oracle/replay"                    # this dump tool, that grammar; v1.0.0 has no oracle/
+  mkdir -p "$cmp/$rev/oracle"
+  cp -r oracle/replay "$cmp/$rev/oracle/replay"
   (cd "$cmp/$rev/oracle/replay" && go build -a -o "$cmp/replay-$rev" .)
   "$cmp/replay-$rev" -root . -dump "$cmp/$rev.jsonl"   # -root .: the inputs of this checkout for both
 done

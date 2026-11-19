@@ -49,7 +49,8 @@ test('different sources and duplicate ids are refused', () => {
 
 test('a record without a valid id, sha256, tree or error flags is refused', () => {
   const good = JSON.parse(rec('a', '(p)'));
-  const cases = [{ id: undefined }, { id: '' }, { sha256: undefined }, { sha256: 'a'.repeat(63) }, { sha256: 'A'.repeat(64) },
+  const cases = [{ id: undefined }, { id: '' }, { sha256: undefined }, { sha256: 'a'.repeat(63) }, { sha256: 'A'.repeat(64) }, { sha256: [good.sha256] },
+    { id: ['a'] }, { tree: ['(p)'] },
     { tree: undefined }, { error: undefined }, { error: 0 }, { errors: undefined }, { missing: -1 }];
   for (const c of cases) {
     assert.throws(() => readDump(JSON.stringify({ ...good, ...c }), 'x.jsonl'), /x.jsonl line 1: not a tree dump record/, JSON.stringify(c));

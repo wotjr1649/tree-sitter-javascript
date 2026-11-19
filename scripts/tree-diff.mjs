@@ -26,7 +26,7 @@ export function readDump(text, name = 'dump') {
       throw new Error(`${where}: ${e.message}`);
     }
     const ok =
-      r !== null && typeof r.id === 'string' && r.id !== '' && /^[0-9a-f]{64}$/.test(r.sha256) && typeof r.tree === 'string' &&
+      r !== null && typeof r.id === 'string' && r.id !== '' && typeof r.sha256 === 'string' && /^[0-9a-f]{64}$/.test(r.sha256) && typeof r.tree === 'string' &&
       typeof r.error === 'boolean' && count(r.errors) && count(r.missing);
     if (!ok) throw new Error(`${where}: not a tree dump record (id, 64-hex sha256, tree, error, errors, missing): ${line.slice(0, 80)}`);
     if (out.has(r.id)) throw new Error(`${where}: duplicate id ${r.id}`);

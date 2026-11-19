@@ -34,14 +34,21 @@ function elements(src, name) {
   throw new Error(`${name}: the initializer has no end`);
 }
 
+// cInt reads a C integer literal (decimal, 0-prefixed octal, 0x hex, u/l suffixes); any other form is an error.
+function cInt(s, what) {
+  const m = s.match(/^(?:0[xX]([0-9a-fA-F]+)|(0[0-7]*)|([1-9][0-9]*))(?:[uU](?:ll|LL|[lL])?|(?:ll|LL|[lL])[uU]?)?$/);
+  if (!m) throw new Error(`${what}: ${JSON.stringify(s)} is not a C integer literal`);
+  return m[1] ? parseInt(m[1], 16) : m[2] ? parseInt(m[2], 8) : Number(m[3]);
+}
+
 // count is the array length C gives the elements: `[i] = v` sets the position to i. Every value must match value.
 function count(name, list, value) {
   let pos = 0;
   let len = 0;
   for (const e of list) {
-    const m = e.match(/^(?:\[\s*(\d+)\s*\]\s*=\s*)?([^]*)$/);
+    const m = e.match(/^(?:\[\s*(\w+)\s*\]\s*=\s*)?([^]*)$/);
     if (!value.test(m[2])) throw new Error(`${name}: unexpected entry ${JSON.stringify(e.slice(0, 80))}`);
-    if (m[1] !== undefined) pos = Number(m[1]);
+    if (m[1] !== undefined) pos = cInt(m[1], `${name} designator`);
     len = Math.max(len, ++pos);
   }
   return len;
@@ -52,9 +59,9 @@ export function measure(parserC) {
   const src = parserC.toString('latin1');
   const cost = { parser_c_bytes: parserC.length };
   for (const d of DEFINES) {
-    const m = src.match(new RegExp(`^#define\\s+${d}\\s+(\\d+)\\s*$`, 'm'));
+    const m = src.match(new RegExp(`^#define\\s+${d}\\s+(\\w+)\\s*$`, 'm'));
     if (!m) throw new Error(`parser.c has no #define ${d}`);
-    cost[d.toLowerCase()] = Number(m[1]);
+    cost[d.toLowerCase()] = cInt(m[1], d);
   }
   cost.parse_table_entries = cost.large_state_count * cost.symbol_count;
   // uint16 values: numbers, symbols and macros such as ACTIONS(5).
@@ -66,9 +73,9 @@ export function measure(parserC) {
   cost.parse_action_entries = count('ts_parse_actions', actions, /^(\{\s*\.entry\s*=\s*\{[^{}]*\}\s*\}|\w+\([^()]*\))$/);
   let due = 0;
   for (const e of actions) {
-    const c = e.match(/\.count\s*=\s*(\d+)/);
+    const c = e.match(/\.count\s*=\s*(\w+)/);
     if (c ? due !== 0 : due-- === 0) throw new Error(`ts_parse_actions: a header's action count does not match near ${e.slice(0, 80)}`);
-    if (c) due = Number(c[1]);
+    if (c) due = cInt(c[1], 'ts_parse_actions count');
   }
   if (due !== 0) throw new Error('ts_parse_actions: the last header has fewer actions than its count');
   return cost;
