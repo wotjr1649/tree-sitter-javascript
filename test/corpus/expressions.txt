@@ -212,6 +212,99 @@ f
         (string_fragment)))))
 
 ============================================
+Tagged templates with invalid escape sequences
+============================================
+
+a`\u{0`;
+a`\x`;
+a`\u`;
+a`\u12${b}\xz${c}\u{110000}`;
+a.b`\xg`;
+a()`\ug`;
+new a`\x`;
+a`${b`\u{`}`;
+
+---
+
+(program
+  (expression_statement
+    (call_expression
+      (identifier)
+      (template_string
+        (escape_sequence))))
+  (expression_statement
+    (call_expression
+      (identifier)
+      (template_string
+        (escape_sequence))))
+  (expression_statement
+    (call_expression
+      (identifier)
+      (template_string
+        (escape_sequence))))
+  (expression_statement
+    (call_expression
+      (identifier)
+      (template_string
+        (escape_sequence)
+        (template_substitution
+          (identifier))
+        (escape_sequence)
+        (string_fragment)
+        (template_substitution
+          (identifier))
+        (escape_sequence))))
+  (expression_statement
+    (call_expression
+      (member_expression
+        (identifier)
+        (property_identifier))
+      (template_string
+        (escape_sequence)
+        (string_fragment))))
+  (expression_statement
+    (call_expression
+      (call_expression
+        (identifier)
+        (arguments))
+      (template_string
+        (escape_sequence)
+        (string_fragment))))
+  (expression_statement
+    (new_expression
+      (call_expression
+        (identifier)
+        (template_string
+          (escape_sequence)))))
+  (expression_statement
+    (call_expression
+      (identifier)
+      (template_string
+        (template_substitution
+          (call_expression
+            (identifier)
+            (template_string
+              (escape_sequence))))))))
+
+============================================
+Invalid escape sequence in a template without a tag
+:error
+============================================
+
+`\u{0`;
+
+---
+
+============================================
+Invalid escape sequence in a substitution of a tagged template
+:error
+============================================
+
+a`${`\x`}`;
+
+---
+
+============================================
 Numbers
 ============================================
 
@@ -1943,6 +2036,139 @@ c <<= 1;
     (augmented_assignment_expression
       (identifier)
       (number))))
+
+============================================
+Call expressions as assignment targets (annex B)
+============================================
+
+f() = 1;
+f() += 1;
+f() **= 1, g(a)(b) >>>= 2;
+a.b() -= 1;
+async() = 1;
+async() *= 1;
+for (f() in o);
+for (f() of o);
+for (async() of o);
+async function g() {
+  for await (f() of o);
+}
+
+---
+
+(program
+  (expression_statement
+    (assignment_expression
+      (call_expression
+        (identifier)
+        (arguments))
+      (number)))
+  (expression_statement
+    (augmented_assignment_expression
+      (call_expression
+        (identifier)
+        (arguments))
+      (number)))
+  (expression_statement
+    (sequence_expression
+      (augmented_assignment_expression
+        (call_expression
+          (identifier)
+          (arguments))
+        (number))
+      (augmented_assignment_expression
+        (call_expression
+          (call_expression
+            (identifier)
+            (arguments
+              (identifier)))
+          (arguments
+            (identifier)))
+        (number))))
+  (expression_statement
+    (augmented_assignment_expression
+      (call_expression
+        (member_expression
+          (identifier)
+          (property_identifier))
+        (arguments))
+      (number)))
+  (expression_statement
+    (assignment_expression
+      (call_expression
+        (identifier)
+        (arguments))
+      (number)))
+  (expression_statement
+    (augmented_assignment_expression
+      (call_expression
+        (identifier)
+        (arguments))
+      (number)))
+  (for_in_statement
+    (call_expression
+      (identifier)
+      (arguments))
+    (identifier)
+    (empty_statement))
+  (for_in_statement
+    (call_expression
+      (identifier)
+      (arguments))
+    (identifier)
+    (empty_statement))
+  (for_in_statement
+    (call_expression
+      (identifier)
+      (arguments))
+    (identifier)
+    (empty_statement))
+  (function_declaration
+    (identifier)
+    (formal_parameters)
+    (statement_block
+      (for_in_statement
+        (call_expression
+          (identifier)
+          (arguments))
+        (identifier)
+        (empty_statement)))))
+
+============================================
+Logical assignment to a call expression
+:error
+============================================
+
+f() &&= 1;
+
+---
+
+============================================
+Call expression in an array destructuring target
+:error
+============================================
+
+[f()] = a;
+
+---
+
+============================================
+Call expression in an object destructuring target
+:error
+============================================
+
+({ a: f() } = b);
+
+---
+
+============================================
+'new' expression as an assignment target
+:error
+============================================
+
+new f() = 1;
+
+---
 
 ==============================================
 Operator precedence

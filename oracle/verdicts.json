@@ -32,7 +32,7 @@
    }
   },
   "cases_file": "cases.jsonl",
-  "cases_sha256": "bf0b6cfa5021a8ce8765fdceef5c8de8a1de0ac5a38bcc524387652a5d5c1acf",
+  "cases_sha256": "f123f81bddc758c793e9a9c23a7b516e1bfc47c3fa4e906a52e926bc7a9a4968",
   "runner": "run.mjs",
   "runner_sha256": "06cfe49cd56d0bac9b5c672b1f62fc0f44b37de02c0a2bf04c557e5354c5c24d"
  },
@@ -3020,6 +3020,496 @@
     "class": "accept",
     "errors": [],
     "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j8/export-star-attributes",
+   "sha256": "091ef3f8eeba4746663bf3cd042913f4baa3d704788b561682528bbe1dca19f5",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j8/export-named-attributes",
+   "sha256": "1ad82424387754c4b7c0f8c49ea1b0b228d235e34e69f680e49133e91986d04e",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j8/export-namespace-attributes",
+   "sha256": "5ba45150a6e66ee73dd49b89b564847a21afcf9d4613b1ede1f4ec3be32662bc",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j8/import-attributes-newline",
+   "sha256": "6e772c302dddd6705c88d6067a340adc4c8559f1b99d938b696b14496d311e52",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j8/import-source-attributes-newline",
+   "sha256": "2ce1e516cb8a14d5e5efdb387839bc6ef58fbe6ec754704a051a88f869321c4a",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j8/export-attributes-newline",
+   "sha256": "e7a2125fbfa9f52c69eec091435a5594af39dce240b3d28cb9e6afa2fc956206",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j8/reject-export-attributes-no-from",
+   "sha256": "4d6416600f776c9d92b9deec5421397774409ebc47f91cded08bb924bc8a6728",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token, expected \"(\" (1:16)",
+      "at": 16
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected a semicolon or an implicit semicolon after a statement, but found none",
+      "at": 10
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected a semicolon or an implicit semicolon after a statement, but found none",
+      "at": 10
+     }
+    ]
+   }
+  },
+  {
+   "id": "j8/reject-export-attributes-newline-no-from",
+   "sha256": "6b3f369d03c879381c784e56856b4b83e1a0fc2e196910bcbdb3e79455443270",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token, expected \"(\" (2:5)",
+      "at": 16
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected `(` but found `{`",
+      "at": 16
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected `(` but found `{`",
+      "at": 16
+     }
+    ]
+   }
+  },
+  {
+   "id": "j8/export-attributes-keys",
+   "sha256": "11c47ca1b966a4df20cbb6e5661c96c5573f4a7bc8ed11acfbcb57be19621c2f",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j8/reject-export-attributes-number-value",
+   "sha256": "c3c17793f1b4e3edc55264abd175c3209a45ebbbdde1e123595d572ac98181a0",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Only string literals are allowed as module attribute values. (1:30)",
+      "at": 30
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Only string literals are allowed as module attribute values.",
+      "at": 30
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Only string literals are allowed as module attribute values.",
+      "at": 30
+     }
+    ]
+   }
+  },
+  {
+   "id": "j8/reject-export-attributes-computed-key",
+   "sha256": "b6110a5e39f50a7ff1ae1a163cdd60acd71daa869eaa5be1ae07966d28bd2aa8",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (1:26)",
+      "at": 26
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token",
+      "at": 26
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Unexpected token",
+      "at": 26
+     }
+    ]
+   }
+  },
+  {
+   "id": "j8/reject-import-attributes-newline-number-key",
+   "sha256": "9bde0ae7aed4164a6da2631e68efc5628530c4146181f87cf02ebe91bc0fbd7c",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (2:6)",
+      "at": 24
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token",
+      "at": 24
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Unexpected token",
+      "at": 24
+     }
+    ]
+   }
+  },
+  {
+   "id": "j8/reject-import-attributes-shorthand",
+   "sha256": "f61d9bb604637dbff215eec3cf6dc6ca7c5161afa15c19b5013468c7e049e4c2",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token, expected \":\" (1:28)",
+      "at": 28
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected `:` but found `}`",
+      "at": 28
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected `:` but found `}`",
+      "at": 28
+     }
+    ]
+   }
+  },
+  {
+   "id": "j8/export-alias-reserved",
+   "sha256": "2980047c8af03c8933ed747878ad784372f3692fa93471b46678c427e81114c8",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j8/export-namespace-reserved",
+   "sha256": "d81b6e9b039b957dc6850ad2c91efb7cbe96ee08deb480c29ba7d0fc151ebb6b",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j8/import-name-reserved",
+   "sha256": "487905b68aeb72fe367f30c41d03e47363fc6a513423fdc4f637d6882cf25421",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j8/export-local-alias-import",
+   "sha256": "639afd15fcb8670543be766b4aeba9791160186774fcb3ed615a435a8ee1ef86",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j8/for-async-of-arrow",
+   "sha256": "ece21967f0466a31bbb9d53a1c3624d44af4fa8cb949e2e704423bea9b6b3b40",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j8/tagged-template-invalid-unicode-brace",
+   "sha256": "ae1145ba5b8402bfc45664de85b8de33022587f65266346ae7865e6767c5f09c",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j8/tagged-template-invalid-hex",
+   "sha256": "4fdb7fa2ef0a4787b34ef64fbd0f0e7146e816b2f00c6cd35e161b28c0a84206",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j8/disagree-call-assignment",
+   "sha256": "b8c0e4b1d02b37a9fae45dcbd1adda8edc382d64670ca42eba83af08265bbbb8",
+   "sourceType": "script",
+   "verdict": "disagree",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Cannot assign to this expression",
+      "at": 0
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Cannot assign to this expression",
+      "at": 0
+     }
+    ]
+   }
+  },
+  {
+   "id": "j8/disagree-call-compound-assignment",
+   "sha256": "5ca9f3db63a309cd8c6abc37474d1a8cc66ae2684005df86813a35f789f8f054",
+   "sourceType": "script",
+   "verdict": "disagree",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Cannot assign to this expression",
+      "at": 0
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Cannot assign to this expression",
+      "at": 0
+     }
+    ]
+   }
+  },
+  {
+   "id": "j8/disagree-call-for-of-head",
+   "sha256": "ba183b8bdde28202b22a4e9f3da4d870ad8fbca5c410b2dc3d11acb17ed84d75",
+   "sourceType": "script",
+   "verdict": "disagree",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Cannot assign to this expression",
+      "at": 5
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Cannot assign to this expression",
+      "at": 5
+     }
+    ]
+   }
+  },
+  {
+   "id": "j8/disagree-async-call-assignment",
+   "sha256": "2951a784e34bca65f109a8abb1925e79c8ddfea87ab9326edbc2d58a891c1be3",
+   "sourceType": "script",
+   "verdict": "disagree",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Cannot assign to this expression",
+      "at": 0
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Cannot assign to this expression",
+      "at": 0
+     }
+    ]
    }
   }
  ]

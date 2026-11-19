@@ -407,6 +407,10 @@
             "named": true
           },
           {
+            "type": "call_expression",
+            "named": true
+          },
+          {
             "type": "identifier",
             "named": true
           },
@@ -478,6 +482,10 @@
         "multiple": false,
         "required": true,
         "types": [
+          {
+            "type": "call_expression",
+            "named": true
+          },
           {
             "type": "identifier",
             "named": true
@@ -1174,11 +1182,15 @@
       }
     },
     "children": {
-      "multiple": false,
+      "multiple": true,
       "required": false,
       "types": [
         {
           "type": "export_clause",
+          "named": true
+        },
+        {
+          "type": "import_attribute",
           "named": true
         },
         {
@@ -1321,6 +1333,10 @@
         "types": [
           {
             "type": "array_pattern",
+            "named": true
+          },
+          {
+            "type": "call_expression",
             "named": true
           },
           {
@@ -2372,6 +2388,10 @@
         "types": [
           {
             "type": "expression",
+            "named": true
+          },
+          {
+            "type": "string",
             "named": true
           }
         ]
