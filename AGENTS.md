@@ -20,8 +20,12 @@ origin's v0.25.0 is commit `44c892e` in this history, kept as `refs/upstream/v0.
 - Manifests, their lockfiles' own entries and `tree-sitter.json` `metadata.version` carry the release version (2.0.0
   now); CLI 0.27.2 compiles `metadata.version` into `parser.c` (`.metadata`), so regenerate `src/` after changing it.
 - Releases are `vMAJOR.MINOR.PATCH` (first independent `v2.0.0` after the `v1.0.0` baseline), each an annotated tag plus
-  a GitHub Release without binaries (ADR-0001 amendment 2026-11-19). SemVer: breaking means a node kind or field
-  removed or renamed, or a changed tree for input that previously parsed without an error.
+  a GitHub Release without binaries (ADR-0001 amendment 2026-11-19). SemVer: breaking (major) means a node kind or
+  field removed or renamed, or a changed tree for valid input (input that `@babel/parser` and `oxc-parser`, as pinned
+  in `oracle/`, both accept). Making accepted invalid input an error, changing recovery trees and parsing input that
+  gave an error are minor; the CHANGELOG lists them all. Tree-changing fixes are batched into one major release.
+- The grammar checks syntax, not early errors (static semantics such as `await using` in a non-async function or
+  `for (using x in o)`); those are a non-goal and stay accepted (owner decision, 2026-11-19).
 - The parser is ABI 15. Binding runtime lower bounds are the 0.25 line (Rust, Node, Python, Go, Swift) and CMake
   defaults to ABI 15; do not lower them without the owner's approval. `Package.swift` declares `swift-tools-version`
   5.9, the minimum SwiftTreeSitter 0.25.0 requires. CI tests Python under `ci/python-constraints.txt` and Swift with

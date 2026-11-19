@@ -13,9 +13,10 @@ v0.25.0 behaviour, `src/` byte-identical to it). Every fix below makes inputs th
 applies, in the TypeScript/TSX grammars built on this `grammar.js` (tree-sitter-typescript `59fc4ed` + #357). In
 TS/TSX the scanner fixes (J1, J1b) need the same change in tree-sitter-typescript's own scanner, and J3b and J4's
 type-annotated form need the patches handed over to it.
-Breaking: 18 of the 533 distinct inputs that 1.0.0 parsed without an error get a different tree. 16 still parse without
-an error, mostly where 1.0.0 read them wrongly (`using [a] = b`, `using` followed by a line break and a name); 2 that
-1.0.0 accepted are now errors (`for (using` + line break + `x of y)` and `... of of y)`). No node kind or field is removed or renamed, the grammar name and
+Breaking: 18 of the 533 distinct inputs that 1.0.0 parsed without an error get a different tree. 16 of them are valid
+code (Babel and oxc accept them) that 1.0.0 read wrongly (`using [a] = b`, `using` followed by a line break and a
+name); this makes the release major. The other 2 are invalid code that 1.0.0 accepted and that is an error now
+(`for (using` + line break + `x of y)` and `... of of y)`). No node kind or field is removed or renamed, the grammar name and
 the C symbol are unchanged, and `src/node-types.json` gains one entry (`using_declaration` in
 `for_statement.initializer`). The numeric symbol ids and the underlying grammar names (`GrammarName()`) of some nodes
 also change. See [docs/migrating-from-1.0.md](docs/migrating-from-1.0.md).
@@ -115,8 +116,8 @@ Not fixed in 2.0.0; tracked as GitHub Issues where a number is given:
 - In a `for` header or a block, a line break after `await using` or between `await` and `using`, and inside a block
   comment after `using`, is accepted; so is `for (using of of y);` (#18).
 - `for (using x in o);`, `for (using x;;)` and `await using` in a non-async function
-  (`function f() { await using x = g(); }`) are accepted (no early-error checks; Babel and oxc reject them).
-  `await using` at module top level is valid.
+  (`function f() { await using x = g(); }`) are accepted; Babel and oxc reject them. Early errors are a non-goal
+  (ADR-0001). `await using` at module top level is valid.
 - The scanner's automatic-semicolon rules accept a lone CR after `using` and names such as `in_` and `instanceof_`
   after a line break, and the TS/TSX grammars accept U+2028/U+2029 there (#17).
 - Other `isw*` calls in `src/scanner.c` (`iswspace` in `scan_jsx_text` and the calls on the automatic-semicolon,

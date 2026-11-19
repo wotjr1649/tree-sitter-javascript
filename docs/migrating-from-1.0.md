@@ -18,7 +18,9 @@ The grammar name `javascript`, the C symbol `tree_sitter_javascript`, ABI 15 and
 ## Trees that change for input 1.0.0 parsed without an error
 
 This is why the version is 2.0.0. 18 of the 533 distinct inputs that 1.0.0 parsed without an error (3.4 %) get a
-different tree: 16 still parse without an error, 2 now give one. 373 inputs that gave an error in 1.0.0 no longer do.
+different tree: 16 are valid code (Babel 8.1.2 and oxc 0.159.0 accept them; `await using` + line break + `x = 1;` at
+top level only as a module) and still parse without an error, which is a breaking change; 2 are invalid code (both
+reject them) and now give an error. 373 inputs that gave an error in 1.0.0 no longer do.
 Most of them 1.0.0 had read wrongly. A query or walker written against the old tree of these forms stops matching.
 All of them involve `using`:
 

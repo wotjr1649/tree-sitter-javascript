@@ -43,7 +43,11 @@ identical).
    decision 3). A release is a `vMAJOR.MINOR.PATCH` annotated tag plus a GitHub Release made by hand without
    binaries, each separately approved by the owner; `CHANGELOG.md` (Keep a Changelog) records it, and
    `docs/migrating-from-1.0.md` covers the move from 1.0.0. A major version marks a breaking change: a node kind or
-   field removed or renamed, or a changed tree for input that previously parsed without an error. Manifests and
+   field removed or renamed, or a changed tree for valid input, that is input `@babel/parser` and `oxc-parser` (the
+   versions pinned in `oracle/`) both accept. Making accepted invalid input an error, changing recovery trees inside
+   `ERROR` nodes and parsing input that gave an error are minor changes, each listed in the CHANGELOG. Releases follow
+   as fixes are ready; tree-changing fixes are batched into one major release. Early errors (static semantics) are a
+   non-goal: the grammar checks syntax only (owner decision, 2026-11-19). Manifests and
    `tree-sitter.json` `metadata.version` carry the release version, so `src/parser.c` (`.metadata`) changes with it;
    the `0.25.0` exception above ended with v1.0.0. Decision 4 still excludes registry publishing and automation.
 4. No registry publishing (npm, crates.io, PyPI) and no automated tagging or release workflow. Consumers pin commits.
