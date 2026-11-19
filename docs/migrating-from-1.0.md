@@ -140,5 +140,6 @@ this release (`ts-using-keyword-declarator.patch`, `ts-jsx-this-member.patch`):
   2,855,926 bytes, 1,870 states and 261 symbols at `v1.0.0` (+9.8 %). Before #24 the J3b head (stack of #9 to #15)
   was 3,280,157 bytes with 2,098 states.
 - **Speed and memory.** On one shared machine, in paired rounds of the same run, 2.0.0 parsed `typescript.js` 1.46 %
-  slower than 1.0.0 (ranges overlap) with the same peak memory (see the CHANGELOG).
+  slower than 1.0.0 with a median peak working set within 0.05 % of 1.0.0, both with overlapping ranges (see
+  [CHANGELOG.md](../CHANGELOG.md)).
 - **Known limitations** are tracked as GitHub Issues; see the end of [CHANGELOG.md](../CHANGELOG.md).
