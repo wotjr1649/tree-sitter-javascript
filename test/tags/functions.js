@@ -5,7 +5,7 @@ function foo() {
 foo()
 // <- reference.call
 
-{ source: $ => repeat($._expression) }
+({ source: $ => repeat($._expression) })
 // ^ definition.function
 //              ^ reference.call
 

@@ -1678,3 +1678,82 @@ let x = { a: //  3
           (property_identifier)
           (comment)
           (number))))))
+
+==========================================
+A statement that starts with a brace is a block
+==========================================
+
+{a:0}
+function b() {}{c: 1}
+if (foo) { bar: 'baz' }
+{d: {e: 1}}
+
+---
+
+(program
+  (statement_block
+    (labeled_statement
+      (statement_identifier)
+      (expression_statement
+        (number))))
+  (function_declaration
+    (identifier)
+    (formal_parameters)
+    (statement_block))
+  (statement_block
+    (labeled_statement
+      (statement_identifier)
+      (expression_statement
+        (number))))
+  (if_statement
+    (parenthesized_expression
+      (identifier))
+    (statement_block
+      (labeled_statement
+        (statement_identifier)
+        (expression_statement
+          (string
+            (string_fragment))))))
+  (statement_block
+    (labeled_statement
+      (statement_identifier)
+      (statement_block
+        (labeled_statement
+          (statement_identifier)
+          (expression_statement
+            (number)))))))
+
+==========================================
+A brace after a parenthesis or an arrow is an object or a function body
+==========================================
+
+({a: 0});
+x = {a: 0};
+y = () => {a: 0};
+
+---
+
+(program
+  (expression_statement
+    (parenthesized_expression
+      (object
+        (pair
+          (property_identifier)
+          (number)))))
+  (expression_statement
+    (assignment_expression
+      (identifier)
+      (object
+        (pair
+          (property_identifier)
+          (number)))))
+  (expression_statement
+    (assignment_expression
+      (identifier)
+      (arrow_function
+        (formal_parameters)
+        (statement_block
+          (labeled_statement
+            (statement_identifier)
+            (expression_statement
+              (number))))))))
