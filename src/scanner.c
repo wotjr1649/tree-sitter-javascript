@@ -65,18 +65,31 @@ typedef enum {
 
 static inline bool is_line_terminator(int32_t c) { return c == '\n' || c == '\r' || c == 0x2028 || c == 0x2029; }
 
+// White space and line terminators as the grammar's `extras` regex has them (extras_character_set_1 in parser.c).
+// Explicit, not iswspace: that differs between C runtimes.
+static bool is_extra_space(int32_t c) {
+    return (c >= '\t' && c <= '\r') || c == ' ' || c == 0xa0 || c == 0x1680 || (c >= 0x2000 && c <= 0x200b) ||
+           c == 0x2028 || c == 0x2029 || c == 0x202f || c == 0x205f || c == 0x2060 || c == 0x3000 || c == 0xfeff;
+}
+
+// What the automatic-semicolon scan skips: the extras without U+200B, U+2060 and U+FEFF, which is the set iswspace has
+// on Windows. The scan stops at these three as it always did, so every tree that parses today stays (`a<LF><FEFF>(b)`
+// is two statements); only the platform no longer decides. shortcut: changing that is a behaviour change, v3.0.0.
+static bool is_space(int32_t c) { return is_extra_space(c) && c != 0x200b && c != 0x2060 && c != 0xfeff; }
+
 /**
  * @param consume If false, only consume enough to check if comment indicates semicolon-legality
  * @param line_comment_lf If not NULL, set when a line comment ends at LF, CR LF, LS or PS (not a lone CR or the end)
+ * @param line_comment_cr If not NULL, set when a line comment ends at a lone CR
  */
 static WhitespaceResult scan_whitespace_and_comments(TSLexer *lexer, bool *scanned_comment, bool consume,
-                                                     bool *line_comment_lf) {
+                                                     bool *line_comment_lf, bool *line_comment_cr) {
     bool saw_block_newline = false;
     bool saw_block_cr = false;
     bool saw_line_comment = false;
 
     for (;;) {
-        while (iswspace(lexer->lookahead)) {
+        while (is_space(lexer->lookahead)) {
             skip(lexer);
         }
 
@@ -85,8 +98,10 @@ static WhitespaceResult scan_whitespace_and_comments(TSLexer *lexer, bool *scann
 
             if (lexer->lookahead == '/') {
                 skip(lexer);
-                // Ends at a lone CR too, as the comment token does.
-                while (lexer->lookahead != 0 && !is_line_terminator(lexer->lookahead)) {
+                // Ends at a lone CR too, as the comment token does; not after a line break (consume), where it goes
+                // on to the next LF as before J7 (`a<LF>// c<CR>(b)` is two statements, `a<LF>(b)` one call).
+                while (lexer->lookahead != 0 &&
+                       (!is_line_terminator(lexer->lookahead) || (consume && lexer->lookahead == '\r'))) {
                     skip(lexer);
                 }
                 bool cr = lexer->lookahead == '\r';
@@ -95,6 +110,9 @@ static WhitespaceResult scan_whitespace_and_comments(TSLexer *lexer, bool *scann
                 }
                 if (line_comment_lf && (lexer->lookahead == '\n' || (!cr && is_line_terminator(lexer->lookahead)))) {
                     *line_comment_lf = true;
+                }
+                if (line_comment_cr && cr && lexer->lookahead != '\n') {
+                    *line_comment_cr = true;
                 }
                 *scanned_comment = true;
                 saw_line_comment = true;
@@ -133,13 +151,6 @@ static WhitespaceResult scan_whitespace_and_comments(TSLexer *lexer, bool *scann
             return ACCEPT;
         }
     }
-}
-
-// White space and line terminators as the grammar's `extras` regex has them (extras_character_set_1 in parser.c).
-// Explicit, not iswspace: that differs between C runtimes and misses U+FEFF on some.
-static bool is_extra_space(int32_t c) {
-    return (c >= '\t' && c <= '\r') || c == ' ' || c == 0xa0 || c == 0x1680 || (c >= 0x2000 && c <= 0x200b) ||
-           c == 0x2028 || c == 0x2029 || c == 0x202f || c == 0x205f || c == 0x2060 || c == 0x3000 || c == 0xfeff;
 }
 
 // The next character of an identifier name: ASCII letters and digits, `_`, `$`, `\` (an escape), and any other
@@ -220,14 +231,17 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
     // ended at LF, CR LF, LS or PS defers (`a<CR>// c<LF>b`), not one ended at a lone CR (`}<CR>// c<CR><CR>f()`).
     bool line_comment = false;
     bool line_comment_lf = false;
+    // A line comment ended at a lone CR in this call.
+    bool line_comment_cr = false;
 
     for (;;) {
         if (lexer->lookahead == 0) {
-            return true;
+            return !line_comment_cr;
         }
 
         if (lexer->lookahead == '/') {
-            WhitespaceResult result = scan_whitespace_and_comments(lexer, scanned_comment, false, &line_comment_lf);
+            WhitespaceResult result = scan_whitespace_and_comments(lexer, scanned_comment, false, &line_comment_lf,
+                                                                       &line_comment_cr);
             if (result == REJECT) {
                 return false;
             }
@@ -263,21 +277,29 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
             break;
         }
 
-        if (!iswspace(lexer->lookahead)) {
+        if (!is_space(lexer->lookahead)) {
             // The token after a weak line terminator, on its line, is decided as after a line break (`a /*<LF>*/ b`,
             // `a<CR>b`); not after a line comment or at the end of the input (`a<CR>// c<LF>b`, `a /*<LF>*/`: the next
             // call decides there, as before, so the comment stays in the statement).
+            // U+FEFF, U+200B and U+2060 end the scan here without a semicolon, as before J7.
             return !comment_condition && ((weak_newline && !line_comment) || (lone_cr && !line_comment_lf)) &&
-                   !valid_symbols[KEYWORD_CONTINUES] && !lexer->eof(lexer) &&
+                   !is_extra_space(lexer->lookahead) && !valid_symbols[KEYWORD_CONTINUES] && !lexer->eof(lexer) &&
                    semicolon_after_weak_newline(lexer, valid_symbols);
         }
 
         skip(lexer);
     }
 
+    // Before J7 a line comment went on to the next LF, so the first call took nothing here and the semicolon came after
+    // the comment token, from the next call: at the end of the input and at a line terminator
+    // (`a<CR>// c<CR>/*c*/<LF>`: the line comment belongs to the statement, the block comment follows the semicolon).
+    if (line_comment_cr) {
+        return false;
+    }
+
     skip(lexer);
 
-    if (scan_whitespace_and_comments(lexer, scanned_comment, true, NULL) == REJECT) {
+    if (scan_whitespace_and_comments(lexer, scanned_comment, true, NULL, NULL) == REJECT) {
         return false;
     }
 
