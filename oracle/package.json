@@ -1,0 +1,14 @@
+{
+  "name": "tree-sitter-javascript-oracle",
+  "private": true,
+  "type": "module",
+  "description": "Reference-parser oracle for tree-sitter-javascript (not published)",
+  "license": "MIT",
+  "engines": {
+    "node": "^22.18.0 || >=24.11.0"
+  },
+  "dependencies": {
+    "@babel/parser": "8.1.2",
+    "oxc-parser": "0.159.0"
+  }
+}
