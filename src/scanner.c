@@ -12,6 +12,9 @@ enum TokenType {
     ESCAPE_SEQUENCE,
     REGEX_PATTERN,
     JSX_TEXT,
+    // Never returned: only their validity is read (see grammar.js).
+    BINDING_END,
+    KEYWORD_CONTINUES,
 };
 
 void *tree_sitter_javascript_external_scanner_create() { return NULL; }
@@ -30,11 +33,13 @@ static bool scan_template_chars(TSLexer *lexer) {
     lexer->result_symbol = TEMPLATE_CHARS;
     for (bool has_content = false;; has_content = true) {
         lexer->mark_end(lexer);
+        // The end of the input, not a U+0000 in the template (both have lookahead 0).
+        if (lexer->eof(lexer)) {
+            return false;
+        }
         switch (lexer->lookahead) {
             case '`':
                 return has_content;
-            case '\0':
-                return false;
             case '$':
                 advance(lexer);
                 if (lexer->lookahead == '{') {
@@ -107,7 +112,101 @@ static WhitespaceResult scan_whitespace_and_comments(TSLexer *lexer, bool *scann
     }
 }
 
-static bool scan_automatic_semicolon(TSLexer *lexer, bool comment_condition, bool *scanned_comment) {
+// White space and line terminators as the grammar's `extras` regex has them (extras_character_set_1 in parser.c).
+// Explicit, not iswspace: that differs between C runtimes.
+static bool is_extra_space(int32_t c) {
+    return (c >= '\t' && c <= '\r') || c == ' ' || c == 0xa0 || c == 0x1680 || (c >= 0x2000 && c <= 0x200b) ||
+           c == 0x2028 || c == 0x2029 || c == 0x202f || c == 0x205f || c == 0x2060 || c == 0x3000 || c == 0xfeff;
+}
+
+// The next character of an identifier name: ASCII letters and digits, `_`, `$`, `\` (an escape), and any other
+// non-ASCII character that is not white space. ASCII comparisons, not isw*: those differ between C runtimes.
+static bool is_identifier_part(int32_t c) {
+    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_' || c == '$' ||
+           c == '\\' || (c > 0x7f && !is_extra_space(c));
+}
+
+// After a line terminator: does the token that starts at the lookahead get a semicolon inserted before it?
+static bool semicolon_before_next_token(TSLexer *lexer, const bool *valid_symbols) {
+    switch (lexer->lookahead) {
+        // A class field or a declaration's bindings cannot go on with these (`a<LF>*b() {}`, `c<LF>[x] = 1`,
+        // `let a<LF><a/>`), unlike an expression, `return`, or a member prefix (`get<LF>[x]() {}`, `static<LF>*g() {}`;
+        // `async<LF>*g() {}` stays one method, as it parses today). shortcut: `get<LF>*g() {}` and `set<LF>*g() {}`
+        // (a field, then a generator) stay errors: telling get/set from static/async costs a marker of +1.8 % parser.c.
+        case '*':
+        case '[':
+            return valid_symbols[BINDING_END] && !valid_symbols[LOGICAL_OR] && !valid_symbols[KEYWORD_CONTINUES];
+        case '<':
+            return valid_symbols[BINDING_END] && !valid_symbols[LOGICAL_OR];
+
+        case '`':
+        case ',':
+        case ':':
+        case ';':
+        case '%':
+        case '>':
+        case '=':
+        case '(':
+        case '?':
+        case '^':
+        case '|':
+        case '&':
+        case '/':
+            return false;
+
+        // Insert a semicolon before decimals literals but not otherwise.
+        case '.':
+            skip(lexer);
+            return iswdigit(lexer->lookahead);
+
+        // Insert a semicolon before `--` and `++`, but not before binary `+` or `-`.
+        case '+':
+            skip(lexer);
+            return lexer->lookahead == '+';
+        case '-':
+            skip(lexer);
+            return lexer->lookahead == '-';
+
+        // Don't insert a semicolon before `!=`, but do insert one before a unary `!`.
+        case '!':
+            skip(lexer);
+            return lexer->lookahead != '=';
+
+        // Don't insert a semicolon before `in` or `instanceof`, but do insert one
+        // before an identifier.
+        case 'i':
+            skip(lexer);
+
+            if (lexer->lookahead != 'n') {
+                return true;
+            }
+            skip(lexer);
+
+            if (!is_identifier_part(lexer->lookahead)) {
+                return false;
+            }
+
+            for (unsigned i = 0; i < 8; i++) {
+                if (lexer->lookahead != "stanceof"[i]) {
+                    return true;
+                }
+                skip(lexer);
+            }
+
+            if (!is_identifier_part(lexer->lookahead)) {
+                return false;
+            }
+            break;
+
+        default:
+            break;
+    }
+
+    return true;
+}
+
+static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, bool *scanned_comment) {
+    bool comment_condition = !valid_symbols[LOGICAL_OR];
     lexer->result_symbol = AUTOMATIC_SEMICOLON;
     lexer->mark_end(lexer);
 
@@ -152,74 +251,13 @@ static bool scan_automatic_semicolon(TSLexer *lexer, bool comment_condition, boo
         return false;
     }
 
-    switch (lexer->lookahead) {
-        case '`':
-        case ',':
-        case ':':
-        case ';':
-        case '*':
-        case '%':
-        case '>':
-        case '<':
-        case '=':
-        case '[':
-        case '(':
-        case '?':
-        case '^':
-        case '|':
-        case '&':
-        case '/':
-            return false;
-
-        // Insert a semicolon before decimals literals but not otherwise.
-        case '.':
-            skip(lexer);
-            return iswdigit(lexer->lookahead);
-
-        // Insert a semicolon before `--` and `++`, but not before binary `+` or `-`.
-        case '+':
-            skip(lexer);
-            return lexer->lookahead == '+';
-        case '-':
-            skip(lexer);
-            return lexer->lookahead == '-';
-
-        // Don't insert a semicolon before `!=`, but do insert one before a unary `!`.
-        case '!':
-            skip(lexer);
-            return lexer->lookahead != '=';
-
-        // Don't insert a semicolon before `in` or `instanceof`, but do insert one
-        // before an identifier.
-        case 'i':
-            skip(lexer);
-
-            if (lexer->lookahead != 'n') {
-                return true;
-            }
-            skip(lexer);
-
-            if (!iswalpha(lexer->lookahead)) {
-                return false;
-            }
-
-            for (unsigned i = 0; i < 8; i++) {
-                if (lexer->lookahead != "stanceof"[i]) {
-                    return true;
-                }
-                skip(lexer);
-            }
-
-            if (!iswalpha(lexer->lookahead)) {
-                return false;
-            }
-            break;
-
-        default:
-            break;
+    // After a comment the next call decides, as before: where the comment holds a line break the base scanner
+    // takes the semicolon after it (`let x<LF>/*<LF>*//*<LF>*/[b]`), so the declaration keeps its comment.
+    if (*scanned_comment && (lexer->lookahead == '*' || lexer->lookahead == '[' || lexer->lookahead == '<')) {
+        return false;
     }
 
-    return true;
+    return semicolon_before_next_token(lexer, valid_symbols);
 }
 
 static bool scan_ternary_qmark(TSLexer *lexer) {
@@ -390,7 +428,7 @@ bool tree_sitter_javascript_external_scanner_scan(void *payload, TSLexer *lexer,
 
     if (valid_symbols[AUTOMATIC_SEMICOLON]) {
         bool scanned_comment = false;
-        bool ret = scan_automatic_semicolon(lexer, !valid_symbols[LOGICAL_OR], &scanned_comment);
+        bool ret = scan_automatic_semicolon(lexer, valid_symbols, &scanned_comment);
         if (!ret && !scanned_comment && valid_symbols[TERNARY_QMARK] && lexer->lookahead == '?') {
             return scan_ternary_qmark(lexer);
         }
