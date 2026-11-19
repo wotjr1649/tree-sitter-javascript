@@ -2,11 +2,12 @@
 // attribute) changes the bytes the tools judge. `git hash-object --no-filters` hashes the working-tree bytes as they are.
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, readFileSync, renameSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 
-// The paths under `paths` (relative to `repo`) whose working-tree bytes differ from the blob of `commit`, or that are
-// missing. An empty list means the checkout is the commit.
+// The paths under `paths` (relative to `repo`) whose working-tree bytes differ from the blob of `commit`, that are missing,
+// or that are on disk but not in the commit's tree (collect walks the disk, so an extra file would be judged). An empty list
+// means the checkout is the commit.
 export function checkoutDiffers(repo, commit, paths) {
   const git = (a, input) => execFileSync("git", ["-C", repo, ...a], { encoding: "utf8", input, maxBuffer: 1 << 29, stdio: ["pipe", "pipe", "inherit"] });
   const blobs = [];
@@ -18,7 +19,18 @@ export function checkoutDiffers(repo, commit, paths) {
   const present = blobs.filter(([p]) => existsSync(join(repo, p)));
   const oids = present.length ? git(["hash-object", "--no-filters", "--stdin-paths"], present.map(([p]) => p).join("\n") + "\n").split("\n") : [];
   const have = new Map(present.map(([p], i) => [p, oids[i]]));
-  return blobs.filter(([p, oid]) => have.get(p) !== oid).map(([p]) => p);
+  const pinned = new Set(blobs.map(([p]) => p));
+  const extra = [];
+  for (const p of paths) {
+    const abs = join(repo, p);
+    if (!existsSync(abs)) continue;
+    const files = statSync(abs).isDirectory() ? readdirSync(abs, { recursive: true, withFileTypes: true }).filter((e) => !e.isDirectory()).map((e) => join(e.parentPath, e.name)) : [abs];
+    for (const f of files) {
+      const rel = relative(repo, f).replaceAll("\\", "/");
+      if (!pinned.has(rel)) extra.push(rel);
+    }
+  }
+  return [...blobs.filter(([p, oid]) => have.get(p) !== oid).map(([p]) => p), ...extra.sort()];
 }
 
 // Extracts the tarball `tgz` into `dir` only when its hashes are `want` ({sha256, integrity}; null: take it as it is, for

@@ -39,6 +39,29 @@ test("a checkout whose bytes are not the commit's blobs is reported (CRLF conver
   }
 });
 
+test("a file on disk that is not in the commit's tree is reported (untracked, ignored or staged), under a directory or a file path", () => {
+  const d = tmp();
+  try {
+    mkdirSync(join(d, "t", "sub"), { recursive: true });
+    writeFileSync(join(d, "t", "a.js"), "a\n");
+    writeFileSync(join(d, "top.txt"), "x\n");
+    writeFileSync(join(d, ".gitignore"), "ignored.js\n");
+    git(d, "init", "-q");
+    git(d, "-c", "core.autocrlf=false", "add", ".");
+    git(d, "commit", "-q", "-m", "x");
+    const head = git(d, "rev-parse", "HEAD").trim();
+    assert.deepEqual(checkoutDiffers(d, head, ["t", "top.txt"]), []);
+    writeFileSync(join(d, "t", "sub", "input.js"), "extra;\n");
+    writeFileSync(join(d, "t", "ignored.js"), "extra;\n");
+    writeFileSync(join(d, "t", "staged.js"), "extra;\n");
+    git(d, "add", "t/staged.js");
+    writeFileSync(join(d, "outside.js"), "not under the paths\n");
+    assert.deepEqual(checkoutDiffers(d, head, ["t", "top.txt"]), ["t/ignored.js", "t/staged.js", "t/sub/input.js"]);
+  } finally {
+    rmSync(d, { recursive: true, force: true });
+  }
+});
+
 test("a tarball with other hashes is not extracted and leaves no extraction; a verified one is extracted afresh", () => {
   const d = tmp();
   try {
@@ -81,6 +104,29 @@ test("readVerified returns the text of the collected bytes and refuses anything 
     assert.throws(() => readVerified(f, sum), /differs from the collected/);
     assert.throws(() => readVerified(join(d, "missing.js"), sum), /ENOENT/);
     assert.throws(() => readVerified(f, undefined), /no sha256 recorded/);
+  } finally {
+    rmSync(d, { recursive: true, force: true });
+  }
+});
+
+test("stats.mjs counts jsxLike from the collected bytes and fails (exit 3) on an npm file changed since collect", () => {
+  const d = tmp();
+  try {
+    const id = "pkgs/sample/package/index.js";
+    const raw = "const v = 1;\n";
+    const row = { id, set: "npm", pkg: "sample@1", size: raw.length, sha256: createHash("sha256").update(raw).digest("hex"), cat: "ok", truth: "unknown", ts: { clean: true } };
+    writeFileSync(join(d, "results.jsonl"), JSON.stringify(row) + "\n");
+    mkdirSync(join(d, "data", "pkgs", "sample", "package"), { recursive: true });
+    const stats = () => spawnSync(process.execPath, [join(here, "../stats.mjs"), "--dir", d], { encoding: "utf8" });
+    writeFileSync(join(d, "data", id), raw);
+    assert.equal(stats().status, 0);
+    const pkg = () => JSON.parse(readFileSync(join(d, "stats.json"), "utf8"));
+    assert.equal(pkg().packages["sample@1"].jsxLike, 0);
+    writeFileSync(join(d, "data", id), "<Example />;\n");
+    const r = stats();
+    assert.equal(r.status, 3);
+    assert.match(r.stderr, /pkgs\/sample\/package\/index\.js: sha256 .* differs from the collected/);
+    assert.deepEqual([pkg().packages["sample@1"].jsxLike, pkg().inputErrors.length], [0, 1]);
   } finally {
     rmSync(d, { recursive: true, force: true });
   }

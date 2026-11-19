@@ -5,7 +5,8 @@
 // With --pin the tarball hashes are written to manifest.json; without it a mismatch is an error (exit 2): an archive whose
 // sha256 or sha512 differs is never extracted, a stale extraction of it is removed, and every run extracts a verified
 // tarball afresh. The git checkouts are made with core.autocrlf=false and every run checks that their files are byte for
-// byte the blobs of the pinned commit (an existing checkout with CRLF files is an error: delete it and fetch again).
+// byte the blobs of the pinned commit and holds no other file under the pinned paths (an existing checkout with CRLF files
+// or an extra file is an error: delete it and fetch again).
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
@@ -24,7 +25,7 @@ const safe = (name) => name.replace(/^@/, "").replace("/", "__");
 function checkBytes(repo, commit, paths, label) {
   const diff = checkoutDiffers(repo, commit, paths);
   if (!diff.length) return;
-  console.error(`${label}: ${diff.length} files differ from the blobs of ${commit} (first: ${diff.slice(0, 3).join(", ")}); delete ${repo} and fetch again`);
+  console.error(`${label}: ${diff.length} files differ from the blobs of ${commit} or are not in its tree (first: ${diff.slice(0, 3).join(", ")}); delete ${repo} and fetch again`);
   process.exit(2);
 }
 

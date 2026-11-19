@@ -36,11 +36,12 @@ function* walk(dir) {
 
 // ---- test262 -------------------------------------------------------------------------------------------------------
 const t262 = join(data, "test262");
-// the files are judged as the pinned commits have them (fetch.mjs checks this too; a CRLF checkout would change the bytes)
+// the files are judged as the pinned commits have them, and only those (fetch.mjs checks this too; a CRLF checkout would change
+// the bytes, an extra file would be walked and judged)
 for (const [repo, commit, paths] of [[t262, manifest.test262.commit, ["features.txt", ...manifest.test262.roots]], [join(data, "babel-fixtures"), manifest.babel_jsx.commit, [manifest.babel_jsx.path]]]) {
   if (!existsSync(repo)) continue;
   const diff = checkoutDiffers(repo, commit, paths);
-  if (diff.length) { console.error(`collect: ${diff.length} files of ${repo} differ from the blobs of ${commit} (first: ${diff.slice(0, 3).join(", ")}); fetch again`); process.exit(2); }
+  if (diff.length) { console.error(`collect: ${diff.length} files of ${repo} differ from the blobs of ${commit} or are not in its tree (first: ${diff.slice(0, 3).join(", ")}); fetch again`); process.exit(2); }
 }
 const unstable = new Set();
 {

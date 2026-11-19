@@ -63,10 +63,13 @@ about 3 minutes (collect 95 s, tsparse 60 s, both minimisations 10 s).
 Pinned bytes. `fetch.mjs` stops before using a tarball whose sha256 or sha512 differs from the manifest (nothing is extracted,
 a stale extraction is removed, and a verified tarball is always extracted afresh, never reused). The git checkouts are made with
 `core.autocrlf=false`, and `fetch.mjs` and `collect.mjs` check that every file under the pinned paths is byte for byte the blob of
-the pinned commit (`git hash-object --no-filters`); a checkout with CRLF files is an error, not a run (delete it and fetch again).
+the pinned commit (`git hash-object --no-filters`) and that no other file is on disk under those paths (untracked, ignored or
+only staged; `collect.mjs` walks the disk); a checkout with CRLF files or an extra file is an error, not a run (exit 2 with the
+first paths; delete it and fetch again).
 `collect.mjs` records the sha256 of each file it judged, and every later stage that reads the file again (`tsparse`,
-`structure.mjs`, `minimize.mjs`, `structure-min.mjs`) refuses a file whose bytes differ or that cannot be read: it is category
-`X` / status `input-error`, exit code 3, and is never counted as a parser defect.
+`structure.mjs`, `minimize.mjs`, `structure-min.mjs`, and `stats.mjs` for the npm `jsxLike` count) refuses a file whose bytes
+differ or that cannot be read: it is category `X` / status `input-error` (in `stats.json`: `inputErrors`, not counted), exit
+code 3, and is never counted as a parser defect.
 
 `tools.mjs` repeats the options, error classes and UTF-16 to UTF-8 conversion of `../run.mjs` instead of importing them,
 because `run.mjs` is a script whose sha256 is recorded in `../verdicts.json`. `test/pinned.test.mjs` runs `run.mjs` on a few cases
