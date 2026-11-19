@@ -715,6 +715,14 @@ module.exports = grammar({
       field('property', alias(choice($.identifier, $._keyword_identifier), $.property_identifier)),
     )),
 
+    // A JSX member tag on `this` (`<this.props.Foo />`). It is separate from nested_identifier, which TypeScript also
+    // uses for namespace names, import aliases and type paths, where `this` as the object conflicts.
+    _jsx_this_member_expression: $ => prec('member', seq(
+      field('object', choice($.this, alias($._jsx_this_member_expression, $.member_expression))),
+      '.',
+      field('property', alias(choice($.identifier, $._keyword_identifier), $.property_identifier)),
+    )),
+
     // No reserved words in namespace names: in TSX, `<a:typeof …` and the like would conflict with type annotations.
     jsx_namespace_name: $ => {
       const name = choice(alias($.jsx_identifier, $.identifier), $.identifier);
@@ -724,6 +732,7 @@ module.exports = grammar({
     _jsx_element_name: $ => choice(
       $._jsx_identifier,
       alias($.nested_identifier, $.member_expression),
+      alias($._jsx_this_member_expression, $.member_expression),
       $.jsx_namespace_name,
     ),
 

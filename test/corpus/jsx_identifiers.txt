@@ -194,3 +194,65 @@ JSX contextual keywords as member objects and attribute names
         (property_identifier))
       attribute: (jsx_attribute
         (property_identifier)))))
+
+==============================================
+JSX member tags on this
+==============================================
+
+<this.Foo />;
+<this.props.Foo bar="1" />;
+<this.a.b.C>x</this.a.b.C>;
+class Example { render() { return <this.props.Component />; } }
+
+---
+
+(program
+  (expression_statement
+    (jsx_self_closing_element
+      name: (member_expression
+        object: (this)
+        property: (property_identifier))))
+  (expression_statement
+    (jsx_self_closing_element
+      name: (member_expression
+        object: (member_expression
+          object: (this)
+          property: (property_identifier))
+        property: (property_identifier))
+      attribute: (jsx_attribute
+        (property_identifier)
+        (string
+          (string_fragment)))))
+  (expression_statement
+    (jsx_element
+      open_tag: (jsx_opening_element
+        name: (member_expression
+          object: (member_expression
+            object: (member_expression
+              object: (this)
+              property: (property_identifier))
+            property: (property_identifier))
+          property: (property_identifier)))
+      (jsx_text)
+      close_tag: (jsx_closing_element
+        name: (member_expression
+          object: (member_expression
+            object: (member_expression
+              object: (this)
+              property: (property_identifier))
+            property: (property_identifier))
+          property: (property_identifier)))))
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      member: (method_definition
+        name: (property_identifier)
+        parameters: (formal_parameters)
+        body: (statement_block
+          (return_statement
+            (jsx_self_closing_element
+              name: (member_expression
+                object: (member_expression
+                  object: (this)
+                  property: (property_identifier))
+                property: (property_identifier)))))))))

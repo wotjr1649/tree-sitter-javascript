@@ -32,7 +32,7 @@
    }
   },
   "cases_file": "cases.jsonl",
-  "cases_sha256": "3f53935746d0021bd1c7fbaadb36491e351c411ac28b48e2bd6c67ffab74ac07",
+  "cases_sha256": "42d40254143d0231121f26f5f2bb5681b928bb91f3c87707c473419d6d5629b1",
   "runner": "run.mjs",
   "runner_sha256": "06cfe49cd56d0bac9b5c672b1f62fc0f44b37de02c0a2bf04c557e5354c5c24d"
  },
@@ -2718,6 +2718,261 @@
      {
       "message": "Expected `;` but found `Identifier`",
       "at": 16
+     }
+    ]
+   }
+  },
+  {
+   "id": "j3b/this-props-member",
+   "sha256": "e3052cab5cbccda5aa08bf306aa86febdd33bdd5e841e710262cc989709bc0a1",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j3b/this-member",
+   "sha256": "b32dbb5fffda94b26de9138fec21342138bf0b87009e29495efcf3b8a6cddfd1",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j3b/this-member-pair",
+   "sha256": "1e4ef3fe0686f58ed31315608b0f31eb4278faca2362a07e3d4c063720a4f52c",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j3b/this-class-render",
+   "sha256": "265f8cd8ce93d092d19b53cceedc9fd747957d9b8d1c00724e28600abc763ffd",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j3b/this-member-attributes-children",
+   "sha256": "c2dac45c4236d221676db8744b58bed70ff0ab2946dac3ee3fe4fbda656eea85",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j3b/this-reserved-property",
+   "sha256": "466d61bc48b63babac3a5057aa80de67f761a0e0bdd819a350212ecdcb7471c6",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j3b/this-reserved-pair",
+   "sha256": "b76e001385d7950bbf3bd1a3b233d5631240c485b02ab2f880e89c279bc2997a",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j3b/this-arrow",
+   "sha256": "5dfb50d2289f9bdcda5c49c8c8d369ff84dae1f0f7982159a94c7990c3314fe6",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j3b/this-nested-child",
+   "sha256": "a4f27c2d18bc52a48088c40f347f89558875154f6870fa39dadb00d8e4a1d049",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j3b/reject-this-private",
+   "sha256": "b2aa57d111d690e9a14dde66bca1131f8df2e1fb2f66fc56710d5299c5224607",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (1:6)",
+      "at": 6
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token",
+      "at": 6
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Unexpected token",
+      "at": 6
+     }
+    ]
+   }
+  },
+  {
+   "id": "j3b/reject-this-dot",
+   "sha256": "43579faae196c5f18385ec9d1fa651111bc6a4b8f77bb0f94c0c20223a2d69bc",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (1:7)",
+      "at": 7
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token",
+      "at": 7
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Unexpected token",
+      "at": 7
+     }
+    ]
+   }
+  },
+  {
+   "id": "j3b/reject-this-index",
+   "sha256": "40610d9f86707cf4be6f834811bfd6314f111cd290acc3f7fe1bac485e0dc7f5",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (1:5)",
+      "at": 5
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token",
+      "at": 5
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Unexpected token",
+      "at": 5
+     }
+    ]
+   }
+  },
+  {
+   "id": "j3b/reject-this-optional",
+   "sha256": "fcc29906d6d40f34bd7f44f1f39b433129da75165789313987dabac06acbdd5b",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (1:5)",
+      "at": 5
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token",
+      "at": 5
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Unexpected token",
+      "at": 5
      }
     ]
    }
