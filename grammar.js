@@ -436,10 +436,6 @@ module.exports = grammar({
           optional($._automatic_semicolon),
           field('operator', 'of'),
         ),
-        // `await using` and a line break is an await expression, never a for…in/of head: this alternative only makes
-        // the automatic semicolon valid there, and no `;` follows it, so a binding after the line break is an error.
-        // Its fields keep `left` and `operator` required in node-types.json.
-        seq('await', field('left', alias('using', $.identifier)), $._automatic_semicolon, ';', field('operator', 'of')),
       ),
       field('right', $._expressions),
       ')',

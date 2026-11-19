@@ -1071,39 +1071,11 @@ async function g() {
 ---
 
 ============================================
-Line break after await using in a plain for loop
-:error
-============================================
-
-async function g() {
-  for (await using
-  x = f();;) {}
-}
-
----
-
-============================================
-Line break after await using in a for-of loop
-:error
-============================================
-
-async function g() {
-  for (await using
-  x of y) {}
-}
-
----
-
-============================================
-'using' and 'await using' as expressions in for heads
+'using' as an expression in for-in heads
 ============================================
 
 for (using in o);
 for (using.x in o);
-async function g() {
-  for (await using
-  ;;);
-}
 
 ---
 
@@ -1117,16 +1089,7 @@ async function g() {
       (identifier)
       (property_identifier))
     (identifier)
-    (empty_statement))
-  (function_declaration
-    (identifier)
-    (formal_parameters)
-    (statement_block
-      (for_statement
-        (await_expression
-          (identifier))
-        (empty_statement)
-        (empty_statement)))))
+    (empty_statement)))
 
 ============================================
 'using' as identifier

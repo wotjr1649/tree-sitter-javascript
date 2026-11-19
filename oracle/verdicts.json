@@ -32,7 +32,7 @@
    }
   },
   "cases_file": "cases.jsonl",
-  "cases_sha256": "32df9a4a6bd7b72a440116aff3629b8bc9e43bf42d57a9e76c999e2e97903644",
+  "cases_sha256": "bf0b6cfa5021a8ce8765fdceef5c8de8a1de0ac5a38bcc524387652a5d5c1acf",
   "runner": "run.mjs",
   "runner_sha256": "06cfe49cd56d0bac9b5c672b1f62fc0f44b37de02c0a2bf04c557e5354c5c24d"
  },
@@ -3005,81 +3005,6 @@
       "at": 26
      }
     ]
-   }
-  },
-  {
-   "id": "j6/reject-await-using-newline-init",
-   "sha256": "c1111afe77ca18ca635274a80386ee839c5630af19a9217bfea1cdd1adb164f6",
-   "sourceType": "module",
-   "verdict": "syntax",
-   "babel": {
-    "class": "syntax",
-    "errors": [
-     {
-      "message": "Unexpected token (2:8)",
-      "at": 46
-     }
-    ]
-   },
-   "oxc": {
-    "class": "syntax",
-    "errors": [
-     {
-      "message": "Expected `;` but found `Identifier`",
-      "at": 38
-     }
-    ],
-    "errorsWithSemantic": [
-     {
-      "message": "Expected `;` but found `Identifier`",
-      "at": 38
-     }
-    ]
-   }
-  },
-  {
-   "id": "j6/reject-await-using-newline-of",
-   "sha256": "7eea1e482679af036f49a8bca6a489c79e0342783ecf6c8dc1b6580c5c1a9f4a",
-   "sourceType": "module",
-   "verdict": "syntax",
-   "babel": {
-    "class": "syntax",
-    "errors": [
-     {
-      "message": "Unexpected token, expected \")\" (2:5)",
-      "at": 43
-     }
-    ]
-   },
-   "oxc": {
-    "class": "syntax",
-    "errors": [
-     {
-      "message": "Expected `;` but found `Identifier`",
-      "at": 38
-     }
-    ],
-    "errorsWithSemantic": [
-     {
-      "message": "Expected `;` but found `Identifier`",
-      "at": 38
-     }
-    ]
-   }
-  },
-  {
-   "id": "j6/await-using-newline-semicolon",
-   "sha256": "bdd846e1bdbaa3ea54f7f1ba8c0e29fc5baef7f1d35d66b94f1ebad8f5e44b05",
-   "sourceType": "module",
-   "verdict": "accept",
-   "babel": {
-    "class": "accept",
-    "errors": []
-   },
-   "oxc": {
-    "class": "accept",
-    "errors": [],
-    "errorsWithSemantic": []
    }
   },
   {
