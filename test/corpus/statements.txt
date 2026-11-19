@@ -360,6 +360,225 @@ export { "string import" as "string export" } from 'foo';
       (string_fragment))))
 
 ============================================
+Import attributes on exports from another module
+============================================
+
+export * from "a" with { type: "json" };
+export * as ns from "a" with { type: "json" };
+export { a } from "a" with { type: "json" };
+export { a as b, } from "a" with {};
+
+---
+
+(program
+  (export_statement
+    (string
+      (string_fragment))
+    (import_attribute
+      (object
+        (pair
+          (property_identifier)
+          (string
+            (string_fragment))))))
+  (export_statement
+    (namespace_export
+      (identifier))
+    (string
+      (string_fragment))
+    (import_attribute
+      (object
+        (pair
+          (property_identifier)
+          (string
+            (string_fragment))))))
+  (export_statement
+    (export_clause
+      (export_specifier
+        (identifier)))
+    (string
+      (string_fragment))
+    (import_attribute
+      (object
+        (pair
+          (property_identifier)
+          (string
+            (string_fragment))))))
+  (export_statement
+    (export_clause
+      (export_specifier
+        (identifier)
+        (identifier)))
+    (string
+      (string_fragment))
+    (import_attribute
+      (object))))
+
+============================================
+Line break before import attributes
+============================================
+
+import a from "a"
+with { type: "json" }
+import "b"
+with { type: "json" };
+export * from "c"
+with { type: "json" }
+export { d } from "d"
+with { type: "json" }
+import e from "e"
+f()
+
+---
+
+(program
+  (import_statement
+    (import_clause
+      (identifier))
+    (string
+      (string_fragment))
+    (import_attribute
+      (object
+        (pair
+          (property_identifier)
+          (string
+            (string_fragment))))))
+  (import_statement
+    (string
+      (string_fragment))
+    (import_attribute
+      (object
+        (pair
+          (property_identifier)
+          (string
+            (string_fragment))))))
+  (export_statement
+    (string
+      (string_fragment))
+    (import_attribute
+      (object
+        (pair
+          (property_identifier)
+          (string
+            (string_fragment))))))
+  (export_statement
+    (export_clause
+      (export_specifier
+        (identifier)))
+    (string
+      (string_fragment))
+    (import_attribute
+      (object
+        (pair
+          (property_identifier)
+          (string
+            (string_fragment))))))
+  (import_statement
+    (import_clause
+      (identifier))
+    (string
+      (string_fragment)))
+  (expression_statement
+    (call_expression
+      (identifier)
+      (arguments))))
+
+============================================
+Import attributes need a source
+:error
+============================================
+
+export { a } with { type: "json" };
+
+---
+
+============================================
+Reserved words as module export and import names
+============================================
+
+export { a as if, b as class, c as default, d as await } from "a";
+export { if, new as in } from "b";
+export * as typeof from "c";
+import { if as a, class as b, default as c, "d" as e } from "d";
+var f;
+export { f as import };
+
+---
+
+(program
+  (export_statement
+    (export_clause
+      (export_specifier
+        (identifier)
+        (identifier))
+      (export_specifier
+        (identifier)
+        (identifier))
+      (export_specifier
+        (identifier))
+      (export_specifier
+        (identifier)
+        (identifier)))
+    (string
+      (string_fragment)))
+  (export_statement
+    (export_clause
+      (export_specifier
+        (identifier))
+      (export_specifier
+        (identifier)
+        (identifier)))
+    (string
+      (string_fragment)))
+  (export_statement
+    (namespace_export
+      (identifier))
+    (string
+      (string_fragment)))
+  (import_statement
+    (import_clause
+      (named_imports
+        (import_specifier
+          (identifier)
+          (identifier))
+        (import_specifier
+          (identifier)
+          (identifier))
+        (import_specifier
+          (identifier))
+        (import_specifier
+          (string
+            (string_fragment))
+          (identifier))))
+    (string
+      (string_fragment)))
+  (variable_declaration
+    (variable_declarator
+      (identifier)))
+  (export_statement
+    (export_clause
+      (export_specifier
+        (identifier)
+        (identifier)))))
+
+============================================
+Reserved word as an import binding
+:error
+============================================
+
+import { a as if } from "a";
+
+---
+
+============================================
+Reserved word as a namespace import binding
+:error
+============================================
+
+import * as class from "a";
+
+---
+
+============================================
 Decorators before exports
 ============================================
 
@@ -1127,6 +1346,45 @@ async function g() {
           (identifier))
         (empty_statement)
         (empty_statement)))))
+
+============================================
+'async of' arrow function in a for initializer
+============================================
+
+for (async of => {};;) {}
+for (async of => x;;);
+for (async of x);
+for ((async) of x);
+for (async in x);
+
+---
+
+(program
+  (for_statement
+    (arrow_function
+      (identifier)
+      (statement_block))
+    (empty_statement)
+    (statement_block))
+  (for_statement
+    (arrow_function
+      (identifier)
+      (identifier))
+    (empty_statement)
+    (empty_statement))
+  (for_in_statement
+    (identifier)
+    (identifier)
+    (empty_statement))
+  (for_in_statement
+    (parenthesized_expression
+      (identifier))
+    (identifier)
+    (empty_statement))
+  (for_in_statement
+    (identifier)
+    (identifier)
+    (empty_statement)))
 
 ============================================
 'using' as identifier

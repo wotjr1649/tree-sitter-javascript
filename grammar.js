@@ -151,9 +151,7 @@ module.exports = grammar({
       seq(
         'export',
         choice(
-          seq('*', $._from_clause),
-          seq($.namespace_export, $._from_clause),
-          seq($.export_clause, $._from_clause),
+          seq(choice('*', $.namespace_export, $.export_clause), $._from_clause, optional($._import_attributes)),
           $.export_clause,
         ),
         $._semicolon,
@@ -196,11 +194,12 @@ module.exports = grammar({
       )),
     ),
 
-    _module_export_name: $ => choice(
+    // Any IdentifierName, reserved words included (`export { a as if }`, `import { if as a } from 'x'`).
+    _module_export_name: $ => reserved('properties', choice(
       $.identifier,
       $.string,
       'default',
-    ),
+    )),
 
     declaration: $ => choice(
       $.function_declaration,
@@ -223,7 +222,7 @@ module.exports = grammar({
         seq($.import_clause, $._from_clause),
         field('source', $.string),
       ),
-      optional($.import_attribute),
+      optional($._import_attributes),
       $._semicolon,
     ),
 
@@ -267,6 +266,13 @@ module.exports = grammar({
     ),
 
     import_attribute: $ => seq('with', $.object),
+
+    // `with` is a keyword that can follow a line break here, so the automatic semicolon the scanner inserts before it
+    // must not end the statement: the precedence makes the attributes win over a `with` statement after it.
+    _import_attributes: $ => choice(
+      $.import_attribute,
+      prec(1, seq($._automatic_semicolon, $.import_attribute)),
+    ),
 
     //
     // Statements
@@ -395,6 +401,7 @@ module.exports = grammar({
             field('left', choice(
               $._lhs_expression,
               $.parenthesized_expression,
+              $.call_expression,
             )),
             // `using` and a line break is an identifier, not a declaration (`for (using\nof y)`): the automatic
             // semicolon there makes a declarator after the line break an error.
@@ -869,13 +876,19 @@ module.exports = grammar({
     )),
 
     arrow_function: $ => seq(
-      optional('async'),
       choice(
-        field('parameter', choice(
-          alias($._reserved_identifier, $.identifier),
-          $.identifier,
-        )),
-        $._call_signature,
+        seq(
+          optional('async'),
+          choice(
+            field('parameter', choice(
+              alias($._reserved_identifier, $.identifier),
+              $.identifier,
+            )),
+            $._call_signature,
+          ),
+        ),
+        // After `async`, `of` is a keyword for the parser: `for (async of => {};;)` starts a for-of head otherwise.
+        seq('async', field('parameter', alias('of', $.identifier))),
       ),
       '=>',
       field('body', choice(
@@ -897,7 +910,7 @@ module.exports = grammar({
       )),
       prec('template_call', seq(
         field('function', choice($.primary_expression, $.new_expression)),
-        field('arguments', $.template_string),
+        field('arguments', alias($._tagged_template_string, $.template_string)),
       )),
       prec('member', seq(
         field('function', $.primary_expression),
@@ -944,7 +957,8 @@ module.exports = grammar({
     ),
 
     assignment_expression: $ => prec.right('assign', seq(
-      field('left', choice($.parenthesized_expression, $._lhs_expression)),
+      // `f() = 1` is a runtime ReferenceError, not a syntax error, in web-compatible JavaScript (ECMA-262 annex B.3.4).
+      field('left', choice($.parenthesized_expression, $._lhs_expression, $.call_expression)),
       '=',
       field('right', $.expression),
     )),
@@ -957,11 +971,19 @@ module.exports = grammar({
       $.parenthesized_expression,
     ),
 
-    augmented_assignment_expression: $ => prec.right('assign', seq(
-      field('left', $._augmented_assignment_lhs),
-      field('operator', choice('+=', '-=', '*=', '/=', '%=', '^=', '&=', '|=', '>>=', '>>>=',
-        '<<=', '**=', '&&=', '||=', '??=')),
-      field('right', $.expression),
+    augmented_assignment_expression: $ => prec.right('assign', choice(
+      seq(
+        field('left', $._augmented_assignment_lhs),
+        field('operator', choice('+=', '-=', '*=', '/=', '%=', '^=', '&=', '|=', '>>=', '>>>=',
+          '<<=', '**=', '&&=', '||=', '??=')),
+        field('right', $.expression),
+      ),
+      // Annex B.3.4 allows a call expression only for the arithmetic operators, not the logical ones.
+      seq(
+        field('left', $.call_expression),
+        field('operator', choice('+=', '-=', '*=', '/=', '%=', '^=', '&=', '|=', '>>=', '>>>=', '<<=', '**=')),
+        field('right', $.expression),
+      ),
     )),
 
     _initializer: $ => seq(
@@ -1101,6 +1123,26 @@ module.exports = grammar({
       )),
       '`',
     ),
+
+    // A tagged template may hold escapes that are not valid in an untagged one (the cooked value is undefined).
+    _tagged_template_string: $ => seq(
+      '`',
+      repeat(choice(
+        alias($._template_chars, $.string_fragment),
+        $.escape_sequence,
+        alias($._invalid_escape_sequence, $.escape_sequence),
+        $.template_substitution,
+      )),
+      '`',
+    ),
+
+    _invalid_escape_sequence: _ => token.immediate(seq(
+      '\\',
+      choice(
+        /x[0-9a-fA-F]?/,
+        /u(\{[0-9a-fA-F]*|[0-9a-fA-F]{0,3})/,
+      ),
+    )),
 
     template_substitution: $ => seq(
       '${',
