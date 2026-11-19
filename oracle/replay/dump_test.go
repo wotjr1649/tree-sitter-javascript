@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 
@@ -13,17 +14,54 @@ import (
 )
 
 func TestSplitCorpus(t *testing.T) {
-	text := "==========\nFirst\n==========\n\na = 1;\n---\n\n(program)\n\n" +
-		"==========\nFirst\n==========\n\nx\n----\ny\n---\n(program)\n"
-	got := splitCorpus("c.txt", text)
-	want := []input{{"c.txt#First", "\na = 1;"}, {"c.txt#First#2", "\nx\n----\ny"}}
-	if len(got) != len(want) {
-		t.Fatalf("got %d inputs: %q", len(got), got)
-	}
-	for i := range want {
-		if got[i] != want[i] {
-			t.Errorf("input %d = %q, want %q", i, got[i], want[i])
+	for _, c := range []struct{ name, text string }{
+		// The CLI's own cases (test_parse_test_content_simple, ..._with_dashes_in_source_code).
+		{"simple", "===============\nThe first test\n===============\n\na b c\n\n---\n\n(a\n    (b c))\n\n" +
+			"================\nThe second test\n================\nd\n---\n(d)"},
+		{"dashes", "==================\nCode with dashes\n==================\nabc\n---\ndefg\n----\nhijkl\n-------\n\n(a (b))\n\n" +
+			"=========================\nCode ending with dashes\n=========================\nabc\n-----------\n-------------------\n\n(c (d))"},
+		{"crlf", "===\r\nTrailing\r\n===\r\n\r\nx\r\n\r\n---\r\n(program)\r\n"},
+		{"attributes", "===\nWith error\n:error\n:platform(nowhere)\n===\nx\n---\n(ERROR)\n===\nTwo\nlines\n===\ny\n---\n(program)\n"},
+		{"suffix", "===s\nSuffixed\n===s\n===\nx\n---\n---s\n(program)\n"},
+		{"repeats", strings.Repeat("===\nRepeat\n===\nx\n---\n(program)\n", 2) + "===\nRepeat#2\n===\ny\n---\n(program)\n"},
+	} {
+		got, err := splitCorpus("c.txt", c.text)
+		if err != nil {
+			t.Errorf("%s: %v", c.name, err)
 		}
+		want := map[string][]input{
+			"simple":     {{"c.txt#The first test", "\na b c\n"}, {"c.txt#The second test", "d"}},
+			"dashes":     {{"c.txt#Code with dashes", "abc\n---\ndefg\n----\nhijkl"}, {"c.txt#Code ending with dashes", "abc\n-----------"}},
+			"crlf":       {{"c.txt#Trailing", "\r\nx\r\n"}},
+			"attributes": {{"c.txt#With error", "x"}, {"c.txt#Two\nlines", "y"}},
+			"suffix":     {{"c.txt#Suffixed", "===\nx\n---"}},
+			"repeats":    {{"c.txt#Repeat", "x"}, {"c.txt#Repeat#2", "x"}, {"c.txt#Repeat#2#2", "y"}},
+		}[c.name]
+		if !slices.Equal(got, want) {
+			t.Errorf("%s: got %q, want %q", c.name, got, want)
+		}
+	}
+	for text, msg := range map[string]string{
+		"===\nMissing divider\n===\nx\n": `c.txt: test "Missing divider" has no --- divider`,
+		"x\n---\n(program)\n":            "c.txt: no corpus tests",
+		"===\nT\n===\n\xff\n---\n":       "c.txt: not UTF-8",
+	} {
+		if _, err := splitCorpus("c.txt", text); err == nil || err.Error() != msg {
+			t.Errorf("%q: got error %v, want %s", text, err, msg)
+		}
+	}
+}
+
+// TestSplitCorpusSource checks a real corpus case against the source the CLI feeds the parser (CLI 0.27.2 rules:
+// the bytes up to the divider without its one preceding line ending; sha256 computed independently).
+func TestSplitCorpusSource(t *testing.T) {
+	got, err := loadInputs("../..", []string{"test/corpus/destructuring.txt"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got[0].ID != "test/corpus/destructuring.txt#Object destructuring assignments" ||
+		sum([]byte(got[0].Source)) != "552cdf1ac6d9d7f335d0c1bdd83f5aac5308068231330fad89eef247f4c201bc" {
+		t.Errorf("got %q", got[0])
 	}
 }
 
@@ -72,14 +110,25 @@ func TestLoadInputs(t *testing.T) {
 	}
 	write("test/corpus/a.txt", "===\nT\n===\nx\n---\n(program)\n")
 	write("examples/e.js", "y")
-	write("set.jsonl", `{"id":"k","source":"z","sha256":"ignored"}`+"\n")
+	write("set.jsonl", `{"id":"k","source":"z","sha256":"ignored"}`+"\n"+`{"id":"e","source":""}`+"\n")
 	got, err := loadInputs(dir, []string{"test/corpus/*.txt", "examples/*", "set.jsonl"})
 	if err != nil {
 		t.Fatal(err)
 	}
-	want := []input{{"test/corpus/a.txt#T", "x"}, {"examples/e.js", "y"}, {"k", "z"}}
-	if len(got) != 3 || got[0] != want[0] || got[1] != want[1] || got[2] != want[2] {
+	want := []input{{"test/corpus/a.txt#T", "x"}, {"examples/e.js", "y"}, {"k", "z"}, {"e", ""}}
+	if !slices.Equal(got, want) {
 		t.Errorf("got %q", got)
+	}
+	write("bad.jsonl", `{"id":"a","source":"x"}`+"\n\n"+`{"id":"b","soruce":"x"}`+"\n")
+	write("null.jsonl", `{"id":"n","source":null}`+"\n")
+	for f, msg := range map[string]string{"bad.jsonl": "bad.jsonl line 3: no string source", "null.jsonl": "null.jsonl line 1: no string source"} {
+		if _, err := loadInputs(dir, []string{f}); err == nil || !strings.HasSuffix(err.Error(), msg) {
+			t.Errorf("%s: got error %v, want %s", f, err, msg)
+		}
+	}
+	write("test/corpus/none.txt", "no tests\n")
+	if _, err := loadInputs(dir, []string{"test/corpus/none.txt"}); err == nil || err.Error() != "test/corpus/none.txt: no corpus tests" {
+		t.Errorf("a corpus file without tests: got error %v", err)
 	}
 	if _, err := loadInputs(dir, []string{"set.jsonl", "set.jsonl"}); err == nil {
 		t.Error("a duplicate id must be refused")

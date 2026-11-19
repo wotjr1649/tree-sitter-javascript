@@ -11,15 +11,27 @@ import { fileURLToPath } from 'node:url';
 
 export const CLASSES = ['same', 'changed-clean', 'clean-to-error', 'error-to-clean', 'error-changed', 'only-base', 'only-head'];
 
-export function readDump(text) {
+const count = (n) => Number.isInteger(n) && n >= 0;
+
+// readDump reads every record of a dump; a record without a valid field the comparison uses is refused.
+export function readDump(text, name = 'dump') {
   const out = new Map();
-  for (const line of text.split('\n')) {
-    if (!line.trim()) continue;
-    const r = JSON.parse(line);
-    if (typeof r.id !== 'string' || typeof r.tree !== 'string') throw new Error(`not a tree dump record: ${line.slice(0, 80)}`);
-    if (out.has(r.id)) throw new Error(`duplicate id ${r.id}`);
+  text.split('\n').forEach((line, n) => {
+    if (!line.trim()) return;
+    const where = `${name} line ${n + 1}`;
+    let r;
+    try {
+      r = JSON.parse(line);
+    } catch (e) {
+      throw new Error(`${where}: ${e.message}`);
+    }
+    const ok =
+      r !== null && typeof r.id === 'string' && r.id !== '' && /^[0-9a-f]{64}$/.test(r.sha256) && typeof r.tree === 'string' &&
+      typeof r.error === 'boolean' && count(r.errors) && count(r.missing);
+    if (!ok) throw new Error(`${where}: not a tree dump record (id, 64-hex sha256, tree, error, errors, missing): ${line.slice(0, 80)}`);
+    if (out.has(r.id)) throw new Error(`${where}: duplicate id ${r.id}`);
     out.set(r.id, r);
-  }
+  });
   return out;
 }
 
@@ -59,7 +71,7 @@ export function report(groups, base, head, trees) {
 function main(argv) {
   const files = argv.filter((a) => !a.startsWith('--'));
   if (files.length !== 2) throw new Error('usage: tree-diff.mjs BASE.jsonl HEAD.jsonl [--trees]');
-  const [base, head] = files.map((f) => readDump(readFileSync(f, 'utf8')));
+  const [base, head] = files.map((f) => readDump(readFileSync(f, 'utf8'), f));
   console.log(report(diff(base, head), base, head, argv.includes('--trees')));
   return 0;
 }

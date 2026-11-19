@@ -9,10 +9,42 @@ import { fileURLToPath } from 'node:url';
 
 const DEFINES = ['STATE_COUNT', 'LARGE_STATE_COUNT', 'SYMBOL_COUNT', 'ALIAS_COUNT', 'TOKEN_COUNT', 'FIELD_COUNT'];
 
-function body(src, decl) {
-  const start = src.indexOf(decl);
-  if (start < 0) throw new Error(`parser.c has no ${decl}`);
-  return src.slice(start + decl.length, src.indexOf('\n};', start));
+// elements returns the top-level elements of the initializer `name[] = { ... };`: the text between its braces, found
+// by nesting depth, split at the commas outside () and {}. It throws when the end is not a `};`.
+function elements(src, name) {
+  const decls = [...src.matchAll(new RegExp(`\\b${name}\\s*\\[\\s*\\]\\s*=\\s*\\{`, 'g'))];
+  if (decls.length !== 1) throw new Error(`parser.c has ${decls.length} ${name}[] initializers, want 1`);
+  const out = [];
+  let depth = 0;
+  let start = decls[0].index + decls[0][0].length;
+  for (let i = start; i < src.length; i++) {
+    const ch = src[i];
+    if (ch === '(' || ch === '{') depth++;
+    else if (ch === ')' || (ch === '}' && depth > 0)) depth--;
+    else if (ch === ',' && depth === 0) {
+      out.push(src.slice(start, i).trim());
+      start = i + 1;
+    } else if (ch === '}') {
+      if (!/^\s*;/.test(src.slice(i + 1, i + 64))) throw new Error(`${name}: the initializer does not end with };`);
+      const last = src.slice(start, i).trim();
+      if (last) out.push(last);
+      return out;
+    }
+  }
+  throw new Error(`${name}: the initializer has no end`);
+}
+
+// count is the array length C gives the elements: `[i] = v` sets the position to i. Every value must match value.
+function count(name, list, value) {
+  let pos = 0;
+  let len = 0;
+  for (const e of list) {
+    const m = e.match(/^(?:\[\s*(\d+)\s*\]\s*=\s*)?([^]*)$/);
+    if (!value.test(m[2])) throw new Error(`${name}: unexpected entry ${JSON.stringify(e.slice(0, 80))}`);
+    if (m[1] !== undefined) pos = Number(m[1]);
+    len = Math.max(len, ++pos);
+  }
+  return len;
 }
 
 // parserC is the file's bytes (a Buffer), so the size does not depend on decoding.
@@ -20,19 +52,25 @@ export function measure(parserC) {
   const src = parserC.toString('latin1');
   const cost = { parser_c_bytes: parserC.length };
   for (const d of DEFINES) {
-    const m = src.match(new RegExp(`^#define ${d} (\\d+)$`, 'm'));
+    const m = src.match(new RegExp(`^#define\\s+${d}\\s+(\\d+)\\s*$`, 'm'));
     if (!m) throw new Error(`parser.c has no #define ${d}`);
     cost[d.toLowerCase()] = Number(m[1]);
   }
   cost.parse_table_entries = cost.large_state_count * cost.symbol_count;
-  // Every uint16 of the small table is followed by a comma, and the table holds no other comma.
-  cost.small_parse_table_entries = (body(src, 'ts_small_parse_table[] = {').match(/,/g) ?? []).length;
+  // uint16 values: numbers, symbols and macros such as ACTIONS(5).
+  const small = elements(src, 'ts_small_parse_table');
+  cost.small_parse_table_entries = count('ts_small_parse_table', small, /^\w+(\(\s*\d+\s*\))?$/);
   cost.small_parse_table_map_entries = cost.state_count - cost.large_state_count;
-  // The last header `[i] = {.entry = {.count = c` is followed by its c actions.
-  const heads = [...body(src, 'ts_parse_actions[] = {').matchAll(/\[(\d+)\] = \{\.entry = \{\.count = (\d+)/g)];
-  if (!heads.length) throw new Error('parser.c has no parse actions');
-  const [, i, c] = heads.at(-1);
-  cost.parse_action_entries = Number(i) + 1 + Number(c);
+  // Headers `{.entry = {.count = c, ...}}`, each followed by its c actions such as SHIFT(4) or REDUCE(sym, 0, 0, 0).
+  const actions = elements(src, 'ts_parse_actions');
+  cost.parse_action_entries = count('ts_parse_actions', actions, /^(\{\s*\.entry\s*=\s*\{[^{}]*\}\s*\}|\w+\([^()]*\))$/);
+  let due = 0;
+  for (const e of actions) {
+    const c = e.match(/\.count\s*=\s*(\d+)/);
+    if (c ? due !== 0 : due-- === 0) throw new Error(`ts_parse_actions: a header's action count does not match near ${e.slice(0, 80)}`);
+    if (c) due = Number(c[1]);
+  }
+  if (due !== 0) throw new Error('ts_parse_actions: the last header has fewer actions than its count');
   return cost;
 }
 

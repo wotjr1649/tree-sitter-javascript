@@ -3,25 +3,23 @@ package main
 import (
 	"bufio"
 	"bytes"
-	"crypto/sha256"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
-	"regexp"
 	"sort"
 	"strconv"
 	"strings"
+	"unicode"
+	"unicode/utf8"
 
 	tree_sitter "github.com/tree-sitter/go-tree-sitter"
 )
 
 // input is one source to dump.
 type input struct {
-	ID     string `json:"id"`
-	Source string `json:"source"`
+	ID, Source string
 }
 
 // dumpRecord is one line of a tree dump (-dump): the full tree, its error flags and the source hash.
@@ -37,55 +35,114 @@ type dumpRecord struct {
 // defaultInputs are the dump's input sets, relative to the repository root.
 var defaultInputs = []string{"test/corpus/*.txt", "examples/*", "test/highlight/*", "test/tags/*", "oracle/cases.jsonl"}
 
-var (
-	headerLine  = regexp.MustCompile(`^={3,}\s*$`)
-	dividerLine = regexp.MustCompile(`^-{3,}\s*$`)
-)
+// delimiter reports whether line (with its line ending) is 3 or more c followed by a suffix, as the CLI's
+// parse_delimiter_line: n is the run of c, suffix the rest without the line ending.
+func delimiter(line string, c byte) (n int, suffix string, ok bool) {
+	for n < len(line) && line[n] == c {
+		n++
+	}
+	return n, strings.TrimRight(line[n:], "\r\n"), n >= 3
+}
 
-// splitCorpus returns the inputs of a tree-sitter corpus file: the text between each test's header and its last
-// `---` divider, without the trailing line breaks. Ids are `<name>#<test name>`, numbered when a name repeats.
-// shortcut: no header suffixes or `:skip`-style attributes (this corpus has none); handle them if the corpus gains some.
-func splitCorpus(name, text string) []input {
+// corpusHeader parses the header (`===`, name lines, attribute lines such as `:error`, `===`) at lines[start] as the
+// CLI's parse_header: it returns the test name and the index of the first body line, or ok false if there is none.
+func corpusHeader(lines []string, suffix string, start int) (name string, body int, ok bool) {
+	if _, s, ok := delimiter(lines[start], '='); !ok || s != suffix {
+		return "", 0, false
+	}
+	var b strings.Builder
+	marker := false
+	i := start + 1
+	for ; i < len(lines); i++ {
+		if _, s, ok := delimiter(lines[i], '='); ok && s == suffix {
+			break
+		}
+		t := strings.TrimSpace(lines[i])
+		if t == "" && !marker {
+			return "", 0, false
+		}
+		switch head, _, _ := strings.Cut(t, "("); head {
+		case ":skip", ":fail-fast", ":error", ":cst":
+			marker = true
+		case ":platform", ":language":
+			marker = marker || strings.HasPrefix(t, head+"(") && strings.HasSuffix(t, ")")
+		default:
+			if !marker {
+				b.WriteString(lines[i])
+			}
+		}
+	}
+	if i >= len(lines) {
+		return "", 0, false
+	}
+	return strings.TrimRightFunc(b.String(), unicode.IsSpace), i + 1, true
+}
+
+// splitCorpus returns the inputs of a tree-sitter corpus file by the rules of tree-sitter CLI 0.27.2
+// (crates/cli/src/test.rs, parse_test_content): each test's source is the bytes between its header and its longest
+// `---` divider (the last one of that length), without the one line ending before the divider; delimiters carry the
+// suffix of the file's first suffixed `===` line. Ids are `<name>#<test name>`, numbered `#2`, `#3`... while taken.
+// A file without tests, a test without a divider or a file that is not UTF-8 is an error.
+func splitCorpus(name, text string) ([]input, error) {
+	if !utf8.ValidString(text) {
+		return nil, fmt.Errorf("%s: not UTF-8", name)
+	}
+	lines := strings.SplitAfter(text, "\n")
+	if lines[len(lines)-1] == "" {
+		lines = lines[:len(lines)-1]
+	}
+	suffix := ""
+	for _, l := range lines {
+		if _, s, ok := delimiter(l, '='); ok && s != "" {
+			suffix = s
+			break
+		}
+	}
 	var out []input
-	lines := strings.Split(strings.ReplaceAll(text, "\r\n", "\n"), "\n")
-	seen := map[string]int{}
+	used := map[string]bool{}
+	add := func(title string, body []string) error {
+		div, best := -1, 0
+		for j, l := range body {
+			if n, s, ok := delimiter(l, '-'); ok && s == suffix && n+len(s) >= best {
+				div, best = j, n+len(s)
+			}
+		}
+		if div < 0 {
+			return fmt.Errorf("%s: test %q has no --- divider", name, title)
+		}
+		id := name + "#" + title
+		for n := 2; used[id]; n++ {
+			id = name + "#" + title + "#" + strconv.Itoa(n)
+		}
+		used[id] = true
+		src := strings.TrimSuffix(strings.TrimSuffix(strings.Join(body[:div], ""), "\n"), "\r")
+		out = append(out, input{ID: id, Source: src})
+		return nil
+	}
+	title, body := "", -1
 	for i := 0; i < len(lines); {
-		if !headerLine.MatchString(lines[i]) {
+		t, b, ok := corpusHeader(lines, suffix, i)
+		if !ok {
 			i++
 			continue
 		}
-		j := i + 1
-		for j < len(lines) && !headerLine.MatchString(lines[j]) {
-			j++
-		}
-		title := strings.TrimSpace(strings.Join(lines[i+1:min(j, len(lines))], " "))
-		k := j + 1
-		for k < len(lines) && !headerLine.MatchString(lines[k]) {
-			k++
-		}
-		if j >= len(lines) {
-			break
-		}
-		body := lines[j+1 : k]
-		div := -1
-		for n, l := range body {
-			if dividerLine.MatchString(l) {
-				div = n
+		if body >= 0 {
+			if err := add(title, lines[body:i]); err != nil {
+				return nil, err
 			}
 		}
-		if div >= 0 {
-			id := name + "#" + title
-			if seen[id]++; seen[id] > 1 {
-				id += "#" + strconv.Itoa(seen[id])
-			}
-			out = append(out, input{ID: id, Source: strings.TrimRight(strings.Join(body[:div], "\n"), "\n")})
-		}
-		i = k
+		title, body, i = t, b, b
 	}
-	return out
+	if body < 0 {
+		return nil, fmt.Errorf("%s: no corpus tests", name)
+	}
+	if err := add(title, lines[body:]); err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
-// readJSONL reads records with `id` and `source`; other fields are ignored.
+// readJSONL reads records with an `id` and a string `source` (may be empty); other fields are ignored.
 func readJSONL(path string) ([]input, error) {
 	b, err := os.ReadFile(path)
 	if err != nil {
@@ -96,14 +153,20 @@ func readJSONL(path string) ([]input, error) {
 		if len(bytes.TrimSpace(line)) == 0 {
 			continue
 		}
-		var in input
-		if err := json.Unmarshal(line, &in); err != nil {
+		var r struct {
+			ID     string  `json:"id"`
+			Source *string `json:"source"`
+		}
+		if err := json.Unmarshal(line, &r); err != nil {
 			return nil, fmt.Errorf("%s line %d: %w", path, n+1, err)
 		}
-		if in.ID == "" {
+		if r.ID == "" {
 			return nil, fmt.Errorf("%s line %d: no id", path, n+1)
 		}
-		out = append(out, in)
+		if r.Source == nil {
+			return nil, fmt.Errorf("%s line %d: no string source", path, n+1)
+		}
+		out = append(out, input{ID: r.ID, Source: *r.Source})
 	}
 	return out, nil
 }
@@ -139,8 +202,9 @@ func loadInputs(root string, patterns []string) ([]input, error) {
 				got, err = readJSONL(f)
 			case strings.HasSuffix(f, ".txt") && strings.Contains(name, "corpus/"):
 				var b []byte
-				b, err = os.ReadFile(f)
-				got = splitCorpus(name, string(b))
+				if b, err = os.ReadFile(f); err == nil {
+					got, err = splitCorpus(name, string(b))
+				}
 			default:
 				var b []byte
 				b, err = os.ReadFile(f)
@@ -151,7 +215,7 @@ func loadInputs(root string, patterns []string) ([]input, error) {
 			}
 			for _, in := range got {
 				if ids[in.ID] {
-					return nil, fmt.Errorf("duplicate input id %q", in.ID)
+					return nil, fmt.Errorf("%s: duplicate input id %q", name, in.ID)
 				}
 				ids[in.ID] = true
 				out = append(out, in)
@@ -213,8 +277,7 @@ func dump(parser *tree_sitter.Parser, inputs []input, w io.Writer) error {
 		if t == nil {
 			return fmt.Errorf("%s: parse returned no tree", in.ID)
 		}
-		h := sha256.Sum256(src)
-		r := dumpRecord{ID: in.ID, SHA256: hex.EncodeToString(h[:]), Error: t.RootNode().HasError()}
+		r := dumpRecord{ID: in.ID, SHA256: sum(src), Error: t.RootNode().HasError()}
 		r.Tree, r.Errors, r.Missing = treeString(t.RootNode())
 		t.Close()
 		if err := enc.Encode(r); err != nil {

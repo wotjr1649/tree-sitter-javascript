@@ -74,21 +74,23 @@ CI (`oracle` job of `.github/workflows/ci.yml`, `ubuntu-24.04`): `npm ci`, regen
 
 ## Tree dumps for reviews and release notes
 
-`replay -dump OUT.jsonl [-root DIR] [INPUT...]` parses inputs without judging them and writes one JSON line per input: `id`, `sha256` of the source, `error` (the root's `has_error`), the `errors` and `missing` node counts, and `tree`, every node named and anonymous as `(field:kind@start:end ...)` (anonymous kinds quoted, `MISSING ` before a missing node's kind, UTF-8 byte offsets). Inputs are glob patterns relative to `-root` (default `../..`): a `*.jsonl` file holds `{id, source}` records (other fields ignored, so `oracle/cases.jsonl` works as is); a `.txt` file under `corpus/` is split into its tests (`test/corpus/x.txt#name`, the text between the header and the last `---`, trailing line breaks removed); any other file is one input named by its path. Without inputs it dumps the corpus, `examples/`, `test/highlight/`, `test/tags/` and `oracle/cases.jsonl`. Ids must be unique.
+`replay -dump OUT.jsonl [-root DIR] [INPUT...]` parses inputs without judging them and writes one JSON line per input: `id`, `sha256` of the source, `error` (the root's `has_error`), the `errors` and `missing` node counts, and `tree`, every node named and anonymous as `(field:kind@start:end ...)` (anonymous kinds quoted, `MISSING ` before a missing node's kind, UTF-8 byte offsets). Inputs are glob patterns relative to `-root` (default `../..`): a `*.jsonl` file holds `{id, source}` records with a string `source` (other fields ignored, so `oracle/cases.jsonl` works as is); a `.txt` file under `corpus/` is split into its tests by the rules of tree-sitter CLI 0.27.2, so each source is the bytes the CLI parses: everything between the header and the longest `---` divider (the last one of that length) except the one line ending before it, CRLF kept; header attributes such as `:error` and suffixed `===` headers are understood. Corpus ids are `test/corpus/x.txt#name` (the name without attribute lines), numbered `#2`, `#3`... while taken; a corpus file without tests or a test without a divider is an error. Any other file is one input named by its path. Without inputs it dumps the corpus, `examples/`, `test/highlight/`, `test/tags/` and `oracle/cases.jsonl`. Ids must be unique.
 
-`node scripts/tree-diff.mjs BASE.jsonl HEAD.jsonl [--trees]` compares two dumps by id: same, changed-clean (no ERROR or MISSING on either side), clean-to-error, error-to-clean, error-changed, only-base, only-head, as a markdown table and the list of changed ids (`--trees` adds both trees). It refuses an id whose source differs between the dumps.
+`node scripts/tree-diff.mjs BASE.jsonl HEAD.jsonl [--trees]` compares two dumps by id: same, changed-clean (no ERROR or MISSING on either side), clean-to-error, error-to-clean, error-changed, only-base, only-head, as a markdown table and the list of changed ids (`--trees` adds both trees). It refuses (exit 2) a record without a valid `id`, 64-hex `sha256`, `tree`, `error`, `errors` and `missing`, and an id whose source differs between the dumps.
 
 To compare two commits, build the dump of each against that commit's grammar and the same inputs. The binding `#include`s the commit's `src/parser.c`, so each build needs its own checkout and `go build -a` (or a fresh `GOCACHE`):
 
 ```sh
+set -euo pipefail                           # a failed step, such as go build, stops the comparison
+mkdir -p build && cmp=$(mktemp -d "$PWD/build/cmp.XXXXXX")  # fresh per run: no binary or dump of an earlier run
+trap 'for w in "$cmp"/*/; do git worktree remove --force "$w"; done' EXIT
 for rev in v1.0.0 HEAD; do
-  git worktree add --detach build/cmp/$rev $rev
-  rm -rf build/cmp/$rev/oracle/replay && cp -r oracle/replay build/cmp/$rev/oracle/replay  # this dump tool, that grammar
-  (cd build/cmp/$rev/oracle/replay && go build -a -o ../../../replay-$rev .)
-  build/cmp/replay-$rev -root . -dump build/cmp/$rev.jsonl     # -root .: the inputs of this checkout for both
+  git worktree add --detach "$cmp/$rev" "$rev"
+  rm -rf "$cmp/$rev/oracle/replay" && cp -r oracle/replay "$cmp/$rev/oracle/replay"  # this dump tool, that grammar
+  (cd "$cmp/$rev/oracle/replay" && go build -a -o "$cmp/replay-$rev" .)
+  "$cmp/replay-$rev" -root . -dump "$cmp/$rev.jsonl"   # -root .: the inputs of this checkout for both
 done
-node scripts/tree-diff.mjs build/cmp/v1.0.0.jsonl build/cmp/HEAD.jsonl --trees
-git worktree remove --force build/cmp/v1.0.0 && git worktree remove --force build/cmp/HEAD
+node scripts/tree-diff.mjs "$cmp/v1.0.0.jsonl" "$cmp/HEAD.jsonl" --trees
 ```
 
 ## Adding cases in a fix pull request

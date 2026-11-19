@@ -1,5 +1,10 @@
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { test } from 'node:test';
+import { fileURLToPath } from 'node:url';
 import { measure, table } from './parser-cost.mjs';
 
 const parserC = Buffer.from(`#define LANGUAGE_VERSION 15
@@ -46,6 +51,40 @@ test('measure reads the defines and the table sizes', () => {
 
 test('measure refuses a file without a define', () => {
   assert.throws(() => measure(Buffer.from('#define STATE_COUNT 1\n')), /LARGE_STATE_COUNT/);
+});
+
+const sizes = (c) => {
+  const m = measure(Buffer.from(c));
+  return [m.small_parse_table_entries, m.parse_action_entries];
+};
+const edit = (from, to) => {
+  assert.ok(parserC.toString().includes(from));
+  return parserC.toString().replace(from, to);
+};
+
+test('formatting does not change the table sizes', () => {
+  assert.deepEqual(sizes(edit('sym_d,\n};', 'sym_d\n};')), [12, 6]); // no trailing comma
+  assert.deepEqual(sizes(edit('[3] = {.entry = {.count', '[3]  =  { .entry  = { .count')), [12, 6]);
+  assert.deepEqual(sizes(edit('sym_d,\n};', 'sym_d,\n  };')), [12, 6]); // indented closer
+  assert.deepEqual(sizes(edit('ts_small_parse_table[] = {', 'ts_small_parse_table [ ] =\n{')), [12, 6]);
+});
+
+test('an initializer without its end or with unexpected entries is refused', () => {
+  assert.throws(() => measure(Buffer.from(edit('sym_d,\n};', 'sym_d,\n}'))), /does not end with \};/);
+  assert.throws(() => measure(Buffer.from(edit('sym_d,\n};', 'sym_d,\n'))), /ts_small_parse_table: the initializer has no end/);
+  assert.throws(() => measure(Buffer.from(parserC.toString().split('ts_parse_actions')[0] + 'ts_parse_actions[] = {\n  [0] = {.entry')), /no end/);
+  assert.throws(() => measure(Buffer.from(edit('sym_c,', 'sym_c,,'))), /unexpected entry/);
+  assert.throws(() => measure(Buffer.from(edit(' SHIFT(4),', ''))), /fewer actions/);
+  assert.throws(() => measure(Buffer.from(edit('RECOVER(),', 'RECOVER(), RECOVER(),'))), /count does not match/);
+});
+
+test('the command exits 2 when it cannot measure', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'parser-cost-'));
+  writeFileSync(join(dir, 'parser.c'), edit('sym_d,\n};', 'sym_d,\n'));
+  const r = spawnSync(process.execPath, [fileURLToPath(new URL('parser-cost.mjs', import.meta.url)), '--parser', join(dir, 'parser.c')], { encoding: 'utf8' });
+  rmSync(dir, { recursive: true });
+  assert.equal(r.status, 2);
+  assert.match(r.stderr, /ts_small_parse_table: the initializer has no end/);
 });
 
 test('table shows baseline, current and the relative change', () => {
