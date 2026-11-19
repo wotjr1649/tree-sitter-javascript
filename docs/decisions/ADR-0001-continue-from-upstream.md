@@ -35,6 +35,8 @@ identical).
    repository carries that fix: `src/scanner.c` has the origin's PR #388 scanner hunks (issue #366), identical to
    go-treesitter patch record 0001; the generated `src/` files are unchanged. go-treesitter retires its patch record
    only in a later, separately approved pin move to a release that contains the fix (its ADR-0024 7.6, ADR-0023).
+   Amendment (owner-approved, 2026-11-19, v3.0.0): `src/scanner.c` also keeps a serialised stack of function contexts
+   for `await`/`yield` (#303), driven by zero-width marker tokens in `grammar.js`.
 4. No registry publishing (npm, crates.io, PyPI) and no automated tagging or release workflow. Consumers pin commits.
 5. The grammar name `javascript`, the C symbol `tree_sitter_javascript`, node kinds and fields stay unless a release
    declares a breaking change (major version, CHANGELOG).

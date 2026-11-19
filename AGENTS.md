@@ -16,7 +16,9 @@ origin's v0.25.0 is commit `44c892e` in this history, kept as `refs/upstream/v0.
   hunks, identical to go-treesitter's ADR-0023 patch record 0001; ADR-0001 amendment 2026-11-19) and, on top of it,
   ASCII-only digit checks for character references (J1b), so it no longer equals that record's result; v1.0.0 kept the
   origin's scanner and left that patch in go-treesitter, which retires it only in a later, separately approved pin move
-  to a release containing the fix (its ADR-0024 7.6).
+  to a release containing the fix (its ADR-0024 7.6). It also keeps a serialised stack of function contexts for
+  `await`/`yield` (the grammar's zero-width marker tokens open and close each function body), so its external token
+  order must match `externals` in `grammar.js`.
 - Exception to the 1.0.0 manifest versions (owner decision, 2026-11-18): `tree-sitter.json` `metadata.version` stays at
   the upstream value `0.25.0` for v1.0.0, because CLI 0.27.2 compiles it into `parser.c` (`.metadata`) and changing it
   breaks the byte-identical baseline (ADR-0024 7.5). Set the real version in the first behaviour-changing release

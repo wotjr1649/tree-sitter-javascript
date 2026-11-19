@@ -19,7 +19,7 @@ const RESERVED_WORDS = [
 ];
 
 const CONTEXTUAL_KEYWORDS = [
-  'get', 'set', 'async', 'await', 'static', 'export', 'let', 'using',
+  'get', 'set', 'async', 'static', 'export', 'let', 'using',
 ];
 
 module.exports = grammar({
@@ -36,6 +36,25 @@ module.exports = grammar({
     $.escape_sequence,
     $.regex_pattern,
     $.jsx_text,
+    // The scanner tracks whether `await` and `yield` are keywords (src/scanner.c). A function's body is preceded by a
+    // zero-width start token (the scanner emits it only before a `{`) and followed by `_function_end`. A function or
+    // method that is async or a generator says so with `_async_function`, `_async_method` (the keyword `async`, which
+    // the scanner returns only where `function` or a name follows it) and `_generator_star` (the `*`). An async arrow
+    // function's expression body has `_async_arrow_expression_start`, and a class static block opens with
+    // `_static_block_start`. `await` is a keyword in async code and at the top level (a module may use it there) and an
+    // identifier in other functions, where the scanner does not return `_await`; `yield` is a keyword only in
+    // generators.
+    $._function_start,
+    $._arrow_start,
+    $._async_arrow_start,
+    $._async_arrow_expression_start,
+    $._static_block_start,
+    $._function_end,
+    $._await,
+    $._yield,
+    $._async_function,
+    $._async_method,
+    $._generator_star,
   ],
 
   extras: $ => [
@@ -114,8 +133,6 @@ module.exports = grammar({
 
   conflicts: $ => [
     [$.primary_expression, $._property_name],
-    [$.primary_expression, $.await_expression],
-    [$.primary_expression, $.await_expression, $._property_name],
     [$.primary_expression, $.arrow_function],
     [$.primary_expression, $.arrow_function, $._property_name],
     [$.primary_expression, $.method_definition],
@@ -348,6 +365,10 @@ module.exports = grammar({
       optional($._automatic_semicolon),
     )),
 
+    // The body of a function: a statement_block, after the marker that the function's rule puts before it.
+    _function_body: $ => functionBody($),
+    _static_block_body: $ => functionBody($, $._static_block_start),
+
     else_clause: $ => seq('else', $.statement),
 
     if_statement: $ => prec.right(seq(
@@ -382,7 +403,7 @@ module.exports = grammar({
 
     for_in_statement: $ => seq(
       'for',
-      optional('await'),
+      optional(awaitKeyword($)),
       $._for_header,
       field('body', $.statement),
     ),
@@ -418,7 +439,7 @@ module.exports = grammar({
         seq(
           field('kind', choice(
             'using',
-            seq('await', 'using'),
+            seq(awaitKeyword($), 'using'),
           )),
           field('left', choice(
             $.identifier,
@@ -587,7 +608,7 @@ module.exports = grammar({
     ),
 
     yield_expression: $ => prec.right(seq(
-      'yield',
+      alias($._yield, 'yield'),
       choice(
         seq('*', $.expression),
         optional($.expression),
@@ -823,56 +844,73 @@ module.exports = grammar({
     class_heritage: $ => seq('extends', $.expression),
 
     function_expression: $ => prec('literal', seq(
-      optional('async'),
+      optional(alias($._async_function, 'async')),
       'function',
       field('name', optional($.identifier)),
       $._call_signature,
-      field('body', $.statement_block),
+      $._function_start,
+      field('body', alias($._function_body, $.statement_block)),
     )),
 
     function_declaration: $ => prec.right('declaration', seq(
-      optional('async'),
+      optional(alias($._async_function, 'async')),
       'function',
       field('name', $.identifier),
       $._call_signature,
-      field('body', $.statement_block),
+      $._function_start,
+      field('body', alias($._function_body, $.statement_block)),
       optional($._automatic_semicolon),
     )),
 
     generator_function: $ => prec('literal', seq(
-      optional('async'),
+      optional(alias($._async_function, 'async')),
       'function',
-      '*',
+      alias($._generator_star, '*'),
       field('name', optional($.identifier)),
       $._call_signature,
-      field('body', $.statement_block),
+      $._function_start,
+      field('body', alias($._function_body, $.statement_block)),
     )),
 
     generator_function_declaration: $ => prec.right('declaration', seq(
-      optional('async'),
+      optional(alias($._async_function, 'async')),
       'function',
-      '*',
+      alias($._generator_star, '*'),
       field('name', $.identifier),
       $._call_signature,
-      field('body', $.statement_block),
+      $._function_start,
+      field('body', alias($._function_body, $.statement_block)),
       optional($._automatic_semicolon),
     )),
 
-    arrow_function: $ => seq(
-      optional('async'),
-      choice(
+    arrow_function: $ => {
+      const head = choice(
         field('parameter', choice(
           alias($._reserved_identifier, $.identifier),
           $.identifier,
         )),
         $._call_signature,
-      ),
-      '=>',
-      field('body', choice(
-        $.expression,
-        $.statement_block,
-      )),
-    ),
+      );
+      return choice(
+        seq(
+          head,
+          '=>',
+          choice(
+            field('body', $.expression),
+            seq($._arrow_start, field('body', alias($._function_body, $.statement_block))),
+          ),
+        ),
+        seq(
+          'async',
+          head,
+          '=>',
+          choice(
+            seq($._async_arrow_expression_start, field('body', $.expression)),
+            seq($._async_arrow_start, field('body', alias($._function_body, $.statement_block))),
+          ),
+        ),
+      );
+    },
 
     // Override
     _call_signature: $ => field('parameters', $.formal_parameters),
@@ -903,7 +941,7 @@ module.exports = grammar({
     )),
 
     await_expression: $ => prec('unary_void', seq(
-      'await',
+      awaitKeyword($),
       $.expression,
     )),
 
@@ -1258,7 +1296,8 @@ module.exports = grammar({
     class_static_block: $ => seq(
       'static',
       optional($._automatic_semicolon),
-      field('body', $.statement_block),
+      // `await` is reserved in a static block, as in an async function.
+      field('body', alias($._static_block_body, $.statement_block)),
     ),
 
     // This negative dynamic precedence ensures that during error recovery,
@@ -1280,11 +1319,14 @@ module.exports = grammar({
         'static',
         alias(token(seq('static', /\s+/, 'get', /\s*\n/)), 'static get'),
       )),
-      optional('async'),
-      optional(choice('get', 'set', '*')),
+      // At the start of a statement the object and the block are both read first with the lexer's token (a block
+      // path does not take this one), so `{ async m() {} }` also has the plain keyword, without the scanner's note.
+      optional(choice(alias($._async_method, 'async'), 'async')),
+      optional(choice('get', 'set', alias($._generator_star, '*'))),
       field('name', $._property_name),
       field('parameters', $.formal_parameters),
-      field('body', $.statement_block),
+      $._function_start,
+      field('body', alias($._function_body, $.statement_block)),
     ),
 
     pair: $ => seq(
@@ -1331,6 +1373,36 @@ module.exports = grammar({
 });
 
 /**
+ * The `await` keyword: the scanner's token, the anonymous node `await`.
+ *
+ * @param {GrammarSymbols<string>} $
+ *
+ * @returns {AliasRule}
+ */
+function awaitKeyword($) {
+  return alias($._await, 'await');
+}
+
+/**
+ * A function body: `{ ... }` as a statement_block, with a marker for the scanner after the `{` when `start` is given
+ *
+ * @param {GrammarSymbols<string>} $
+ * @param {RuleOrLiteral} [start]
+ *
+ * @returns {PrecRightRule}
+ */
+function functionBody($, start) {
+  return prec.right(seq(
+    '{',
+    ...(start ? [start] : []),
+    repeat($.statement),
+    '}',
+    $._function_end,
+    optional($._automatic_semicolon),
+  ));
+}
+
+/**
  * Creates a using declaration ending with the given semicolon rule
  *
  * @param {GrammarSymbols<string>} $
@@ -1339,7 +1411,7 @@ module.exports = grammar({
  * @returns {ChoiceRule}
  */
 function usingDeclaration($, semicolon) {
-  const kind = field('kind', choice('using', seq('await', 'using')));
+  const kind = field('kind', choice('using', seq(awaitKeyword($), 'using')));
   return choice(
     seq(kind, commaSep1($.variable_declarator), semicolon),
     // TypeScript reads `using as …` and `using satisfies …` as declarations; the static precedence keeps the

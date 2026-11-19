@@ -2278,22 +2278,26 @@ Non-breaking spaces as whitespace
 Yield expressions
 ==============================================
 
-yield db.users.where('[endpoint+email]')
+function* g() { yield db.users.where('[endpoint+email]') }
 
 ---
 
 (program
-  (expression_statement
-    (yield_expression
-      (call_expression
-        (member_expression
-          (member_expression
-            (identifier)
-            (property_identifier))
-          (property_identifier))
-        (arguments
-          (string
-            (string_fragment)))))))
+  (generator_function_declaration
+    (identifier)
+    (formal_parameters)
+    (statement_block
+      (expression_statement
+        (yield_expression
+          (call_expression
+            (member_expression
+              (member_expression
+                (identifier)
+                (property_identifier))
+              (property_identifier))
+            (arguments
+              (string
+                (string_fragment)))))))))
 
 ============================================
 Reserved words as identifiers
@@ -2311,13 +2315,407 @@ function await(await) { await: await (await + await (0)); }
       (labeled_statement
         (statement_identifier)
         (expression_statement
-          (await_expression
+          (call_expression
+            (identifier)
+            (arguments
+              (binary_expression
+                (identifier)
+                (call_expression
+                  (identifier)
+                  (arguments
+                    (number)))))))))))
+
+==========================================
+Yield expressions in generators
+==========================================
+
+function* g() {
+  yield;
+  yield 1;
+  yield* x;
+  var y = yield;
+  z = (yield) ? yield 1 : yield 2;
+  yield yield 3;
+}
+
+a = function* () { yield 1; };
+b = { *c() { yield 1; }, async *d() { await 1; yield 2; } };
+class E { *f() { yield 1; } static async *g() { yield 2; } }
+
+---
+
+(program
+  (generator_function_declaration
+    (identifier)
+    (formal_parameters)
+    (statement_block
+      (expression_statement
+        (yield_expression))
+      (expression_statement
+        (yield_expression
+          (number)))
+      (expression_statement
+        (yield_expression
+          (identifier)))
+      (variable_declaration
+        (variable_declarator
+          (identifier)
+          (yield_expression)))
+      (expression_statement
+        (assignment_expression
+          (identifier)
+          (ternary_expression
             (parenthesized_expression
+              (yield_expression))
+            (yield_expression
+              (number))
+            (yield_expression
+              (number)))))
+      (expression_statement
+        (yield_expression
+          (yield_expression
+            (number))))))
+  (expression_statement
+    (assignment_expression
+      (identifier)
+      (generator_function
+        (formal_parameters)
+        (statement_block
+          (expression_statement
+            (yield_expression
+              (number)))))))
+  (expression_statement
+    (assignment_expression
+      (identifier)
+      (object
+        (method_definition
+          (property_identifier)
+          (formal_parameters)
+          (statement_block
+            (expression_statement
+              (yield_expression
+                (number)))))
+        (method_definition
+          (property_identifier)
+          (formal_parameters)
+          (statement_block
+            (expression_statement
               (await_expression
-                (unary_expression
-                  (await_expression
-                    (parenthesized_expression
-                      (number))))))))))))
+                (number)))
+            (expression_statement
+              (yield_expression
+                (number))))))))
+  (class_declaration
+    (identifier)
+    (class_body
+      (method_definition
+        (property_identifier)
+        (formal_parameters)
+        (statement_block
+          (expression_statement
+            (yield_expression
+              (number)))))
+      (method_definition
+        (property_identifier)
+        (formal_parameters)
+        (statement_block
+          (expression_statement
+            (yield_expression
+              (number))))))))
+
+==========================================
+Yield as an identifier
+==========================================
+
+yield = 0;
+yield + 1;
+yield();
+yield: ;
+function f(yield) { return yield; }
+a = (yield) => 0;
+function* g() { function h() { return yield + 1; } yield 1; }
+yield - 1;
+
+---
+
+(program
+  (expression_statement
+    (assignment_expression
+      (identifier)
+      (number)))
+  (expression_statement
+    (binary_expression
+      (identifier)
+      (number)))
+  (expression_statement
+    (call_expression
+      (identifier)
+      (arguments)))
+  (labeled_statement
+    (statement_identifier)
+    (empty_statement))
+  (function_declaration
+    (identifier)
+    (formal_parameters
+      (identifier))
+    (statement_block
+      (return_statement
+        (identifier))))
+  (expression_statement
+    (assignment_expression
+      (identifier)
+      (arrow_function
+        (formal_parameters
+          (identifier))
+        (number))))
+  (generator_function_declaration
+    (identifier)
+    (formal_parameters)
+    (statement_block
+      (function_declaration
+        (identifier)
+        (formal_parameters)
+        (statement_block
+          (return_statement
+            (binary_expression
+              (identifier)
+              (number)))))
+      (expression_statement
+        (yield_expression
+          (number)))))
+  (expression_statement
+    (binary_expression
+      (identifier)
+      (number))))
+
+==========================================
+Await as an identifier in functions that are not async
+==========================================
+
+function f() {
+  await(x);
+  await + 1;
+  await = 2;
+  await.x;
+  await: ;
+}
+
+async function g() { function h(await) { return await(1); } }
+
+a = { m() { await(x); }, async n() { await x; } };
+class C { m() { await(x); } static { (function await(await) {}); } }
+
+---
+
+(program
+  (function_declaration
+    (identifier)
+    (formal_parameters)
+    (statement_block
+      (expression_statement
+        (call_expression
+          (identifier)
+          (arguments
+            (identifier))))
+      (expression_statement
+        (binary_expression
+          (identifier)
+          (number)))
+      (expression_statement
+        (assignment_expression
+          (identifier)
+          (number)))
+      (expression_statement
+        (member_expression
+          (identifier)
+          (property_identifier)))
+      (labeled_statement
+        (statement_identifier)
+        (empty_statement))))
+  (function_declaration
+    (identifier)
+    (formal_parameters)
+    (statement_block
+      (function_declaration
+        (identifier)
+        (formal_parameters
+          (identifier))
+        (statement_block
+          (return_statement
+            (call_expression
+              (identifier)
+              (arguments
+                (number))))))))
+  (expression_statement
+    (assignment_expression
+      (identifier)
+      (object
+        (method_definition
+          (property_identifier)
+          (formal_parameters)
+          (statement_block
+            (expression_statement
+              (call_expression
+                (identifier)
+                (arguments
+                  (identifier))))))
+        (method_definition
+          (property_identifier)
+          (formal_parameters)
+          (statement_block
+            (expression_statement
+              (await_expression
+                (identifier))))))))
+  (class_declaration
+    (identifier)
+    (class_body
+      (method_definition
+        (property_identifier)
+        (formal_parameters)
+        (statement_block
+          (expression_statement
+            (call_expression
+              (identifier)
+              (arguments
+                (identifier))))))
+      (class_static_block
+        (statement_block
+          (expression_statement
+            (parenthesized_expression
+              (function_expression
+                (identifier)
+                (formal_parameters
+                  (identifier))
+                (statement_block)))))))))
+
+==========================================
+Await in async functions and arrows
+==========================================
+
+async function f() {
+  await x;
+  await (x)(y);
+  await[0];
+  await await z;
+  await
+  w();
+  for await (a of b);
+  await using c = d;
+}
+
+function g() { return h(async (x) => await x, async y => await (y)(1)); }
+a = async () => { await b; };
+class C { async m() { await 1; } async *n() { await 1; yield 2; } static { await 3; } }
+async function k() { function l() {} await 4; { } await 5; }
+
+---
+
+(program
+  (function_declaration
+    (identifier)
+    (formal_parameters)
+    (statement_block
+      (expression_statement
+        (await_expression
+          (identifier)))
+      (expression_statement
+        (await_expression
+          (call_expression
+            (parenthesized_expression
+              (identifier))
+            (arguments
+              (identifier)))))
+      (expression_statement
+        (await_expression
+          (array
+            (number))))
+      (expression_statement
+        (await_expression
+          (await_expression
+            (identifier))))
+      (expression_statement
+        (await_expression
+          (call_expression
+            (identifier)
+            (arguments))))
+      (for_in_statement
+        (identifier)
+        (identifier)
+        (empty_statement))
+      (using_declaration
+        (variable_declarator
+          (identifier)
+          (identifier)))))
+  (function_declaration
+    (identifier)
+    (formal_parameters)
+    (statement_block
+      (return_statement
+        (call_expression
+          (identifier)
+          (arguments
+            (arrow_function
+              (formal_parameters
+                (identifier))
+              (await_expression
+                (identifier)))
+            (arrow_function
+              (identifier)
+              (await_expression
+                (call_expression
+                  (parenthesized_expression
+                    (identifier))
+                  (arguments
+                    (number))))))))))
+  (expression_statement
+    (assignment_expression
+      (identifier)
+      (arrow_function
+        (formal_parameters)
+        (statement_block
+          (expression_statement
+            (await_expression
+              (identifier)))))))
+  (class_declaration
+    (identifier)
+    (class_body
+      (method_definition
+        (property_identifier)
+        (formal_parameters)
+        (statement_block
+          (expression_statement
+            (await_expression
+              (number)))))
+      (method_definition
+        (property_identifier)
+        (formal_parameters)
+        (statement_block
+          (expression_statement
+            (await_expression
+              (number)))
+          (expression_statement
+            (yield_expression
+              (number)))))
+      (class_static_block
+        (statement_block
+          (expression_statement
+            (await_expression
+              (number)))))))
+  (function_declaration
+    (identifier)
+    (formal_parameters)
+    (statement_block
+      (function_declaration
+        (identifier)
+        (formal_parameters)
+        (statement_block))
+      (expression_statement
+        (await_expression
+          (number)))
+      (statement_block)
+      (expression_statement
+        (await_expression
+          (number))))))
 
 ============================================
 JSX
