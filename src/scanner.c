@@ -24,7 +24,10 @@ enum TokenType {
     YIELD,
     ASYNC_FUNCTION,
     ASYNC_METHOD,
-    GENERATOR_STAR,
+    GENERATOR_STAR_FUNCTION,
+    GENERATOR_STAR_METHOD,
+    FUNCTION_PARAMS,
+    METHOD_PARAMS,
 };
 
 // Whether `await` and `yield` are keywords depends on the enclosing function, which the parser tells the scanner with
@@ -37,25 +40,31 @@ enum AwaitMode {
 };
 
 #define YIELD_BIT 4
-// shortcut: a function nested more than 1000 deep reads the context of the 1000th; raise this when real code needs it
-// (the state, 3 bytes more than the depth, must fit the 1024-byte serialization buffer).
-#define MAX_FUNCTION_DEPTH 1000
+// shortcut: a function nested more than 960 deep reads the context of the 960th; raise this when real code needs it
+// (the state, 3 bytes + the entries + the depth, must fit the 1024-byte serialization buffer).
+#define MAX_FUNCTION_DEPTH 960
 
-// What the prefix markers noted about the function or method whose start marker comes next.
-#define PENDING_ASYNC 1
-#define PENDING_GENERATOR 2
+// A function or method that is async or a generator says so before its parameters, and a function in the parameters must
+// not take that for itself: the scanner keeps one entry for each function whose parameters are open, and for each method
+// with `async` or `*` (a signature without a body leaves its entry behind: the oldest entries are dropped).
+#define MAX_ENTRIES 32
+#define ENTRY_ASYNC 1
+#define ENTRY_GENERATOR 2
+#define ENTRY_FRESH 4  // noted by `async` or `*`, not yet claimed by the marker after `function`
+#define ENTRY_METHOD 8 // noted by a method's `async` or `*`
 
 typedef struct {
     uint16_t overflow; // function bodies opened beyond MAX_FUNCTION_DEPTH
     uint16_t depth;
-    unsigned char pending;
+    unsigned char entry_count;
+    unsigned char entries[MAX_ENTRIES];
     unsigned char frames[MAX_FUNCTION_DEPTH]; // frames[0] is the top level
 } Scanner;
 
 static void scanner_reset(Scanner *scanner) {
     scanner->overflow = 0;
     scanner->depth = 1;
-    scanner->pending = 0;
+    scanner->entry_count = 0;
     scanner->frames[0] = AWAIT_TOP;
 }
 
@@ -71,21 +80,28 @@ unsigned tree_sitter_javascript_external_scanner_serialize(void *payload, char *
     Scanner *scanner = payload;
     buffer[0] = (char)(scanner->overflow & 0xff);
     buffer[1] = (char)(scanner->overflow >> 8);
-    buffer[2] = (char)scanner->pending;
-    memcpy(buffer + 3, scanner->frames, scanner->depth);
-    return 3u + scanner->depth;
+    buffer[2] = (char)scanner->entry_count;
+    memcpy(buffer + 3, scanner->entries, scanner->entry_count);
+    memcpy(buffer + 3 + scanner->entry_count, scanner->frames, scanner->depth);
+    return 3u + scanner->entry_count + scanner->depth;
 }
 
 void tree_sitter_javascript_external_scanner_deserialize(void *payload, const char *buffer, unsigned length) {
     Scanner *scanner = payload;
-    if (length < 4 || length - 3 > MAX_FUNCTION_DEPTH) {
+    if (length < 4) {
+        scanner_reset(scanner);
+        return;
+    }
+    unsigned entry_count = (unsigned char)buffer[2];
+    if (entry_count > MAX_ENTRIES || length < 4 + entry_count || length - 3 - entry_count > MAX_FUNCTION_DEPTH) {
         scanner_reset(scanner);
         return;
     }
     scanner->overflow = (uint16_t)((unsigned char)buffer[0] | ((unsigned char)buffer[1] << 8));
-    scanner->pending = (unsigned char)buffer[2];
-    scanner->depth = (uint16_t)(length - 3);
-    memcpy(scanner->frames, buffer + 3, scanner->depth);
+    scanner->entry_count = (unsigned char)entry_count;
+    memcpy(scanner->entries, buffer + 3, entry_count);
+    scanner->depth = (uint16_t)(length - 3 - entry_count);
+    memcpy(scanner->frames, buffer + 3 + entry_count, scanner->depth);
 }
 
 static inline void advance(TSLexer *lexer) { lexer->advance(lexer, false); }
@@ -643,6 +659,26 @@ typedef enum {
     CONTEXT_REFUSED, // no token; the lexer has passed a comment, so nothing else can scan from here
 } ContextResult;
 
+static void push_entry(Scanner *scanner, unsigned char entry) {
+    if (scanner->entry_count == MAX_ENTRIES) {
+        memmove(scanner->entries, scanner->entries + 1, MAX_ENTRIES - 1);
+        scanner->entry_count--;
+    }
+    scanner->entries[scanner->entry_count++] = entry;
+}
+
+// The context of a function or method whose body starts: its entry, the top one, or a plain one. A function's entry is what
+// its `_function_params` claimed or pushed, a method's what its `async` or `*` noted and `_method_params` claimed, or
+// `_method_params` pushed inside the parameters of another function. A method outside such parameters has none.
+static void open_function(Scanner *scanner) {
+    unsigned char entry = 0;
+    if (scanner->entry_count > 0) {
+        entry = scanner->entries[--scanner->entry_count];
+    }
+    push_function(scanner, (unsigned char)(((entry & ENTRY_ASYNC) ? AWAIT_KEYWORD : AWAIT_IDENTIFIER) |
+                                           ((entry & ENTRY_GENERATOR) ? YIELD_BIT : 0)));
+}
+
 // The zero-width markers before a function's body. They are emitted only where a `{` follows: an arrow function's
 // body may be an expression, and the marker of an async arrow function's expression body takes the place of the
 // others there. A class static block's marker comes after its `{`.
@@ -663,9 +699,7 @@ static ContextResult scan_function_start(Scanner *scanner, TSLexer *lexer, const
     bool block = scan_whitespace_and_comments(lexer, &scanned_comment, true) != REJECT && lexer->lookahead == '{';
     if (block) {
         if (valid_symbols[FUNCTION_START]) {
-            push_function(scanner, (unsigned char)(((scanner->pending & PENDING_ASYNC) ? AWAIT_KEYWORD : AWAIT_IDENTIFIER) |
-                                                   ((scanner->pending & PENDING_GENERATOR) ? YIELD_BIT : 0)));
-            scanner->pending = 0;
+            open_function(scanner);
             lexer->result_symbol = FUNCTION_START;
         } else if (valid_symbols[ARROW_START]) {
             push_function(scanner, AWAIT_IDENTIFIER);
@@ -702,12 +736,6 @@ static ContextResult scan_context(Scanner *scanner, TSLexer *lexer, const bool *
     return NOT_CONTEXT;
 }
 
-// What an async or generator function or method will be is noted by its `async` and `*` tokens, which the start marker before the
-// body reads and clears. shortcut: a function or method (not an arrow function) inside the parameter list or the
-// computed name of an async or generator function reads the note first, so the outer function reads as plain and its
-// `await`/`yield` as identifiers; fix it with a marker that opens each function before its parameters when real code
-// needs it (the grammar is shared with function signatures, which have no body to close such a marker).
-
 // `async` before `function`, or before a method's name. `async` alone is an identifier, a method or a field name, so the
 // keyword is returned only where `function` (or a name or `*`) follows it on the same line. The lexer is after the `a`.
 static bool scan_async_rest(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
@@ -733,14 +761,15 @@ static bool scan_async_rest(Scanner *scanner, TSLexer *lexer, const bool *valid_
     if (!follows) {
         return false;
     }
-    scanner->pending |= PENDING_ASYNC;
+    push_entry(scanner, (unsigned char)(ENTRY_ASYNC | ENTRY_FRESH | (function ? 0 : ENTRY_METHOD)));
     lexer->result_symbol = function ? ASYNC_FUNCTION : ASYNC_METHOD;
     return true;
 }
 
 // The `*` of a generator function or method.
 static bool scan_generator_star(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
-    if (!valid_symbols[GENERATOR_STAR]) {
+    bool function = valid_symbols[GENERATOR_STAR_FUNCTION];
+    if (!function && !valid_symbols[GENERATOR_STAR_METHOD]) {
         return false;
     }
     while (iswspace(lexer->lookahead)) {
@@ -751,8 +780,63 @@ static bool scan_generator_star(Scanner *scanner, TSLexer *lexer, const bool *va
     }
     advance(lexer);
     lexer->mark_end(lexer);
-    scanner->pending |= PENDING_GENERATOR;
-    lexer->result_symbol = GENERATOR_STAR;
+    unsigned char owner = function ? 0 : ENTRY_METHOD;
+    unsigned char *top = scanner->entry_count > 0 ? &scanner->entries[scanner->entry_count - 1] : NULL;
+    if (top != NULL && (*top & ENTRY_FRESH) && (*top & ENTRY_METHOD) == owner) {
+        *top |= ENTRY_GENERATOR;
+    } else {
+        push_entry(scanner, (unsigned char)(ENTRY_GENERATOR | ENTRY_FRESH | owner));
+    }
+    lexer->result_symbol = function ? GENERATOR_STAR_FUNCTION : GENERATOR_STAR_METHOD;
+    return true;
+}
+
+// The marker right after `function` or its `*`: it claims the entry that `async` and `*` noted, or pushes a plain one.
+static bool scan_function_params(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
+    if (!valid_symbols[FUNCTION_PARAMS]) {
+        return false;
+    }
+    lexer->mark_end(lexer);
+    if (valid_symbols[GENERATOR_STAR_FUNCTION]) {
+        // Right after `function`: a comment may hide the `*`; the lexer reads it and the scanner is asked again.
+        while (iswspace(lexer->lookahead)) {
+            skip(lexer);
+        }
+        if (lexer->lookahead == '/') {
+            return false;
+        }
+    }
+    unsigned char *top = scanner->entry_count > 0 ? &scanner->entries[scanner->entry_count - 1] : NULL;
+    if (top != NULL && (*top & ENTRY_FRESH) && !(*top & ENTRY_METHOD)) {
+        *top &= (unsigned char)~ENTRY_FRESH;
+    } else {
+        push_entry(scanner, 0);
+    }
+    lexer->result_symbol = FUNCTION_PARAMS;
+    return true;
+}
+
+// The marker before the parameters of a method, where `(` or `<` follows its name. Only inside the parameters of another
+// function, or after a method's `async` or `*` (some entry is open): a method elsewhere needs none, and where the
+// parser could also read a block (`{ f(x); }`) the marker is not wanted.
+static bool scan_method_params(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
+    if (!valid_symbols[METHOD_PARAMS] || scanner->entry_count == 0) {
+        return false;
+    }
+    lexer->mark_end(lexer);
+    while (iswspace(lexer->lookahead)) {
+        skip(lexer);
+    }
+    if (lexer->lookahead != '(' && lexer->lookahead != '<') {
+        return false;
+    }
+    unsigned char *top = &scanner->entries[scanner->entry_count - 1];
+    if ((*top & ENTRY_FRESH) && (*top & ENTRY_METHOD)) {
+        *top &= (unsigned char)~ENTRY_FRESH;
+    } else {
+        push_entry(scanner, 0);
+    }
+    lexer->result_symbol = METHOD_PARAMS;
     return true;
 }
 
@@ -786,7 +870,9 @@ bool tree_sitter_javascript_external_scanner_scan(void *payload, TSLexer *lexer,
         return start == CONTEXT_TOKEN;
     }
 
-    if (!valid_symbols[AUTOMATIC_SEMICOLON] && scan_generator_star(scanner, lexer, valid_symbols)) {
+    if (!valid_symbols[AUTOMATIC_SEMICOLON] &&
+        (scan_generator_star(scanner, lexer, valid_symbols) || scan_function_params(scanner, lexer, valid_symbols) ||
+         scan_method_params(scanner, lexer, valid_symbols))) {
         return true;
     }
 
@@ -800,7 +886,8 @@ bool tree_sitter_javascript_external_scanner_scan(void *payload, TSLexer *lexer,
         // After a function declaration, a class or a block, `await` or `yield` can follow on the same line, and a class
         // member `async` can be followed by its name.
         if (!ret && at_token && !scanned_comment &&
-            (scan_generator_star(scanner, lexer, valid_symbols) || scan_keyword(scanner, lexer, valid_symbols))) {
+            (scan_generator_star(scanner, lexer, valid_symbols) || scan_method_params(scanner, lexer, valid_symbols) ||
+             scan_keyword(scanner, lexer, valid_symbols))) {
             return true;
         }
         return ret;

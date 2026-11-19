@@ -39,7 +39,10 @@ module.exports = grammar({
     // The scanner tracks whether `await` and `yield` are keywords (src/scanner.c). A function's body is preceded by a
     // zero-width start token (the scanner emits it only before a `{`) and followed by `_function_end`. A function or
     // method that is async or a generator says so with `_async_function`, `_async_method` (the keyword `async`, which
-    // the scanner returns only where `function` or a name follows it) and `_generator_star` (the `*`). An async arrow
+    // the scanner returns only where `function` or a name follows it) and `_generator_star_function`,
+    // `_generator_star_method` (the `*`); `_function_params` marks where a function's parameters start, so a function
+    // inside them does not take the kind of the outer one, and `_method_params` does the same for a method (the scanner
+    // returns it only inside such parameters). An async arrow
     // function's expression body has `_async_arrow_expression_start`, and a class static block opens with
     // `_static_block_start`. `await` is a keyword in async code and at the top level (a module may use it there) and an
     // identifier in other functions, where the scanner does not return `_await`; `yield` is a keyword only in
@@ -54,7 +57,10 @@ module.exports = grammar({
     $._yield,
     $._async_function,
     $._async_method,
-    $._generator_star,
+    $._generator_star_function,
+    $._generator_star_method,
+    $._function_params,
+    $._method_params,
   ],
 
   extras: $ => [
@@ -846,6 +852,7 @@ module.exports = grammar({
     function_expression: $ => prec('literal', seq(
       optional(alias($._async_function, 'async')),
       'function',
+      $._function_params,
       field('name', optional($.identifier)),
       $._call_signature,
       $._function_start,
@@ -855,6 +862,7 @@ module.exports = grammar({
     function_declaration: $ => prec.right('declaration', seq(
       optional(alias($._async_function, 'async')),
       'function',
+      $._function_params,
       field('name', $.identifier),
       $._call_signature,
       $._function_start,
@@ -865,7 +873,8 @@ module.exports = grammar({
     generator_function: $ => prec('literal', seq(
       optional(alias($._async_function, 'async')),
       'function',
-      alias($._generator_star, '*'),
+      alias($._generator_star_function, '*'),
+      $._function_params,
       field('name', optional($.identifier)),
       $._call_signature,
       $._function_start,
@@ -875,7 +884,8 @@ module.exports = grammar({
     generator_function_declaration: $ => prec.right('declaration', seq(
       optional(alias($._async_function, 'async')),
       'function',
-      alias($._generator_star, '*'),
+      alias($._generator_star_function, '*'),
+      $._function_params,
       field('name', $.identifier),
       $._call_signature,
       $._function_start,
@@ -1322,8 +1332,9 @@ module.exports = grammar({
       // At the start of a statement the object and the block are both read first with the lexer's token (a block
       // path does not take this one), so `{ async m() {} }` also has the plain keyword, without the scanner's note.
       optional(choice(alias($._async_method, 'async'), 'async')),
-      optional(choice('get', 'set', alias($._generator_star, '*'))),
+      optional(choice('get', 'set', alias($._generator_star_method, '*'))),
       field('name', $._property_name),
+      optional($._method_params),
       field('parameters', $.formal_parameters),
       $._function_start,
       field('body', alias($._function_body, $.statement_block)),

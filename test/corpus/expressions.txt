@@ -2717,6 +2717,126 @@ async function k() { function l() {} await 4; { } await 5; }
         (await_expression
           (number))))))
 
+==========================================
+Functions in the parameters of async and generator functions
+==========================================
+
+async function f(a = function () {}) { await x; }
+async function g(a = async function () { await 1; }) { await x; }
+async function h(a = { m() {} }, b = class { n() {} }) { await x; }
+function* i(a = function () {}) { yield 1; }
+class C { async m(a = function () {}) { await x; } *n(a = function () {}) { yield 1; } }
+function j(a = async function () { await 1; }) { await(x); }
+
+---
+
+(program
+  (function_declaration
+    (identifier)
+    (formal_parameters
+      (assignment_pattern
+        (identifier)
+        (function_expression
+          (formal_parameters)
+          (statement_block))))
+    (statement_block
+      (expression_statement
+        (await_expression
+          (identifier)))))
+  (function_declaration
+    (identifier)
+    (formal_parameters
+      (assignment_pattern
+        (identifier)
+        (function_expression
+          (formal_parameters)
+          (statement_block
+            (expression_statement
+              (await_expression
+                (number)))))))
+    (statement_block
+      (expression_statement
+        (await_expression
+          (identifier)))))
+  (function_declaration
+    (identifier)
+    (formal_parameters
+      (assignment_pattern
+        (identifier)
+        (object
+          (method_definition
+            (property_identifier)
+            (formal_parameters)
+            (statement_block))))
+      (assignment_pattern
+        (identifier)
+        (class
+          (class_body
+            (method_definition
+              (property_identifier)
+              (formal_parameters)
+              (statement_block))))))
+    (statement_block
+      (expression_statement
+        (await_expression
+          (identifier)))))
+  (generator_function_declaration
+    (identifier)
+    (formal_parameters
+      (assignment_pattern
+        (identifier)
+        (function_expression
+          (formal_parameters)
+          (statement_block))))
+    (statement_block
+      (expression_statement
+        (yield_expression
+          (number)))))
+  (class_declaration
+    (identifier)
+    (class_body
+      (method_definition
+        (property_identifier)
+        (formal_parameters
+          (assignment_pattern
+            (identifier)
+            (function_expression
+              (formal_parameters)
+              (statement_block))))
+        (statement_block
+          (expression_statement
+            (await_expression
+              (identifier)))))
+      (method_definition
+        (property_identifier)
+        (formal_parameters
+          (assignment_pattern
+            (identifier)
+            (function_expression
+              (formal_parameters)
+              (statement_block))))
+        (statement_block
+          (expression_statement
+            (yield_expression
+              (number)))))))
+  (function_declaration
+    (identifier)
+    (formal_parameters
+      (assignment_pattern
+        (identifier)
+        (function_expression
+          (formal_parameters)
+          (statement_block
+            (expression_statement
+              (await_expression
+                (number)))))))
+    (statement_block
+      (expression_statement
+        (call_expression
+          (identifier)
+          (arguments
+            (identifier)))))))
+
 ============================================
 JSX
 ============================================

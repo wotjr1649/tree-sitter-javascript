@@ -3890,6 +3890,10 @@
             "value": "function"
           },
           {
+            "type": "SYMBOL",
+            "name": "_function_params"
+          },
+          {
             "type": "FIELD",
             "name": "name",
             "content": {
@@ -3955,6 +3959,10 @@
           {
             "type": "STRING",
             "value": "function"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_function_params"
           },
           {
             "type": "FIELD",
@@ -4031,10 +4039,14 @@
             "type": "ALIAS",
             "content": {
               "type": "SYMBOL",
-              "name": "_generator_star"
+              "name": "_generator_star_function"
             },
             "named": false,
             "value": "*"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_function_params"
           },
           {
             "type": "FIELD",
@@ -4107,10 +4119,14 @@
             "type": "ALIAS",
             "content": {
               "type": "SYMBOL",
-              "name": "_generator_star"
+              "name": "_generator_star_function"
             },
             "named": false,
             "value": "*"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_function_params"
           },
           {
             "type": "FIELD",
@@ -7452,7 +7468,7 @@
                   "type": "ALIAS",
                   "content": {
                     "type": "SYMBOL",
-                    "name": "_generator_star"
+                    "name": "_generator_star_method"
                   },
                   "named": false,
                   "value": "*"
@@ -7471,6 +7487,18 @@
             "type": "SYMBOL",
             "name": "_property_name"
           }
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "_method_params"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
         },
         {
           "type": "FIELD",
@@ -8194,7 +8222,19 @@
     },
     {
       "type": "SYMBOL",
-      "name": "_generator_star"
+      "name": "_generator_star_function"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_generator_star_method"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_function_params"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_method_params"
     }
   ],
   "inline": [
