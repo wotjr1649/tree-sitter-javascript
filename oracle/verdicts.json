@@ -32,7 +32,7 @@
    }
   },
   "cases_file": "cases.jsonl",
-  "cases_sha256": "33d4c032a23aedc637b9e1ffedcae903ceb1ee540715227be03f68505dfd1674",
+  "cases_sha256": "f123f81bddc758c793e9a9c23a7b516e1bfc47c3fa4e906a52e926bc7a9a4968",
   "runner": "run.mjs",
   "runner_sha256": "06cfe49cd56d0bac9b5c672b1f62fc0f44b37de02c0a2bf04c557e5354c5c24d"
  },
@@ -3168,6 +3168,141 @@
      {
       "message": "Expected `(` but found `{`",
       "at": 16
+     }
+    ]
+   }
+  },
+  {
+   "id": "j8/export-attributes-keys",
+   "sha256": "11c47ca1b966a4df20cbb6e5661c96c5573f4a7bc8ed11acfbcb57be19621c2f",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j8/reject-export-attributes-number-value",
+   "sha256": "c3c17793f1b4e3edc55264abd175c3209a45ebbbdde1e123595d572ac98181a0",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Only string literals are allowed as module attribute values. (1:30)",
+      "at": 30
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Only string literals are allowed as module attribute values.",
+      "at": 30
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Only string literals are allowed as module attribute values.",
+      "at": 30
+     }
+    ]
+   }
+  },
+  {
+   "id": "j8/reject-export-attributes-computed-key",
+   "sha256": "b6110a5e39f50a7ff1ae1a163cdd60acd71daa869eaa5be1ae07966d28bd2aa8",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (1:26)",
+      "at": 26
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token",
+      "at": 26
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Unexpected token",
+      "at": 26
+     }
+    ]
+   }
+  },
+  {
+   "id": "j8/reject-import-attributes-newline-number-key",
+   "sha256": "9bde0ae7aed4164a6da2631e68efc5628530c4146181f87cf02ebe91bc0fbd7c",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (2:6)",
+      "at": 24
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token",
+      "at": 24
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Unexpected token",
+      "at": 24
+     }
+    ]
+   }
+  },
+  {
+   "id": "j8/reject-import-attributes-shorthand",
+   "sha256": "f61d9bb604637dbff215eec3cf6dc6ca7c5161afa15c19b5013468c7e049e4c2",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token, expected \":\" (1:28)",
+      "at": 28
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected `:` but found `}`",
+      "at": 28
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected `:` but found `}`",
+      "at": 28
      }
     ]
    }

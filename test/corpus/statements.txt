@@ -492,6 +492,51 @@ export { a } with { type: "json" };
 ---
 
 ============================================
+Import attribute keys and values
+============================================
+
+import a from "a" with { if: "b", "c": "d", };
+
+---
+
+(program
+  (import_statement
+    (import_clause
+      (identifier))
+    (string
+      (string_fragment))
+    (import_attribute
+      (object
+        (pair
+          (property_identifier)
+          (string
+            (string_fragment)))
+        (pair
+          (string
+            (string_fragment))
+          (string
+            (string_fragment)))))))
+
+============================================
+Import attribute values are strings
+:error
+============================================
+
+export * from "a" with { type: 1 };
+
+---
+
+============================================
+Import attributes are not an object literal
+:error
+============================================
+
+import a from "a"
+with { type, ...b };
+
+---
+
+============================================
 Reserved words as module export and import names
 ============================================
 
