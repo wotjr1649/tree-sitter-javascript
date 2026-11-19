@@ -307,3 +307,155 @@ b
     (statement_block))))
   (expression_statement
     (member_expression (identifier) (comment) (property_identifier))))
+
+============================================================
+Class fields before a generator method or a computed member on the next line
+============================================================
+
+class A {
+  a
+  *b() {}
+  c
+  ['d'] = 0
+  static e
+  [f]
+  #g
+  *h() {}
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      member: (field_definition
+        property: (property_identifier))
+      member: (method_definition
+        name: (property_identifier)
+        parameters: (formal_parameters)
+        body: (statement_block))
+      member: (field_definition
+        property: (property_identifier))
+      member: (field_definition
+        property: (computed_property_name
+          (string
+            (string_fragment)))
+        value: (number))
+      member: (field_definition
+        property: (property_identifier))
+      member: (field_definition
+        property: (computed_property_name
+          (identifier)))
+      member: (field_definition
+        property: (private_property_identifier))
+      member: (method_definition
+        name: (property_identifier)
+        parameters: (formal_parameters)
+        body: (statement_block)))))
+
+============================================================
+Class member prefixes before a line break
+============================================================
+
+class A {
+  get
+  [a]() {}
+  static
+  *b() {}
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      member: (method_definition
+        name: (computed_property_name
+          (identifier))
+        parameters: (formal_parameters)
+        body: (statement_block))
+      member: (method_definition
+        name: (property_identifier)
+        parameters: (formal_parameters)
+        body: (statement_block)))))
+
+============================================================
+Declarations before a JSX element or an array on the next line
+============================================================
+
+{
+  let a
+  <a />
+}
+var b
+[0].forEach(f)
+
+---
+
+(program
+  (statement_block
+    (lexical_declaration
+      (variable_declarator
+        name: (identifier)))
+    (expression_statement
+      (jsx_self_closing_element
+        name: (identifier))))
+  (variable_declaration
+    (variable_declarator
+      name: (identifier)))
+  (expression_statement
+    (call_expression
+      function: (member_expression
+        object: (array
+          (number))
+        property: (property_identifier))
+      arguments: (arguments
+        (identifier)))))
+
+============================================================
+Block comments with a line break between statements
+============================================================
+
+a /*
+*/ b
+'c' /*
+*/ 'd'
+
+---
+
+(program
+  (expression_statement
+    (identifier))
+  (comment)
+  (expression_statement
+    (identifier))
+  (expression_statement
+    (string
+      (string_fragment)))
+  (comment)
+  (expression_statement
+    (string
+      (string_fragment))))
+
+============================================================
+Identifiers beginning with in or instanceof on the next line
+============================================================
+
+a
+in_b
+c
+instanceof_d
+
+---
+
+(program
+  (expression_statement
+    (identifier))
+  (expression_statement
+    (identifier))
+  (expression_statement
+    (identifier))
+  (expression_statement
+    (identifier)))

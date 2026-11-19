@@ -36,6 +36,12 @@ module.exports = grammar({
     $.escape_sequence,
     $.regex_pattern,
     $.jsx_text,
+    // Never produced: the scanner only reads whether they are valid, to tell apart parse states that look the same to
+    // it when it decides on an automatic semicolon. Valid after a class field name or a binding without initializer...
+    $._binding_end,
+    // ...and after a keyword that may still go on: before a declarator (`let`, `using`) or a property name (`get`,
+    // `set`, `static`, `async` in a class), after `await` and `yield`.
+    $._keyword_continues,
   ],
 
   extras: $ => [
@@ -333,12 +339,13 @@ module.exports = grammar({
     ),
 
     variable_declarator: $ => seq(
+      optional($._keyword_continues),
       field('name', choice(
         $.identifier,
         alias('of', $.identifier),
         $._destructuring_pattern,
       )),
-      optional($._initializer),
+      optional(choice($._initializer, $._binding_end)),
     ),
 
     statement_block: $ => prec.right(seq(
@@ -586,8 +593,11 @@ module.exports = grammar({
       $.call_expression,
     ),
 
+    // A hidden rule, so that the marker does not split the productions of yield_expression (parser size).
+    _yield_keyword: $ => seq('yield', optional($._keyword_continues)),
+
     yield_expression: $ => prec.right(seq(
-      'yield',
+      $._yield_keyword,
       choice(
         seq('*', $.expression),
         optional($.expression),
@@ -904,6 +914,7 @@ module.exports = grammar({
 
     await_expression: $ => prec('unary_void', seq(
       'await',
+      optional($._keyword_continues),
       $.expression,
     )),
 
@@ -1039,7 +1050,8 @@ module.exports = grammar({
           alias($.unescaped_double_string_fragment, $.string_fragment),
           $.escape_sequence,
         )),
-        '"',
+        // Immediate: a line terminator before the closing quote is not white space but an unterminated string.
+        token.immediate('"'),
       ),
       seq(
         '\'',
@@ -1047,7 +1059,7 @@ module.exports = grammar({
           alias($.unescaped_single_string_fragment, $.string_fragment),
           $.escape_sequence,
         )),
-        '\'',
+        token.immediate('\''),
       ),
     ),
 
@@ -1110,13 +1122,13 @@ module.exports = grammar({
         seq(
           '[',
           repeat(choice(
-            seq('\\', /./), // escaped character
-            /[^\]\n\\]/, // any character besides ']' or '\n'
+            seq('\\', /[^\n\r\u2028\u2029]/), // escaped character
+            /[^\]\n\r\u2028\u2029\\]/, // any character besides ']', '\' or a line terminator
           )),
           ']',
         ), // square-bracket-delimited character class
-        seq('\\', /./), // escaped character
-        /[^/\\\[\n]/, // any character besides '[', '\', '/', '\n'
+        seq('\\', /[^\n\r\u2028\u2029]/), // escaped character
+        /[^/\\\[\n\r\u2028\u2029]/, // any character besides '[', '\', '/' or a line terminator
       )),
     )),
 
@@ -1243,7 +1255,7 @@ module.exports = grammar({
       repeat(field('decorator', $.decorator)),
       optional('static'),
       field('property', $._property_name),
-      optional($._initializer),
+      optional(choice($._initializer, $._binding_end)),
     ),
 
     formal_parameters: $ => seq(
@@ -1299,7 +1311,7 @@ module.exports = grammar({
       field('value', choice($.pattern, $.assignment_pattern)),
     ),
 
-    _property_name: $ => reserved('properties', choice(
+    _property_name: $ => seq(optional($._keyword_continues), reserved('properties', choice(
       alias(
         choice($.identifier, $._reserved_identifier),
         $.property_identifier,
@@ -1308,7 +1320,7 @@ module.exports = grammar({
       $.string,
       $.number,
       $.computed_property_name,
-    )),
+    ))),
 
     computed_property_name: $ => seq(
       '[',

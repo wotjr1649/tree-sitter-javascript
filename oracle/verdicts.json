@@ -32,7 +32,7 @@
    }
   },
   "cases_file": "cases.jsonl",
-  "cases_sha256": "42d40254143d0231121f26f5f2bb5681b928bb91f3c87707c473419d6d5629b1",
+  "cases_sha256": "5ff8fbed981afb8e64c743d51fb40d1cca14ecf6da1431d477604551192dcbcc",
   "runner": "run.mjs",
   "runner_sha256": "06cfe49cd56d0bac9b5c672b1f62fc0f44b37de02c0a2bf04c557e5354c5c24d"
  },
@@ -2973,6 +2973,352 @@
      {
       "message": "Unexpected token",
       "at": 5
+     }
+    ]
+   }
+  },
+  {
+   "id": "j7/class-field-before-generator",
+   "sha256": "2247a27b0ac1f6b9d22be18f513c3dc18665a259c7571a67cddd85fe872204b4",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j7/class-field-before-computed",
+   "sha256": "5a2fbda18bcd1116c8e8bdcfdf94d95238feb5f16823811e185d98234f6b4ac7",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j7/class-escaped-field-before-generator",
+   "sha256": "f811bad33f70370f04ec43937f9c9dd2758fefdbdf58f45d3955145ff34b3088",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j7/class-getter-computed-across-line",
+   "sha256": "ac8787cf33745dd16d3630abe78090bd3f7be76fc12da58f2c2d88e7a15a7499",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j7/let-before-jsx",
+   "sha256": "67b3cff8cb1f369aacc5050494619e5f4a0bc69db6bddf29e8b239417d55e3f0",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j7/var-before-array",
+   "sha256": "446e1e89b4746b2932a1c434296b276f2e3a3123d793bb3e1dda5fd7e8e38c76",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j7/comment-lf-asi",
+   "sha256": "7c73b78ea0e2378a72674b710551f6f27ad732e7ab1998fe1b9880128ff79b2e",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j7/comment-cr-asi",
+   "sha256": "769ab9f84906e8db16e4c4af99098809ec33ebabab5b07281bb1f7dc2650a90e",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j7/comment-ls-asi",
+   "sha256": "fc0cbcf91b05038c5cd0a12492f0298263cb11cb934b0904f5c272b914ac450e",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j7/comment-asi-identifiers",
+   "sha256": "d0c756ffed58f92a0ef3952a83a61b39492794dce6183fce68536355d0bea885",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j7/lone-cr-asi",
+   "sha256": "4580c7994b97abc1b82e486ce99e4d44ecea072ba8e0aa0ebf8c1680a4addf56",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j7/in-prefix-identifier",
+   "sha256": "7b715eec6921e369172641610701d9ec12d0481b1d295c70c4f22b13b2335b2b",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j7/instanceof-prefix-identifier",
+   "sha256": "a0fafdce23eeb5a968dc71adfb886fbd8ffa1d246dd8825af70b0457a6319fc8",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j7/template-nul",
+   "sha256": "4b84cfd3fb273d1c7bbbd7751795c9b4fdf5e33b1bfe421651401ea20ffafd73",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j7/reject-string-lf",
+   "sha256": "08fc5362c4efb91cba0d729de7ee0cd51b357f34fe4301b61b7d04487146a3ac",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unterminated string constant. (1:0)",
+      "at": 0
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unterminated string",
+      "at": 0
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Unterminated string",
+      "at": 0
+     }
+    ]
+   }
+  },
+  {
+   "id": "j7/reject-string-cr",
+   "sha256": "9db6ff56dbea649911af43d7f1c005a2a3aa2d9ebc52df89f7b4863edcffa27a",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unterminated string constant. (1:0)",
+      "at": 0
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unterminated string",
+      "at": 0
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Unterminated string",
+      "at": 0
+     }
+    ]
+   }
+  },
+  {
+   "id": "j7/reject-regex-cr",
+   "sha256": "b08c9e334189733a5db527d49904619be2e203e63550486a73482616dda889ba",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unterminated regular expression. (1:1)",
+      "at": 1
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unterminated regular expression",
+      "at": 0
+     },
+     {
+      "message": "Unexpected token",
+      "at": 0
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Unterminated regular expression",
+      "at": 0
+     },
+     {
+      "message": "Unexpected token",
+      "at": 0
+     }
+    ]
+   }
+  },
+  {
+   "id": "j7/reject-regex-ls",
+   "sha256": "fbdad93d7b93983ab287f1e3b1448411f30cbfa534970db290cb116b88b3d1b6",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unterminated regular expression. (1:1)",
+      "at": 1
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unterminated regular expression",
+      "at": 0
+     },
+     {
+      "message": "Unexpected token",
+      "at": 0
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Unterminated regular expression",
+      "at": 0
+     },
+     {
+      "message": "Unexpected token",
+      "at": 0
      }
     ]
    }
