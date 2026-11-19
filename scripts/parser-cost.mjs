@@ -73,9 +73,9 @@ export function measure(parserC) {
   cost.parse_action_entries = count('ts_parse_actions', actions, /^(\{\s*\.entry\s*=\s*\{[^{}]*\}\s*\}|\w+\([^()]*\))$/);
   let due = 0;
   for (const e of actions) {
-    const c = e.match(/\.count\s*=\s*(\w+)/);
+    const c = e.match(/\.count\s*=([^,}]*)/); // the whole value, so `1+1` or `1.5` is refused rather than read as 1
     if (c ? due !== 0 : due-- === 0) throw new Error(`ts_parse_actions: a header's action count does not match near ${e.slice(0, 80)}`);
-    if (c) due = cInt(c[1], 'ts_parse_actions count');
+    if (c) due = cInt(c[1].trim(), 'ts_parse_actions count');
   }
   if (due !== 0) throw new Error('ts_parse_actions: the last header has fewer actions than its count');
   return cost;
