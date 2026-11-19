@@ -935,6 +935,106 @@ for await (await using resource of resources) {
             (identifier)))))))
 
 ============================================
+'using' as identifier
+============================================
+
+using = 1;
+using(x);
+using.x;
+using[0];
+using++;
+using => using;
+async using => 1;
+using instanceof C;
+using: for (;;) break using;
+using [a] = b;
+{ using
+x = 1; }
+
+---
+
+(program
+  (expression_statement
+    (assignment_expression
+      (identifier)
+      (number)))
+  (expression_statement
+    (call_expression
+      (identifier)
+      (arguments
+        (identifier))))
+  (expression_statement
+    (member_expression
+      (identifier)
+      (property_identifier)))
+  (expression_statement
+    (subscript_expression
+      (identifier)
+      (number)))
+  (expression_statement
+    (update_expression
+      (identifier)))
+  (expression_statement
+    (arrow_function
+      (identifier)
+      (identifier)))
+  (expression_statement
+    (arrow_function
+      (identifier)
+      (number)))
+  (expression_statement
+    (binary_expression
+      (identifier)
+      (identifier)))
+  (labeled_statement
+    (statement_identifier)
+    (for_statement
+      (empty_statement)
+      (empty_statement)
+      (break_statement
+        (statement_identifier))))
+  (expression_statement
+    (assignment_expression
+      (subscript_expression
+        (identifier)
+        (identifier))
+      (identifier)))
+  (statement_block
+    (expression_statement
+      (identifier))
+    (expression_statement
+      (assignment_expression
+        (identifier)
+        (number)))))
+
+============================================
+'as' and 'satisfies' as using bindings
+============================================
+
+{ using as = f(); }
+for (using as of y);
+for (using satisfies of y);
+
+---
+
+(program
+  (statement_block
+    (using_declaration
+      (variable_declarator
+        (identifier)
+        (call_expression
+          (identifier)
+          (arguments)))))
+  (for_in_statement
+    (identifier)
+    (identifier)
+    (empty_statement))
+  (for_in_statement
+    (identifier)
+    (identifier)
+    (empty_statement)))
+
+============================================
 'of' as identifier in declarations
 ============================================
 

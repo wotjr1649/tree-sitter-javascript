@@ -19,7 +19,7 @@ const RESERVED_WORDS = [
 ];
 
 const CONTEXTUAL_KEYWORDS = [
-  'get', 'set', 'async', 'await', 'static', 'export', 'let',
+  'get', 'set', 'async', 'await', 'static', 'export', 'let', 'using',
 ];
 
 module.exports = grammar({
@@ -107,6 +107,8 @@ module.exports = grammar({
     [$.import_statement, $.import],
     [$.export_statement, $.primary_expression],
     [$.lexical_declaration, $.primary_expression],
+    // Unlike `let [`, `using [` starts an expression: a using declaration binds identifiers only.
+    [$.primary_expression, $.using_declaration],
   ],
 
   conflicts: $ => [
@@ -311,13 +313,24 @@ module.exports = grammar({
       $._semicolon,
     ),
 
-    using_declaration: $ => seq(
-      field('kind', choice(
-        'using',
-        seq('await', 'using'),
-      )),
-      commaSep1($.variable_declarator),
-      $._semicolon,
+    using_declaration: $ => {
+      const kind = field('kind', choice('using', seq('await', 'using')));
+      return choice(
+        seq(kind, commaSep1($.variable_declarator), $._semicolon),
+        // TypeScript reads `using as …` and `using satisfies …` as declarations; the static precedence keeps the
+        // expression reading (`using as T`) from taking these names at the start of a statement.
+        prec(1, seq(
+          kind,
+          alias($._using_keyword_declarator, $.variable_declarator),
+          repeat(seq(',', $.variable_declarator)),
+          $._semicolon,
+        )),
+      );
+    },
+
+    _using_keyword_declarator: $ => seq(
+      field('name', alias(choice('as', 'satisfies'), $.identifier)),
+      optional($._initializer),
     ),
 
     variable_declarator: $ => seq(
@@ -408,6 +421,8 @@ module.exports = grammar({
           field('left', choice(
             $.identifier,
             alias('of', $.identifier),
+            // In TypeScript, `using as` and `using satisfies` can also start an expression, so these lex as keywords.
+            alias(choice('as', 'satisfies'), $.identifier),
             $._destructuring_pattern,
           )),
           optional($._automatic_semicolon),

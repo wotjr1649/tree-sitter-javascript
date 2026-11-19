@@ -32,7 +32,7 @@
    }
   },
   "cases_file": "cases.jsonl",
-  "cases_sha256": "c88297729661b9fff11265dd46b62f84379412b5917f183d356251e7ecf8a70e",
+  "cases_sha256": "fb981e17a83d42c7955677b4fe7c8495b99f3808e8c7edf50799b8b36ae21781",
   "runner": "run.mjs",
   "runner_sha256": "06cfe49cd56d0bac9b5c672b1f62fc0f44b37de02c0a2bf04c557e5354c5c24d"
  },
@@ -1826,6 +1826,606 @@
    "id": "j3/guard-contextual-member-chain",
    "sha256": "e32d14ebfa5ffda2702872d56a3cebc11473ff31ce476994138cd445197a6241",
    "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j4/using-assign",
+   "sha256": "eb2b08ddde34acf04ab4ae93a505a437b9d314e83fd59e8b3ce7e84cf5d14af5",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j4/using-call",
+   "sha256": "caecce291fcdf325f53dace84b0dca56c0f0a6502463d07b269a6d9b1083ff1f",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j4/using-member",
+   "sha256": "38ad7fcceabd7a93e9f055795edf5f32c0972de0b2c799001cbac872ebcea2f4",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j4/using-subscript",
+   "sha256": "beecb80ed2940617c15de59bc14c74ac9d48204e1f210027b988a4c1bc8c3cf0",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j4/using-update",
+   "sha256": "1b1f297dbc34104ca70693284ab490355d3e49be6db22033d4d57cf8230c0b91",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j4/using-arrow",
+   "sha256": "89cd5a53161393674a17265980401c5cc1b2832321fddacc27e74465190a9548",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j4/using-newline-member",
+   "sha256": "1c65f096c93d1b2ce797775e2b442c77f6707942a449f5566f0a23cb9770cf99",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j4/using-in",
+   "sha256": "86eacb4a72357282563cffc7ea9bb04f77c13207c18484b43374e2d8af5c7ffc",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j4/using-instanceof",
+   "sha256": "3096ca62d1962dc8d1d1336e99bdcfad305391eced4e42fdf27030d1ebe99d25",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j4/using-label",
+   "sha256": "09104399ee409ab9a4f945e3fbe6adbd9245ac928ef25d2be95313c72e228a8a",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j4/using-tagged-template",
+   "sha256": "2b01193b832e98dc4c1650f562cec877b4705ca3e8cd139486ae5f402149bd48",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j4/using-optional-member",
+   "sha256": "2c9999aa4ee0dea36e7791c14de85c31fbf4416f6bdd329a39ac57e435518a87",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j4/using-statement",
+   "sha256": "6380cfc30141d75bd05dbc1113ee23fbd114214bdc2309abaa351ded306626b1",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j4/using-block-call",
+   "sha256": "c49ee99dccddda0dffcbd704d71dded0201e2847c26c6fc3342be6e84088d789",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j4/using-block-assign",
+   "sha256": "69ade54ae8e8003ab54ffab85890010f91679331a4bdcf5cd454d21f6ad97c66",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j4/using-compound-assign",
+   "sha256": "6e7f00dd2006c5e020255677b1cfbcf1720865a8b63fa8f6b3366ce2e6f28b8a",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j4/using-conditional",
+   "sha256": "ca8ba09159d89befba20dd43d9b66d847612d1475647fd82fc349d567a0797e5",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j4/using-binary",
+   "sha256": "1da0e900470507af43f5144680dc1d2a6b476648786a96088c0b0ba058d501fe",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j4/using-comma",
+   "sha256": "2f87400ee9685ef6524b88a71f0f92097d7ffbcad22587d79df01dd786f1109e",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j4/using-await-operand",
+   "sha256": "92acacb5eb6a64dbfc848df7a3ae3a6539dbe5e18c6091dcbbb5ab768a58bc9d",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j4/using-for-of",
+   "sha256": "364e856476ca3aa701a8163184695cf9f4f0a382e28572f8e6c9d7aca9bee206",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j4/using-for-in",
+   "sha256": "88c0fd4fe74da4284bfc03aaa9106dc733861c50c81b16bb52d49c88e27c00c3",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j4/using-for-member-of",
+   "sha256": "2ce51bf472ed4b6ad76fa9eda4ea19763e8032910b03a65e40b909a70289a7cd",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j4/using-for-init-assign",
+   "sha256": "6d56dc93ecc50f9109319e4d2e33012d621556a84d5fb7a2e60620e3201d6d52",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j4/using-assign-script",
+   "sha256": "eb2b08ddde34acf04ab4ae93a505a437b9d314e83fd59e8b3ce7e84cf5d14af5",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j4/using-call-script",
+   "sha256": "caecce291fcdf325f53dace84b0dca56c0f0a6502463d07b269a6d9b1083ff1f",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j4/ambiguous-subscript-assign",
+   "sha256": "7d6af2aa41fb36077044ea924164cbe5eb942ba527a6c97446c7b03e4775f4c1",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j4/ambiguous-block-subscript-assign",
+   "sha256": "3ac3e94baad8e539a5d14bfb8d9f3515534508bc7696f00b9d4bf1f3a46e0f3e",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j4/ambiguous-newline-subscript",
+   "sha256": "b328802a73cb7daa1d22b197a4da458f5db0cd7bf6b5c6b92d9c1977c54cff27",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j4/ambiguous-newline-declarator",
+   "sha256": "4d92d84ca008dbc59928efce3481e229735f2c54e77bdd071f2a0ff69fcae259",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j4/ambiguous-block-newline-declarator",
+   "sha256": "694abeadb32dadf406a70532b53bddd2bfe49494a713fd64335c9b8d95f5f967",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j4/ambiguous-await-newline-declarator",
+   "sha256": "7d5fe886726bbaed8655f55494780664fd2507833d2efa5c60e5c7066f4d9883",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j4/fix-as-newline",
+   "sha256": "dbf505d5d5554276b988b433f1380238dc9ae1ed08ed739e2b114efdc8f68d3f",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j4/fix-block-as",
+   "sha256": "672254ced486d88f70838ec45c03a6ae56e59b1e14f99028dab1925074e78063",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j4/fix-block-satisfies",
+   "sha256": "7b47803d4b57544c530dce6ab03e7c7bfc5fc4a56df33273ebaf51b2b60cb6d8",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j4/fix-await-as",
+   "sha256": "05476d709c5b52ed9e35b73c5eac9ee9f57bcc720ffe201295bb75548c7a4199",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j4/fix-for-as-of",
+   "sha256": "c4cbe7ebfe5508257f96614b55e691c4bcd7a8c7da17a3d0d08809b6ecfeffe6",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j4/fix-for-satisfies-of",
+   "sha256": "c4e2669fddab57d3396f1ede18667992e5c1797bc270f5b923baf278da57eadd",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j4/fix-multi-as",
+   "sha256": "de52b839fd291f742f06284bfcab6895072889bc3775df30e038fd682458fed9",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "j4/fix-as-then-declaration",
+   "sha256": "a14e6451217d86e14f27767da325382f52e0ff39f57c271ff09e3ae8b2c7661a",
+   "sourceType": "module",
    "verdict": "accept",
    "babel": {
     "class": "accept",
