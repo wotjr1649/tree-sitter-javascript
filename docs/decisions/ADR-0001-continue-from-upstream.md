@@ -3,6 +3,7 @@
 - Status: accepted (owner decision, 2026-11-18)
 - Date: 2026-11-18
 - Amended: 2026-11-19 (decision 3, owner-approved)
+- Amended: 2026-11-19 (decisions 3 and 4, release versions from v2.0.0, owner-approved)
 
 ## Context
 
@@ -28,14 +29,25 @@ identical).
    origin's (go-treesitter's ADR-0023 patch to it stays in go-treesitter). Manifest versions are 1.0.0 except
    `tree-sitter.json` `metadata.version`, which the generator compiles into `parser.c` (`.metadata`) and which stays
    `0.25.0` so `src/` stays identical (owner decision; the real version is set in the first behaviour-changing release,
-   v1.1 or later); nothing is tagged or published here. Later versions change behaviour only through fixes that start from a failing case.
+   v1.1 or later [superseded by the release amendment below: that release is v2.0.0]); nothing is tagged or published
+   here [for v1.0.0; later releases: the release amendment below]. Later versions change behaviour only through fixes that start from a failing case.
 
    Amendment (owner-approved, 2026-11-19): the v1.0.0 baseline above kept go-treesitter's ADR-0023 JSX patch in
    go-treesitter, with `src/scanner.c` equal to the origin's. From the change that adds this amendment on, this
    repository carries that fix: `src/scanner.c` has the origin's PR #388 scanner hunks (issue #366), identical to
    go-treesitter patch record 0001; the generated `src/` files are unchanged. go-treesitter retires its patch record
    only in a later, separately approved pin move to a release that contains the fix (its ADR-0024 7.6, ADR-0023).
+
+   Amendment (owner-approved, 2026-11-19, release versions): versions after the `v1.0.0` baseline follow Semantic
+   Versioning, starting with `v2.0.0`, the first independent release (the model of tree-sitter-mssql ADR-0007
+   decision 3). A release is a `vMAJOR.MINOR.PATCH` annotated tag plus a GitHub Release made by hand without
+   binaries, each separately approved by the owner; `CHANGELOG.md` (Keep a Changelog) records it, and
+   `docs/migrating-from-1.0.md` covers the move from 1.0.0. A major version marks a breaking change: a node kind or
+   field removed or renamed, or a changed tree for input that previously parsed without an error. Manifests and
+   `tree-sitter.json` `metadata.version` carry the release version, so `src/parser.c` (`.metadata`) changes with it;
+   the `0.25.0` exception above ended with v1.0.0. Decision 4 still excludes registry publishing and automation.
 4. No registry publishing (npm, crates.io, PyPI) and no automated tagging or release workflow. Consumers pin commits.
+   Manual tagged releases follow the release amendment to decision 3.
 5. The grammar name `javascript`, the C symbol `tree_sitter_javascript`, node kinds and fields stay unless a release
    declares a breaking change (major version, CHANGELOG).
 6. The parser is ABI 15 and the binding runtimes follow it: lower bounds are the 0.25 line (Rust `>=0.25, <0.28`,
@@ -57,8 +69,8 @@ identical).
 ## Consequences
 
 - Pinned commits stay reachable because this repository does not rewrite its history.
-- The origin's publish workflow, `FUNDING.yml` and the maintainers entry are removed; the release path is decided
-  separately by the owner. CI runs on `main` and pull requests without path filters. Its manual trigger (`workflow_dispatch`) is declared, and the
+- The origin's publish workflow, `FUNDING.yml` and the maintainers entry are removed; releases are made by hand as
+  the release amendment to decision 3 describes. CI runs on `main` and pull requests without path filters. Its manual trigger (`workflow_dispatch`) is declared, and the
   Actions tab offers it once the workflows are on the default branch.
 - The Go module path is `github.com/wotjr1649/tree-sitter-javascript` (`go.mod` and the Go binding test import). Package
   names (npm, crate, PyPI, Swift) still carry the origin's names; the owner decides when to change them.
