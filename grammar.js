@@ -390,31 +390,37 @@ module.exports = grammar({
     _for_header: $ => seq(
       '(',
       choice(
-        field('left', choice(
-          $._lhs_expression,
-          $.parenthesized_expression,
-        )),
-        // `using` and a line break is an identifier, not a declaration (`for (using\nof y)`): the automatic semicolon
-        // there makes a declarator after the line break an error.
-        seq(field('left', alias('using', $.identifier)), $._automatic_semicolon),
         seq(
-          field('kind', 'var'),
-          field('left', choice(
-            $.identifier,
-            alias('of', $.identifier),
-            $._destructuring_pattern,
-          )),
-          optional($._initializer),
+          choice(
+            field('left', choice(
+              $._lhs_expression,
+              $.parenthesized_expression,
+            )),
+            // `using` and a line break is an identifier, not a declaration (`for (using\nof y)`): the automatic
+            // semicolon there makes a declarator after the line break an error.
+            seq(field('left', alias('using', $.identifier)), $._automatic_semicolon),
+            seq(
+              field('kind', 'var'),
+              field('left', choice(
+                $.identifier,
+                alias('of', $.identifier),
+                $._destructuring_pattern,
+              )),
+              optional($._initializer),
+            ),
+            seq(
+              field('kind', choice('let', 'const')),
+              field('left', choice(
+                $.identifier,
+                alias('of', $.identifier),
+                $._destructuring_pattern,
+              )),
+              optional($._automatic_semicolon),
+            ),
+          ),
+          field('operator', choice('in', 'of')),
         ),
-        seq(
-          field('kind', choice('let', 'const')),
-          field('left', choice(
-            $.identifier,
-            alias('of', $.identifier),
-            $._destructuring_pattern,
-          )),
-          optional($._automatic_semicolon),
-        ),
+        // A using declaration starts a `for…of` head only: `for…in` passes ~Using to ForDeclaration (ECMA-262 §14.7.5).
         seq(
           field('kind', choice(
             'using',
@@ -428,9 +434,13 @@ module.exports = grammar({
             $._destructuring_pattern,
           )),
           optional($._automatic_semicolon),
+          field('operator', 'of'),
         ),
+        // `await using` and a line break is an await expression, never a for…in/of head: this alternative only makes
+        // the automatic semicolon valid there, and no `;` follows it, so a binding after the line break is an error.
+        // Its fields keep `left` and `operator` required in node-types.json.
+        seq('await', field('left', alias('using', $.identifier)), $._automatic_semicolon, ';', field('operator', 'of')),
       ),
-      field('operator', choice('in', 'of')),
       field('right', $._expressions),
       ')',
     ),

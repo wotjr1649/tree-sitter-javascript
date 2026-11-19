@@ -1051,6 +1051,84 @@ y;) {}
 ---
 
 ============================================
+Using declaration in a for-in head
+:error
+============================================
+
+for (using x in o);
+
+---
+
+============================================
+Await using declaration in a for-in head
+:error
+============================================
+
+async function g() {
+  for (await using x in o);
+}
+
+---
+
+============================================
+Line break after await using in a plain for loop
+:error
+============================================
+
+async function g() {
+  for (await using
+  x = f();;) {}
+}
+
+---
+
+============================================
+Line break after await using in a for-of loop
+:error
+============================================
+
+async function g() {
+  for (await using
+  x of y) {}
+}
+
+---
+
+============================================
+'using' and 'await using' as expressions in for heads
+============================================
+
+for (using in o);
+for (using.x in o);
+async function g() {
+  for (await using
+  ;;);
+}
+
+---
+
+(program
+  (for_in_statement
+    (identifier)
+    (identifier)
+    (empty_statement))
+  (for_in_statement
+    (member_expression
+      (identifier)
+      (property_identifier))
+    (identifier)
+    (empty_statement))
+  (function_declaration
+    (identifier)
+    (formal_parameters)
+    (statement_block
+      (for_statement
+        (await_expression
+          (identifier))
+        (empty_statement)
+        (empty_statement)))))
+
+============================================
 'using' as identifier
 ============================================
 
