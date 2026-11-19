@@ -1026,6 +1026,28 @@
         }
       ]
     },
+    "_for_declaration": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "lexical_declaration"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "variable_declaration"
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_for_using_declaration"
+          },
+          "named": true,
+          "value": "using_declaration"
+        }
+      ]
+    },
     "_using_keyword_declarator": {
       "type": "SEQ",
       "members": [
@@ -1245,26 +1267,8 @@
               "type": "FIELD",
               "name": "initializer",
               "content": {
-                "type": "CHOICE",
-                "members": [
-                  {
-                    "type": "SYMBOL",
-                    "name": "lexical_declaration"
-                  },
-                  {
-                    "type": "SYMBOL",
-                    "name": "variable_declaration"
-                  },
-                  {
-                    "type": "ALIAS",
-                    "content": {
-                      "type": "SYMBOL",
-                      "name": "_for_using_declaration"
-                    },
-                    "named": true,
-                    "value": "using_declaration"
-                  }
-                ]
+                "type": "SYMBOL",
+                "name": "_for_declaration"
               }
             },
             {
