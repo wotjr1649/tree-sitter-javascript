@@ -32,7 +32,7 @@
    }
   },
   "cases_file": "cases.jsonl",
-  "cases_sha256": "bf96610e94b10b8ea48215a5f5270ba1df544131b1e6b0b63f1d68b5bad7a731",
+  "cases_sha256": "e5d62e00471cc0949ea386415a1a0ca50ea427573e62de0f37fd91a00a01585d",
   "runner": "run.mjs",
   "runner_sha256": "06cfe49cd56d0bac9b5c672b1f62fc0f44b37de02c0a2bf04c557e5354c5c24d"
  },
@@ -18637,6 +18637,156 @@
    "id": "nul/jsx-comment",
    "sha256": "230903dbffe976292f5ede06f688e5fa9e4be758c6d5b7f66dd736c1e6472a6b",
    "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "idr/get-field-before-generator",
+   "sha256": "7068049d8376de2a2e51fe7bdde6dd835bc3519f13eca8843a5484aacd130b31",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "idr/set-field-before-generator",
+   "sha256": "f6699654d7e1eede5a7991b2097a4a5965444a0c92eb784e94bf617e41317c28",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "idr/static-get-field-before-generator",
+   "sha256": "4bb16b69b0d847e246d872dadd7467d60f804c1cd4f71805c3c55237b7f3774b",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "idr/static-set-field-before-generator",
+   "sha256": "0451208c2f8b1e11f0692bc1e32572f64801ba3244e0a418d72069b79223b86f",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "idr/html-close-after-line-terminating-block",
+   "sha256": "3d1e6cb02d7f3370fbdd2a4b33945050cffa9ffc221ef7ca0224d69303af67e3",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "idr/html-close-after-several-blocks",
+   "sha256": "74c6b9396a0fe9025d6ceaa9576021a68b4222cd58ef170629a6cd45f797ec92",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "idr/html-close-operator-without-line-terminator",
+   "sha256": "f9b836b92b7104dd3afba3889d4505dccc8f43c9a4a2b4f3e7cdce07ef9f3450",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "idr/html-open-operator-in-module",
+   "sha256": "0e6d53497068cc68483a26dc129edde4c74d4bac24ee89ed8a41c506b155ea70",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "idr/static-import-and-reexport-attributes",
+   "sha256": "64949832bf12b286f7687042484bd1c7d57aee2dfe68e2dc26a592d9340dcb1e",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "idr/html-close-ends-at-cr",
+   "sha256": "39391ad330e6320f02af78ac9474d0aabbc199fd64150d86476d90146fee3b8b",
+   "sourceType": "script",
    "verdict": "accept",
    "babel": {
     "class": "accept",

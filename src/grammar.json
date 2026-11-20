@@ -7728,8 +7728,22 @@
           "type": "CHOICE",
           "members": [
             {
-              "type": "STRING",
-              "value": "static"
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "STRING",
+                  "value": "static"
+                },
+                {
+                  "type": "ALIAS",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "_static_before_get_field"
+                  },
+                  "named": false,
+                  "value": "static"
+                }
+              ]
             },
             {
               "type": "BLANK"
@@ -7920,6 +7934,15 @@
                 {
                   "type": "ALIAS",
                   "content": {
+                    "type": "SYMBOL",
+                    "name": "_static_before_get_field"
+                  },
+                  "named": false,
+                  "value": "static"
+                },
+                {
+                  "type": "ALIAS",
+                  "content": {
                     "type": "TOKEN",
                     "content": {
                       "type": "SEQ",
@@ -7980,8 +8003,25 @@
                   "value": "set"
                 },
                 {
-                  "type": "STRING",
-                  "value": "*"
+                  "type": "SEQ",
+                  "members": [
+                    {
+                      "type": "CHOICE",
+                      "members": [
+                        {
+                          "type": "SYMBOL",
+                          "name": "_generator_method_continues"
+                        },
+                        {
+                          "type": "BLANK"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "STRING",
+                      "value": "*"
+                    }
+                  ]
                 }
               ]
             },
@@ -8738,6 +8778,14 @@
     {
       "type": "SYMBOL",
       "name": "_declaration_end"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_generator_method_continues"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_static_before_get_field"
     }
   ],
   "inline": [

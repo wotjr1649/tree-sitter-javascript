@@ -16,6 +16,8 @@ enum TokenType {
     KEYWORD_CONTINUES,
     RESTRICTED_KEYWORD, // Never returned: only its validity is read (see grammar.js).
     DECLARATION_END,
+    GENERATOR_METHOD_CONTINUES,
+    STATIC_BEFORE_GET_FIELD,
 };
 
 void *tree_sitter_javascript_external_scanner_create() { return NULL; }
@@ -84,9 +86,11 @@ static bool is_asi_line_terminator(int32_t c, bool declaration_end) {
  * @param break_after_comment If not NULL: set when a line terminator follows a comment of this scan, in white space or
  *        inside a later block comment (the next call then sees it and decides)
  * @param declaration_newline If not NULL: record line terminators, including CR, for a bare declaration.
+ * @param block_newline If not NULL: record a line terminator inside a block comment before '-->'.
  */
 static WhitespaceResult scan_whitespace_and_comments(TSLexer *lexer, bool *scanned_comment, bool consume,
-                                                     bool *break_after_comment, bool *declaration_newline) {
+                                                     bool *break_after_comment, bool *declaration_newline,
+                                                     bool *block_newline) {
     bool saw_block_newline = false;
     bool seen_comment = false;
 
@@ -128,12 +132,14 @@ static WhitespaceResult scan_whitespace_and_comments(TSLexer *lexer, bool *scann
                     } else if (is_asi_line_terminator(lexer->lookahead, declaration_newline != NULL)) {
                         // A CR alone takes the next-token check instead of the legacy comment shortcut.
                         saw_block_newline |= lexer->lookahead != '\r';
+                        if (block_newline) *block_newline = true;
                         if (declaration_newline) *declaration_newline = true;
                         if (seen_comment && break_after_comment) {
                             *break_after_comment = true;
                         }
                         skip(lexer);
                     } else {
+                        if (block_newline && lexer->lookahead == '\r') *block_newline = true;
                         skip(lexer);
                     }
                 }
@@ -159,10 +165,9 @@ static bool semicolon_before_next_token(TSLexer *lexer, const bool *valid_symbol
     bool binding_end = valid_symbols[BINDING_END] || declaration_end;
     switch (lexer->lookahead) {
         // A class field or a declaration's bindings cannot go on with these (`a<LF>*b() {}`, `c<LF>[x] = 1`,
-        // `let a<LF><a/>`), unlike an expression, `return`, or a member prefix (`get<LF>[x]() {}`, `static<LF>*g() {}`;
-        // `async<LF>*g() {}` stays one method, as it parses today). shortcut: `get<LF>*g() {}` and `set<LF>*g() {}`
-        // (a field, then a generator) stay errors: telling get/set from static/async costs a marker of +1.8 % parser.c.
+        // `let a<LF><a/>`), unlike an expression, `return`, or a member prefix (`get<LF>[x]() {}`, `static<LF>*g() {}`).
         case '*':
+            return binding_end && !valid_symbols[LOGICAL_OR] && !valid_symbols[GENERATOR_METHOD_CONTINUES];
         case '[':
             return binding_end && !valid_symbols[LOGICAL_OR] && !valid_symbols[KEYWORD_CONTINUES];
         case '<':
@@ -241,6 +246,7 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
     bool declaration_break = false;
     bool *declaration_newline = declaration_end ? &declaration_break : NULL;
     bool comment_before_break = false;
+    bool block_newline = false;
     lexer->result_symbol = AUTOMATIC_SEMICOLON;
     lexer->mark_end(lexer);
 
@@ -251,7 +257,7 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
 
         if (lexer->lookahead == '/') {
             WhitespaceResult result = scan_whitespace_and_comments(
-                lexer, scanned_comment, false, NULL, declaration_newline);
+                lexer, scanned_comment, false, NULL, declaration_newline, &block_newline);
             if (result == REJECT) {
                 return declaration_break;
             }
@@ -280,6 +286,19 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
             declaration_break = true;
         }
 
+        // Annex B permits an HTML close comment immediately after a multiline block comment.
+        // Check what follows the HTML comment before ending the statement.
+        if (block_newline && !declaration_break && valid_symbols[HTML_COMMENT] && lexer->lookahead == '-') {
+            skip(lexer);
+            if (lexer->lookahead != '-') return false;
+            skip(lexer);
+            if (lexer->lookahead != '>') return false;
+            do {
+                skip(lexer);
+            } while (!lexer->eof(lexer) && !is_asi_line_terminator(lexer->lookahead, true));
+            break;
+        }
+
         if (!is_extra_space(lexer->lookahead)) {
             if (!declaration_break) return false;
             break;
@@ -290,7 +309,7 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
 
     bool break_after_comment = false;
     // Once a break is known, keep the existing comment attachment and explicit-semicolon decisions.
-    WhitespaceResult result = scan_whitespace_and_comments(lexer, scanned_comment, true, &break_after_comment, NULL);
+    WhitespaceResult result = scan_whitespace_and_comments(lexer, scanned_comment, true, &break_after_comment, NULL, NULL);
     bool defer = *scanned_comment && (comment_before_break || break_after_comment);
     if (result == REJECT) {
         return declaration_end && !defer;
@@ -411,8 +430,7 @@ static bool scan_html_comment(TSLexer *lexer) {
         return false;
     }
 
-    while (!lexer->eof(lexer) && lexer->lookahead != '\n' && lexer->lookahead != 0x2028 &&
-           lexer->lookahead != 0x2029) {
+    while (!lexer->eof(lexer) && !is_asi_line_terminator(lexer->lookahead, true)) {
         advance(lexer);
     }
 
@@ -509,6 +527,28 @@ static bool scan_jsx_text(TSLexer *lexer) {
     return saw_text;
 }
 
+// The legacy 'static get' token wins by length. Before a generator, let 'static' end before the field name.
+static bool scan_static_before_get_field(TSLexer *lexer) {
+    for (const char *c = "static"; *c; c++) {
+        if (lexer->lookahead != *c) return false;
+        advance(lexer);
+    }
+    lexer->mark_end(lexer);
+    if (!is_extra_space(lexer->lookahead)) return false;
+    while (is_extra_space(lexer->lookahead)) advance(lexer);
+    for (const char *c = "get"; *c; c++) {
+        if (lexer->lookahead != *c) return false;
+        advance(lexer);
+    }
+    bool newline = false;
+    while (is_extra_space(lexer->lookahead)) {
+        newline |= is_asi_line_terminator(lexer->lookahead, true);
+        advance(lexer);
+    }
+    lexer->result_symbol = STATIC_BEFORE_GET_FIELD;
+    return newline && lexer->lookahead == '*';
+}
+
 bool tree_sitter_javascript_external_scanner_scan(void *payload, TSLexer *lexer, const bool *valid_symbols) {
     if (valid_symbols[TEMPLATE_CHARS]) {
         if (valid_symbols[AUTOMATIC_SEMICOLON]) {
@@ -534,6 +574,11 @@ bool tree_sitter_javascript_external_scanner_scan(void *payload, TSLexer *lexer,
 
     if (valid_symbols[TERNARY_QMARK]) {
         return scan_ternary_qmark(lexer);
+    }
+
+    if (valid_symbols[STATIC_BEFORE_GET_FIELD] && !valid_symbols[LOGICAL_OR]) {
+        while (is_extra_space(lexer->lookahead)) skip(lexer);
+        if (lexer->lookahead == 's') return scan_static_before_get_field(lexer);
     }
 
     if (valid_symbols[HTML_COMMENT] && !valid_symbols[LOGICAL_OR] && !valid_symbols[ESCAPE_SEQUENCE] &&
