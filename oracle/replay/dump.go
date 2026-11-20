@@ -29,7 +29,7 @@ type dumpRecord struct {
 	Error   bool   `json:"error"` // the root has_error
 	Errors  int    `json:"errors"`
 	Missing int    `json:"missing"`
-	Tree    string `json:"tree"`
+	Tree    string `json:"tree"` // the full CST, or its SHA-256 with -hash
 }
 
 // defaultInputs are the dump's input sets, relative to the repository root.
@@ -225,6 +225,20 @@ func loadInputs(root string, patterns []string) ([]input, error) {
 	return out, nil
 }
 
+// writeInputIDs records the selected inputs before the parser writes the dump.
+func writeInputIDs(path string, inputs []input) error {
+	var buf bytes.Buffer
+	enc := json.NewEncoder(&buf)
+	for _, in := range inputs {
+		if err := enc.Encode(struct {
+			ID string `json:"id"`
+		}{ID: in.ID}); err != nil {
+			return err
+		}
+	}
+	return os.WriteFile(path, buf.Bytes(), 0o644)
+}
+
 // treeString writes the tree as an s-expression of every node, named and anonymous: `(field:kind@start:end ...)`,
 // anonymous kinds quoted, MISSING nodes prefixed with `MISSING `, UTF-8 byte offsets.
 func treeString(root *tree_sitter.Node) (tree string, errors, missing int) {
@@ -267,7 +281,7 @@ func treeString(root *tree_sitter.Node) (tree string, errors, missing int) {
 }
 
 // dump parses every input and writes one dumpRecord per line.
-func dump(parser *tree_sitter.Parser, inputs []input, w io.Writer) error {
+func dump(parser *tree_sitter.Parser, inputs []input, w io.Writer, hashTrees bool) error {
 	bw := bufio.NewWriter(w)
 	enc := json.NewEncoder(bw)
 	enc.SetEscapeHTML(false)
@@ -280,6 +294,9 @@ func dump(parser *tree_sitter.Parser, inputs []input, w io.Writer) error {
 		r := dumpRecord{ID: in.ID, SHA256: sum(src), Error: t.RootNode().HasError()}
 		r.Tree, r.Errors, r.Missing = treeString(t.RootNode())
 		t.Close()
+		if hashTrees {
+			r.Tree = sum([]byte(r.Tree))
+		}
 		if err := enc.Encode(r); err != nil {
 			return err
 		}

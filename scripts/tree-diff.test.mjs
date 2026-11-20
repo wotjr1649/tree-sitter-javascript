@@ -68,3 +68,57 @@ test('the command exits 2 on records without a sha256', () => {
   assert.equal(r.status, 2);
   assert.match(r.stderr, /line 1: not a tree dump record/);
 });
+
+test('--check requires nonempty dumps with the same inputs, trees and error flags', (t) => {
+  const dir = mkdtempSync(join(tmpdir(), 'tree-diff-'));
+  t.after(() => rmSync(dir, { recursive: true }));
+  const left = join(dir, 'left.jsonl');
+  const right = join(dir, 'right.jsonl');
+  const original = rec('a', hash('(program)'));
+  writeFileSync(left, original + '\n');
+  for (const [content, status, message] of [
+    [original, 0, /\| same \| 1 \|/],
+    [rec('a', hash('(ERROR)'), 1), 1, /### clean-to-error/],
+    [rec('a', hash('(program)'), 1), 1, /### clean-to-error/],
+    [rec('b', hash('(program)')), 1, /### only-base/],
+    [rec('a', hash('(program)'), 0, hash('other bytes')), 2, /source differs/],
+    ['', 2, /empty dump/],
+  ]) {
+    writeFileSync(right, content + '\n');
+    const r = spawnSync(process.execPath, [fileURLToPath(new URL('tree-diff.mjs', import.meta.url)), left, right, '--check'], { encoding: 'utf8' });
+    assert.equal(r.status, status, r.stderr);
+    assert.match(r.stdout + r.stderr, message);
+  }
+});
+
+test('--inputs checks both dumps against the selected IDs', (t) => {
+  const dir = mkdtempSync(join(tmpdir(), 'tree-diff-'));
+  t.after(() => rmSync(dir, { recursive: true }));
+  const expected = join(dir, 'inputs.jsonl');
+  writeFileSync(expected, '{"id":"a"}\n{"id":"b"}\n');
+  const dumps = ['ubuntu', 'windows', 'macos'].map((os) => join(dir, os + '.jsonl'));
+  const one = rec('a', '(program)');
+  const full = one + '\n' + rec('b', '(program)');
+  const swapped = one + '\n' + rec('c', '(program)');
+  const script = fileURLToPath(new URL('tree-diff.mjs', import.meta.url));
+  const compare = (contents) => {
+    dumps.forEach((file, i) => writeFileSync(file, contents[i] + '\n'));
+    return dumps.slice(1).map((file) => spawnSync(process.execPath,
+      [script, dumps[0], file, '--check', `--inputs=${expected}`], { encoding: 'utf8' }));
+  };
+
+  assert.deepEqual(compare([full, full, full]).map((r) => r.status), [0, 0]);
+  const allMissing = compare([one, one, one]);
+  assert.deepEqual(allMissing.map((r) => r.status), [1, 1]);
+  assert.match(allMissing[0].stdout, /ubuntu\.jsonl: expected 2 inputs, got 1; missing \["b"\]/);
+  assert.match(allMissing[0].stdout, /windows\.jsonl: expected 2 inputs, got 1; missing \["b"\]/);
+
+  for (const [contents, status] of [
+    [[one, full, full], [1, 1]],
+    [[full, one, full], [1, 0]],
+    [[full, full, one], [0, 1]],
+    [[swapped, swapped, swapped], [1, 1]],
+  ]) {
+    assert.deepEqual(compare(contents).map((r) => r.status), status);
+  }
+});
