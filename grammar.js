@@ -149,6 +149,7 @@ module.exports = grammar({
   ],
 
   conflicts: $ => [
+    [$.primary_expression, $._nonordinary_method_head],
     [$.primary_expression, $._property_name],
     [$.primary_expression, $.await_expression],
     [$.primary_expression, $.await_expression, $._property_name],
@@ -1447,16 +1448,18 @@ module.exports = grammar({
       choice(
         seq($._ordinary_method_name, field('parameters', alias($._ordinary_method_parameters, $.formal_parameters))),
         seq(
-          choice(
-            seq('async', optional($._restricted_keyword), optional(choice('get', 'set')), field('name', $._property_name), $._enter_await),
-            seq(optional($._generator_method_continues), '*', field('name', $._property_name), $._enter_yield),
-            seq('async', optional($._restricted_keyword), optional($._generator_method_continues), '*', field('name', $._property_name), $._enter_both),
-          ),
+          $._nonordinary_method_head,
           field('parameters', $.formal_parameters),
         ),
       ),
       field('body', $.statement_block),
       $._leave_context,
+    ),
+
+    _nonordinary_method_head: $ => choice(
+      seq('async', optional($._restricted_keyword), optional(choice('get', 'set')), field('name', $._property_name), $._enter_await),
+      seq(optional($._generator_method_continues), '*', field('name', $._property_name), $._enter_yield),
+      seq('async', optional($._restricted_keyword), optional($._generator_method_continues), '*', field('name', $._property_name), $._enter_both),
     ),
 
     // Reduce the method head before '(' so a block call can still take its own parse branch.

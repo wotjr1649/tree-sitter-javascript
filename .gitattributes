@@ -43,3 +43,6 @@ build.zig.zon linguist-generated
 
 # Preserve literal CRLF in the yield line-terminator corpus cases.
 test/corpus/yield_annex_b_errors.txt -text whitespace=cr-at-eol
+
+# Preserve literal CRLF and trailing spaces in the captured recovery inputs.
+test/corpus/incomplete_method_heads.txt -text whitespace=cr-at-eol,-blank-at-eol
