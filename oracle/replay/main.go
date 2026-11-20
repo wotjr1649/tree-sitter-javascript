@@ -1,7 +1,7 @@
 // Command replay judges the oracle's verdicts against this grammar through the tree-sitter API.
 //
 //	replay [-oracle DIR] [-tree]
-//	replay -dump OUT.jsonl [-root DIR] [INPUT...]
+//	replay -dump OUT.jsonl [-hash] [-root DIR] [-input-list IDS.jsonl] [INPUT...]
 //
 // The second form writes every input's tree as JSONL (see dump.go and oracle/README.md); exit 2 on any failure.
 // Exit codes: 0 every gated case is consistent; 1 a result differs (listed); 2 the inputs are inconsistent
@@ -235,13 +235,18 @@ func load(dir string) (cases []Case, verdicts map[string]string, problems []stri
 
 func main() { os.Exit(run()) }
 
-func runDump(to, root string, patterns []string) error {
+func runDump(to, root string, patterns []string, hashTrees bool, inputList string) error {
 	if len(patterns) == 0 {
 		patterns = defaultInputs
 	}
 	inputs, err := loadInputs(root, patterns)
 	if err != nil {
 		return err
+	}
+	if inputList != "" {
+		if err := writeInputIDs(inputList, inputs); err != nil {
+			return err
+		}
 	}
 	parser := tree_sitter.NewParser()
 	defer parser.Close()
@@ -254,7 +259,7 @@ func runDump(to, root string, patterns []string) error {
 			return err
 		}
 	}
-	if err := dump(parser, inputs, w); err != nil {
+	if err := dump(parser, inputs, w, hashTrees); err != nil {
 		w.Close()
 		return err
 	}
@@ -266,11 +271,13 @@ func run() int {
 	dir := flag.String("oracle", "..", "the oracle directory (cases.jsonl, verdicts.json, run.mjs, package-lock.json)")
 	showTree := flag.Bool("tree", false, "print every case's tree with byte ranges (for writing expect entries)")
 	dumpTo := flag.String("dump", "", "write the tree of every input as JSONL to this file (- for stdout) instead of judging")
+	hashTrees := flag.Bool("hash", false, "write the SHA-256 of each tree in the dump")
 	root := flag.String("root", "../..", "the repository root, for -dump inputs")
+	inputList := flag.String("input-list", "", "write the IDs of the selected inputs as JSONL before dumping")
 	flag.Parse()
 
 	if *dumpTo != "" {
-		if err := runDump(*dumpTo, *root, flag.Args()); err != nil {
+		if err := runDump(*dumpTo, *root, flag.Args(), *hashTrees, *inputList); err != nil {
 			fmt.Fprintln(os.Stderr, "replay:", err)
 			return 2
 		}

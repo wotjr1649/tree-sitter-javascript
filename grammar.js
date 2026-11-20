@@ -789,16 +789,13 @@ module.exports = grammar({
     _jsx_identifier: $ => choice(
       alias($.jsx_identifier, $.identifier),
       $.identifier,
-      alias($._jsx_keyword_identifier, $.identifier),
+      alias(choice($._jsx_keyword_identifier, $.this), $.identifier),
     ),
 
-    // `const` and `extends` are left out: in TSX they would conflict with the type parameters of a generic arrow
-    // function (`<const T,>() => {}`, `<T extends U>() => {}`). Attribute names add `const` back. Contextual keywords
-    // are left out too: they already lex as identifier here, and as keyword tokens `<async.A />` would fail, because
-    // a member's object takes only identifier.
+    // Contextual keywords already lex as identifiers here.
     _jsx_keyword_identifier: $ => choice(
-      ...RESERVED_WORDS.filter(word => !['this', 'super', 'true', 'false', 'null', 'const', 'extends'].includes(word)),
-      $.this, $.super, $.true, $.false, $.null,
+      ...RESERVED_WORDS.filter(word => !['this', 'super', 'true', 'false', 'null'].includes(word)),
+      $.super, $.true, $.false, $.null,
     ),
 
     nested_identifier: $ => prec('member', seq(
@@ -807,24 +804,23 @@ module.exports = grammar({
       field('property', alias(choice($.identifier, $._keyword_identifier), $.property_identifier)),
     )),
 
-    // A JSX member tag on `this` (`<this.props.Foo />`). It is separate from nested_identifier, which TypeScript also
-    // uses for namespace names, import aliases and type paths, where `this` as the object conflicts.
-    _jsx_this_member_expression: $ => prec('member', seq(
-      field('object', choice($.this, alias($._jsx_this_member_expression, $.member_expression))),
+    // Keyword objects are JSX-only: TS also uses nested_identifier in namespace and type paths.
+    _jsx_keyword_member_expression: $ => prec('member', seq(
+      field('object', choice(
+        $.this,
+        alias($._jsx_keyword_identifier, $.identifier),
+        alias($._jsx_keyword_member_expression, $.member_expression),
+      )),
       '.',
       field('property', alias(choice($.identifier, $._keyword_identifier), $.property_identifier)),
     )),
 
-    // No reserved words in namespace names: in TSX, `<a:typeof …` and the like would conflict with type annotations.
-    jsx_namespace_name: $ => {
-      const name = choice(alias($.jsx_identifier, $.identifier), $.identifier);
-      return seq(name, ':', name);
-    },
+    jsx_namespace_name: $ => seq($._jsx_identifier, ':', $._jsx_identifier),
 
     _jsx_element_name: $ => choice(
       $._jsx_identifier,
       alias($.nested_identifier, $.member_expression),
-      alias($._jsx_this_member_expression, $.member_expression),
+      alias($._jsx_keyword_member_expression, $.member_expression),
       $.jsx_namespace_name,
     ),
 
@@ -841,11 +837,15 @@ module.exports = grammar({
       '/>',
     ),
 
-    _jsx_attribute: $ => choice($.jsx_attribute, $.jsx_expression),
+    _jsx_attribute: $ => choice(
+      $.jsx_attribute,
+      alias($._jsx_spread_attribute, $.jsx_expression),
+    ),
 
-    // Only an element name conflicts with `<const T,>`, so attribute names take `const`.
+    _jsx_spread_attribute: $ => seq('{', $.spread_element, '}'),
+
     _jsx_attribute_name: $ => choice(
-      alias(choice($._jsx_identifier, 'const'), $.property_identifier),
+      alias($._jsx_identifier, $.property_identifier),
       $.jsx_namespace_name,
     ),
 
@@ -889,9 +889,11 @@ module.exports = grammar({
 
     _jsx_attribute_value: $ => choice(
       alias($._jsx_string, $.string),
-      $.jsx_expression,
+      alias($._jsx_expression_attribute_value, $.jsx_expression),
       $._jsx_element,
     ),
+
+    _jsx_expression_attribute_value: $ => seq('{', $.expression, '}'),
 
     class: $ => prec('literal', seq(
       repeat(field('decorator', $.decorator)),
