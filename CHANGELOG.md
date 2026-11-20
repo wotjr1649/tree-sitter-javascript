@@ -17,8 +17,10 @@ statements (#33), labeled blocks (#34), and scanner-dependent inputs on Windows 
   Keep `await(a).x=b` and `await[a].x ??= b` as assignments to an expression involving the identifier `await`.
 - Parse `let [a]` in `for await (let [a] of b)` as an array binding pattern (#32).
 - Parse the semicolon after a default-exported function, generator or class as a separate `empty_statement`, for
-  example in `export default function(){};` (#33). A line break after `export` can precede an export clause or
-  declaration (`export\n{}`, `export\nvar a`), keeping both lines in one `export_statement`.
+  example in `export default function(){};` (#33). An anonymous default-exported declaration can end without a
+  semicolon before the next statement, as in `export default function(){}{}`. In `export default function(){}\n(1)`,
+  `(1)` is a separate expression statement. A line break after `export` can precede an export clause or declaration
+  (`export\n{}`, `export\nvar a`), keeping both lines in one `export_statement`.
 - Honor automatic semicolon insertion for restricted statements using the `_restricted_keyword` scanner marker
   (#33). A lone CR, including one in a block comment, can end a `return`, `break` or `continue` statement before
   its expression or label. For example, `return\r0` is a bare return followed by an expression statement.
@@ -28,22 +30,24 @@ statements (#33), labeled blocks (#34), and scanner-dependent inputs on Windows 
 - End hashbang comments at CR, U+2028 (LS) and U+2029 (PS) as well as LF (#33). The next statement or comment is
   parsed separately, and the range of a CRLF-terminated `hash_bang_line` excludes the CR.
 - Parse `{a:0}` at the start of a statement and in an arrow body such as `() => {a:0}` as a `statement_block`
-  containing a `labeled_statement` (#34). Expression positions such as `({a:0})` and `() => ({a:0})` still contain
-  an `object`.
+  containing a `labeled_statement` (#34). In `{a:0};`, the semicolon is a separate `empty_statement`. Expression
+  positions such as `({a:0})` and `() => ({a:0})` still contain an `object`.
 - Use explicit code-point classes for scanner whitespace and ASCII digits (#42, #16). On Windows, U+FEFF is treated
   as whitespace in scanner lookahead, and supplementary-plane code points keep their full value instead of being
-  truncated to 16 bits. This changes trees such as a trailing block comment after `a\r\uFEFF`, which now lies outside
-  the statement, `a\n\u{12000}(b)` and `a?.\u{10030}b`. The three tested classification modes (Windows UCRT, C locale
-  emulation and glibc-like emulation) produce identical trees with the new scanner.
+  truncated to 16 bits. The block comment in `a\r\uFEFF/*c*/\n` now lies outside the expression statement. When EOF
+  immediately follows `*/`, the comment remains inside the expression statement. Other affected inputs include
+  `a\n\u{12000}(b)` and `a?.\u{10030}b`. With the new scanner, trees for the compared inputs were identical in
+  Windows UCRT, C locale emulation and glibc-like emulation.
 - Count only ASCII whitespace (U+0009 through U+000D and U+0020) when checking for blank JSX text lines (#42, #16).
   Lines containing only U+00A0 or U+3000 now yield `jsx_text`. A line break before a comment is also retained for
-  semicolon insertion in forms such as `let x\n\uFEFF/**/[y]`, which now parses as a declaration and a separate
-  array expression.
+  semicolon insertion in `let x\n/**/[y]` and `let x\n\uFEFF/**/[y]`, which now parse as declarations followed by
+  separate array expressions. The ASCII form previously recovered with an error.
 
 ### Changed
 
-- Babel reads `await++\n(a)(b);` and `await/*\n*/++(a).x;` as two statements. This grammar still reads each as one
-  statement and now parses it as an `await_expression` (#32).
+- In Script mode, Babel reads `await++\n(a)(b);` and `await/*\n*/++(a).x;` as two statements. In Module mode,
+  Babel reports `InvalidLhs` for the first input and reads the second as one `AwaitExpression` statement.
+  This grammar still reads each as one statement and now parses it as an `await_expression` (#32).
 - `await(a)(b;` still has a missing closing parenthesis, now in a call inside the await operand (#32). This also
   applies across line breaks in `await(a)\n(b;\nx();`. In `await[a]?.[;` the `ERROR` still covers bytes [8, 11),
   and the preceding `subscript_expression` becomes an `await_expression` with an array operand.
@@ -55,10 +59,17 @@ statements (#33), labeled blocks (#34), and scanner-dependent inputs on Windows 
   `ERROR` at the opening parenthesis (#32).
 - Invalid `await using [] = null;` recovers as an assignment with an `ERROR` over `using []`. An invalid
   initializer in `for await (let [x] = 0 of [])` puts the array pattern inside the `ERROR` node (#32).
+- `export default function(){}()` and uses of `export` as an identifier such as `export;`, `export = 1` and
+  `export: 1` now produce syntax errors (#33).
 - Recovery changes for invalid export attributes such as `export {a} from 'x' with {['type']: 'json'};` and for
   `for (using of of y)` (#33). In `export {a}\nwith {a:1}`, `with` retains its `ERROR` range and the following
   braces recover as a labeled block. The same block recovery applies to invalid standalone `else{a:0}` and
   `case 1:{a:0}` (#34).
+- Checking only ASCII digits after `.` and `?.` changes syntax-error outcomes and recovery trees on Windows
+  (#42, #16). For example, `a?.\u0660b` previously produced an error and now produces a `member_expression`.
+- In Script input such as `\u{12000}<!-- comment\nright`, Windows previously skipped the supplementary-plane
+  character and produced an `html_comment`. The scanner now preserves the character and the grammar produces a
+  `binary_expression`. Babel's Script parse treats `<!--` as a comment in this case (#42, #16).
 - In `src/node-types.json`, `await_expression` still has one required direct child. Its declared types narrow from
   `expression` to `primary_expression`, `await_expression`, `unary_expression`, `update_expression`, `new_expression`,
   `jsx_element` and `jsx_self_closing_element` (#32). Expanding the supertypes excludes direct assignments, augmented
@@ -72,8 +83,14 @@ statements (#33), labeled blocks (#34), and scanner-dependent inputs on Windows 
 - Recheck queries on `await_expression` that match the old direct children and descend through
   `parenthesized_expression` where appropriate. For `export_statement`, account for the new `value` types and
   the sibling `empty_statement` after a default-exported declaration. Regenerate types derived from `node-types.json`.
-- When vendoring into tree-sitter-typescript, apply the handoff patches `ts-scanner-j7-externals.patch`,
-  `ts-v3b-restricted-keyword.patch` and `ts-v3a-await-operand.patch` alongside the JavaScript grammar.
+- When vendoring into the owner-maintained tree-sitter-typescript, start from `59fc4ed`. Apply #357
+  (`p96/0002-ts357-using-decorator-paren.patch` under
+  `go-treesitter/artifacts/handoff/2026-11-18-owner-repos/javascript-evidence/`), patch 3
+  (`ts-scanner-j7-externals.patch`), patch 5 (`ts-v3b-restricted-keyword.patch`) and the await handoff patch
+  (`ts-v3a-await-operand.patch`) in that order. The latter three are in the JavaScript worktrees' `_handoff-ts/`
+  bundle alongside `HANDOFF-DRAFT.md`. Then replace `third_party/tree-sitter-javascript/grammar.js` with this
+  grammar and regenerate TypeScript and TSX separately with `tree-sitter generate --abi 15 --js-runtime native`
+  using CLI 0.27.2. TypeScript uses its own scanner, so the #42 scanner changes require a separate port.
 
 ### Known limitations
 

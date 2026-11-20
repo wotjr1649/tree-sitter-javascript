@@ -15,6 +15,7 @@ enum TokenType {
     BINDING_END,
     KEYWORD_CONTINUES,
     RESTRICTED_KEYWORD, // Never returned: only its validity is read (see grammar.js).
+    DECLARATION_END,
 };
 
 void *tree_sitter_javascript_external_scanner_create() { return NULL; }
@@ -69,26 +70,31 @@ static bool is_jsx_space(int32_t c) { return (c >= '\t' && c <= '\r') || c == ' 
 static bool is_digit(int32_t c) { return c >= '0' && c <= '9'; }
 
 typedef enum {
-    REJECT,     // Semicolon is illegal, ie a syntax error occurred
+    REJECT,     // A slash that does not start a comment
     NO_NEWLINE, // Unclear if semicolon will be legal, continue
     ACCEPT,     // Semicolon is legal, assuming a comment was encountered
 } WhitespaceResult;
+
+static bool is_asi_line_terminator(int32_t c, bool declaration_end) {
+    return c == '\n' || c == 0x2028 || c == 0x2029 || (declaration_end && c == '\r');
+}
 
 /**
  * @param consume If false, only consume enough to check if comment indicates semicolon-legality
  * @param break_after_comment If not NULL: set when a line terminator follows a comment of this scan, in white space or
  *        inside a later block comment (the next call then sees it and decides)
+ * @param declaration_newline If not NULL: record line terminators, including CR, for a bare declaration.
  */
 static WhitespaceResult scan_whitespace_and_comments(TSLexer *lexer, bool *scanned_comment, bool consume,
-                                                     bool *break_after_comment) {
+                                                     bool *break_after_comment, bool *declaration_newline) {
     bool saw_block_newline = false;
     bool seen_comment = false;
 
     for (;;) {
         while (is_extra_space(lexer->lookahead)) {
-            if (seen_comment && break_after_comment &&
-                (lexer->lookahead == '\n' || lexer->lookahead == 0x2028 || lexer->lookahead == 0x2029)) {
-                *break_after_comment = true;
+            if (is_asi_line_terminator(lexer->lookahead, declaration_newline != NULL)) {
+                if (seen_comment && break_after_comment) *break_after_comment = true;
+                if (declaration_newline) *declaration_newline = true;
             }
             skip(lexer);
         }
@@ -98,8 +104,7 @@ static WhitespaceResult scan_whitespace_and_comments(TSLexer *lexer, bool *scann
 
             if (lexer->lookahead == '/') {
                 skip(lexer);
-                while (lexer->lookahead != 0 && lexer->lookahead != '\n' && lexer->lookahead != 0x2028 &&
-                       lexer->lookahead != 0x2029) {
+                while (lexer->lookahead != 0 && !is_asi_line_terminator(lexer->lookahead, declaration_newline != NULL)) {
                     skip(lexer);
                 }
                 *scanned_comment = true;
@@ -120,8 +125,10 @@ static WhitespaceResult scan_whitespace_and_comments(TSLexer *lexer, bool *scann
 
                             break;
                         }
-                    } else if (lexer->lookahead == '\n' || lexer->lookahead == 0x2028 || lexer->lookahead == 0x2029) {
-                        saw_block_newline = true;
+                    } else if (is_asi_line_terminator(lexer->lookahead, declaration_newline != NULL)) {
+                        // A CR alone takes the next-token check instead of the legacy comment shortcut.
+                        saw_block_newline |= lexer->lookahead != '\r';
+                        if (declaration_newline) *declaration_newline = true;
                         if (seen_comment && break_after_comment) {
                             *break_after_comment = true;
                         }
@@ -147,7 +154,9 @@ static bool is_identifier_part(int32_t c) {
 }
 
 // After a line terminator: does the token that starts at the lookahead get a semicolon inserted before it?
-static bool semicolon_before_next_token(TSLexer *lexer, const bool *valid_symbols) {
+static bool semicolon_before_next_token(TSLexer *lexer, const bool *valid_symbols, bool declaration_end,
+                                        bool defer_declaration) {
+    bool binding_end = valid_symbols[BINDING_END] || declaration_end;
     switch (lexer->lookahead) {
         // A class field or a declaration's bindings cannot go on with these (`a<LF>*b() {}`, `c<LF>[x] = 1`,
         // `let a<LF><a/>`), unlike an expression, `return`, or a member prefix (`get<LF>[x]() {}`, `static<LF>*g() {}`;
@@ -155,18 +164,19 @@ static bool semicolon_before_next_token(TSLexer *lexer, const bool *valid_symbol
         // (a field, then a generator) stay errors: telling get/set from static/async costs a marker of +1.8 % parser.c.
         case '*':
         case '[':
-            return valid_symbols[BINDING_END] && !valid_symbols[LOGICAL_OR] && !valid_symbols[KEYWORD_CONTINUES];
+            return binding_end && !valid_symbols[LOGICAL_OR] && !valid_symbols[KEYWORD_CONTINUES];
         case '<':
-            return valid_symbols[BINDING_END] && !valid_symbols[LOGICAL_OR];
+            return binding_end && !valid_symbols[LOGICAL_OR];
 
+        case '(':
         case '`':
+            return declaration_end && !defer_declaration;
         case ',':
         case ':':
         case ';':
         case '%':
         case '>':
         case '=':
-        case '(':
         case '?':
         case '^':
         case '|':
@@ -179,13 +189,13 @@ static bool semicolon_before_next_token(TSLexer *lexer, const bool *valid_symbol
             skip(lexer);
             return is_digit(lexer->lookahead);
 
-        // Insert a semicolon before `--` and `++`, but not before binary `+` or `-`.
+        // A bare declaration ends before a unary sign, an expression can continue with a binary sign.
         case '+':
             skip(lexer);
-            return lexer->lookahead == '+';
+            return lexer->lookahead == '+' || (declaration_end && !defer_declaration);
         case '-':
             skip(lexer);
-            return lexer->lookahead == '-';
+            return lexer->lookahead == '-' || (declaration_end && !defer_declaration);
 
         // Don't insert a semicolon before `!=`, but do insert one before a unary `!`.
         case '!':
@@ -227,6 +237,10 @@ static bool semicolon_before_next_token(TSLexer *lexer, const bool *valid_symbol
 
 static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, bool *scanned_comment) {
     bool comment_condition = !valid_symbols[LOGICAL_OR];
+    bool declaration_end = valid_symbols[DECLARATION_END] && comment_condition;
+    bool declaration_break = false;
+    bool *declaration_newline = declaration_end ? &declaration_break : NULL;
+    bool comment_before_break = false;
     lexer->result_symbol = AUTOMATIC_SEMICOLON;
     lexer->mark_end(lexer);
 
@@ -236,9 +250,10 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
         }
 
         if (lexer->lookahead == '/') {
-            WhitespaceResult result = scan_whitespace_and_comments(lexer, scanned_comment, false, NULL);
+            WhitespaceResult result = scan_whitespace_and_comments(
+                lexer, scanned_comment, false, NULL, declaration_newline);
             if (result == REJECT) {
-                return false;
+                return declaration_break;
             }
 
             if (result == ACCEPT && comment_condition && lexer->lookahead != ',' && lexer->lookahead != '=') {
@@ -254,35 +269,42 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
             return true;
         }
 
-        if (lexer->lookahead == '\n' || lexer->lookahead == 0x2028 || lexer->lookahead == 0x2029) {
+        if (is_asi_line_terminator(lexer->lookahead, false)) {
+            comment_before_break = *scanned_comment;
+            skip(lexer);
             break;
         }
 
+        // Keep the early comment check after a bare CR so it can end the declaration before the comment.
+        if (declaration_end && lexer->lookahead == '\r') {
+            declaration_break = true;
+        }
+
         if (!is_extra_space(lexer->lookahead)) {
-            return false;
+            if (!declaration_break) return false;
+            break;
         }
 
         skip(lexer);
     }
 
-    skip(lexer);
-
-    bool comment_before_break = *scanned_comment;
     bool break_after_comment = false;
-    if (scan_whitespace_and_comments(lexer, scanned_comment, true, &break_after_comment) == REJECT) {
-        return false;
+    // Once a break is known, keep the existing comment attachment and explicit-semicolon decisions.
+    WhitespaceResult result = scan_whitespace_and_comments(lexer, scanned_comment, true, &break_after_comment, NULL);
+    bool defer = *scanned_comment && (comment_before_break || break_after_comment);
+    if (result == REJECT) {
+        return declaration_end && !defer;
     }
 
     // After a comment the next call decides, as before: where the comment holds a line break the base scanner
     // takes the semicolon after it (`let x<LF>/*<LF>*//*<LF>*/[b]`), so the declaration keeps its comment. Only where
     // that call will still see a line terminator (a comment came before the break, or one follows the first comment).
     // Otherwise the break scanned here is the only one and decides now (`let x<LF>/**/[y]`, `let x<LF>U+FEFF/**/[y]`).
-    if (*scanned_comment && (comment_before_break || break_after_comment) &&
-        (lexer->lookahead == '*' || lexer->lookahead == '[' || lexer->lookahead == '<')) {
+    if (defer && (lexer->lookahead == '*' || lexer->lookahead == '[' || lexer->lookahead == '<')) {
         return false;
     }
 
-    return semicolon_before_next_token(lexer, valid_symbols);
+    return semicolon_before_next_token(lexer, valid_symbols, declaration_end, defer);
 }
 
 // After `return`, `break`, `continue` and a label (ECMA-262 12.9.1, no LineTerminator here): a line terminator ends the
