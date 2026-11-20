@@ -1,6 +1,8 @@
 #include "tree_sitter/parser.h"
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 enum TokenType {
     AUTOMATIC_SEMICOLON,
@@ -16,15 +18,83 @@ enum TokenType {
     KEYWORD_CONTINUES,
     RESTRICTED_KEYWORD, // Never returned: only its validity is read (see grammar.js).
     DECLARATION_END,
+    CONTEXT_IDENTIFIER,
+    ENTER_PLAIN,
+    ENTER_AWAIT,
+    ENTER_YIELD,
+    ENTER_BOTH,
+    ENTER_PLAIN_EXPRESSION,
+    ENTER_ASYNC_ARROW,
+    ENTER_STATIC_BLOCK,
+    ENTER_ORDINARY_METHOD,
+    LEAVE_CONTEXT,
+    LEAVE_CONCISE_BODY,
 };
 
-void *tree_sitter_javascript_external_scanner_create() { return NULL; }
+enum Context {
+    AWAIT_CONTEXT = 1,
+    YIELD_CONTEXT = 2,
+};
 
-void tree_sitter_javascript_external_scanner_destroy(void *p) {}
+// Four scope kinds fit in two bits.
+// shortcut: excess scopes use the base lexer until they close; use parser states if deeper nesting needs full context.
+enum {
+    SCOPE_HEADER_SIZE = 6,
+    SCOPE_BYTES = TREE_SITTER_SERIALIZATION_BUFFER_SIZE - SCOPE_HEADER_SIZE,
+};
 
-unsigned tree_sitter_javascript_external_scanner_serialize(void *payload, char *buffer) { return 0; }
+typedef struct {
+    uint32_t overflow;
+    uint16_t depth;
+    uint8_t flags[SCOPE_BYTES];
+} Scanner;
 
-void tree_sitter_javascript_external_scanner_deserialize(void *p, const char *b, unsigned n) {}
+void *tree_sitter_javascript_external_scanner_create(void) { return calloc(1, sizeof(Scanner)); }
+
+void tree_sitter_javascript_external_scanner_destroy(void *payload) { free(payload); }
+
+unsigned tree_sitter_javascript_external_scanner_serialize(void *payload, char *buffer) {
+    const Scanner *scanner = payload;
+    if (!scanner->depth) return 0;
+
+    unsigned length = (scanner->depth + 3) / 4;
+    memcpy(buffer, &scanner->overflow, sizeof(scanner->overflow));
+    memcpy(buffer + sizeof(scanner->overflow), &scanner->depth, sizeof(scanner->depth));
+    memcpy(buffer + SCOPE_HEADER_SIZE, scanner->flags, length);
+    return SCOPE_HEADER_SIZE + length;
+}
+
+void tree_sitter_javascript_external_scanner_deserialize(void *payload, const char *buffer, unsigned length) {
+    Scanner *scanner = payload;
+    scanner->depth = 0;
+    scanner->overflow = 0;
+    if (length < SCOPE_HEADER_SIZE) return;
+
+    uint16_t depth;
+    memcpy(&depth, buffer + sizeof(scanner->overflow), sizeof(depth));
+    if (depth > SCOPE_BYTES * 4 || length != SCOPE_HEADER_SIZE + (depth + 3u) / 4) return;
+
+    scanner->depth = depth;
+    memcpy(&scanner->overflow, buffer, sizeof(scanner->overflow));
+    memcpy(scanner->flags, buffer + SCOPE_HEADER_SIZE, length - SCOPE_HEADER_SIZE);
+}
+
+static void enter_context(Scanner *scanner, unsigned flags) {
+    if (scanner->depth == SCOPE_BYTES * 4) {
+        scanner->overflow++;
+        return;
+    }
+    unsigned index = scanner->depth++;
+    unsigned shift = (index % 4) * 2;
+    scanner->flags[index / 4] = (scanner->flags[index / 4] & ~(3u << shift)) | (flags << shift);
+}
+
+static unsigned context_flags(const Scanner *scanner) {
+    if (scanner->overflow) return AWAIT_CONTEXT | YIELD_CONTEXT;
+    if (!scanner->depth) return AWAIT_CONTEXT;
+    unsigned index = scanner->depth - 1;
+    return (scanner->flags[index / 4] >> ((index % 4) * 2)) & 3u;
+}
 
 static inline void advance(TSLexer *lexer) { lexer->advance(lexer, false); }
 
@@ -235,7 +305,8 @@ static bool semicolon_before_next_token(TSLexer *lexer, const bool *valid_symbol
     return true;
 }
 
-static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, bool *scanned_comment) {
+static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, bool *scanned_comment,
+                                     bool *at_next_token) {
     bool comment_condition = !valid_symbols[LOGICAL_OR];
     bool declaration_end = valid_symbols[DECLARATION_END] && comment_condition;
     bool declaration_break = false;
@@ -281,7 +352,10 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
         }
 
         if (!is_extra_space(lexer->lookahead)) {
-            if (!declaration_break) return false;
+            if (!declaration_break) {
+                *at_next_token = true;
+                return false;
+            }
             break;
         }
 
@@ -304,17 +378,20 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
         return false;
     }
 
+    *at_next_token = lexer->lookahead == ',' || lexer->lookahead == ':' || lexer->lookahead == ';' ||
+                     lexer->lookahead == ')' || lexer->lookahead == ']' || lexer->lookahead == '}';
     return semicolon_before_next_token(lexer, valid_symbols, declaration_end, defer);
 }
 
 // After `return`, `break`, `continue` and a label (ECMA-262 12.9.1, no LineTerminator here): a line terminator ends the
 // statement whatever follows it, unless it is an explicit `;`. A lone CR is a line terminator, and so is one in a block
 // comment. The statement also ends at an included range start, a `}` and the end of the input.
-static bool scan_restricted_semicolon(TSLexer *lexer) {
+static bool scan_restricted_semicolon(TSLexer *lexer, bool *at_next_token) {
     lexer->result_symbol = AUTOMATIC_SEMICOLON;
     lexer->mark_end(lexer);
 
     bool newline = false;
+    bool scanned_comment = false;
     for (;;) {
         int32_t c = lexer->lookahead;
         if (lexer->eof(lexer) || c == '}' || lexer->is_at_included_range_start(lexer)) {
@@ -327,9 +404,11 @@ static bool scan_restricted_semicolon(TSLexer *lexer) {
         } else if (is_extra_space(c)) {
             skip(lexer);
         } else if (c != '/') {
+            *at_next_token = !newline && !scanned_comment;
             return newline && c != ';';
         } else {
             skip(lexer);
+            scanned_comment = true;
             if (lexer->lookahead == '/') {
                 while (!lexer->eof(lexer) && lexer->lookahead != '\n' && lexer->lookahead != '\r' &&
                        lexer->lookahead != 0x2028 && lexer->lookahead != 0x2029) {
@@ -509,7 +588,48 @@ static bool scan_jsx_text(TSLexer *lexer) {
     return saw_text;
 }
 
+static bool scan_context_identifier(const Scanner *scanner, TSLexer *lexer) {
+    unsigned flags = context_flags(scanner);
+    const char *word = NULL;
+    if (lexer->lookahead == 'a' && !(flags & AWAIT_CONTEXT)) {
+        word = "await";
+    } else if (lexer->lookahead == 'y' && !(flags & YIELD_CONTEXT)) {
+        word = "yield";
+    }
+    if (!word) return false;
+    for (; *word; word++) {
+        if (lexer->lookahead != *word) return false;
+        advance(lexer);
+    }
+    if (is_identifier_part(lexer->lookahead)) return false;
+    lexer->mark_end(lexer);
+    lexer->result_symbol = CONTEXT_IDENTIFIER;
+    return true;
+}
+
+static bool leave_context(Scanner *scanner, TSLexer *lexer, enum TokenType symbol) {
+    if (scanner->overflow) scanner->overflow--;
+    else if (scanner->depth) scanner->depth--;
+    lexer->result_symbol = symbol;
+    return true;
+}
+
+static bool at_concise_body_end(TSLexer *lexer) {
+    switch (lexer->lookahead) {
+        case ',':
+        case ':':
+        case ';':
+        case ')':
+        case ']':
+        case '}':
+            return true;
+        default:
+            return lexer->eof(lexer);
+    }
+}
+
 bool tree_sitter_javascript_external_scanner_scan(void *payload, TSLexer *lexer, const bool *valid_symbols) {
+    Scanner *scanner = payload;
     if (valid_symbols[TEMPLATE_CHARS]) {
         if (valid_symbols[AUTOMATIC_SEMICOLON]) {
             return false;
@@ -521,15 +641,61 @@ bool tree_sitter_javascript_external_scanner_scan(void *payload, TSLexer *lexer,
         return true;
     }
 
-    if (valid_symbols[AUTOMATIC_SEMICOLON]) {
+    if (valid_symbols[LEAVE_CONTEXT]) {
+        lexer->mark_end(lexer);
+        return leave_context(scanner, lexer, LEAVE_CONTEXT);
+    }
+
+    if (valid_symbols[ENTER_PLAIN_EXPRESSION] || valid_symbols[ENTER_ASYNC_ARROW] || valid_symbols[ENTER_ORDINARY_METHOD]) {
+        unsigned token = valid_symbols[ENTER_ASYNC_ARROW] ? ENTER_ASYNC_ARROW :
+                         valid_symbols[ENTER_ORDINARY_METHOD] ? ENTER_ORDINARY_METHOD : ENTER_PLAIN_EXPRESSION;
+        lexer->mark_end(lexer);
+        enter_context(scanner, token == ENTER_ASYNC_ARROW ? AWAIT_CONTEXT : 0);
+        lexer->result_symbol = token;
+        return true;
+    }
+
+    bool at_next_token = true;
+    if (valid_symbols[AUTOMATIC_SEMICOLON] || valid_symbols[LEAVE_CONCISE_BODY]) {
         bool scanned_comment = false;
+        at_next_token = false;
         bool ret = valid_symbols[RESTRICTED_KEYWORD]
-                       ? scan_restricted_semicolon(lexer)
-                       : scan_automatic_semicolon(lexer, valid_symbols, &scanned_comment);
-        if (!ret && !scanned_comment && valid_symbols[TERNARY_QMARK] && lexer->lookahead == '?') {
+                       ? scan_restricted_semicolon(lexer, &at_next_token)
+                       : scan_automatic_semicolon(lexer, valid_symbols, &scanned_comment, &at_next_token);
+        if (valid_symbols[LEAVE_CONCISE_BODY] && (ret || (at_next_token && at_concise_body_end(lexer)))) {
+            return leave_context(scanner, lexer, LEAVE_CONCISE_BODY);
+        }
+        if (ret && valid_symbols[AUTOMATIC_SEMICOLON]) return true;
+        if (!scanned_comment && valid_symbols[TERNARY_QMARK] && lexer->lookahead == '?') {
             return scan_ternary_qmark(lexer);
         }
-        return ret;
+        if (!at_next_token || scanned_comment) return false;
+    } else {
+        lexer->mark_end(lexer);
+    }
+
+    if (valid_symbols[ENTER_STATIC_BLOCK] || valid_symbols[ENTER_PLAIN] || valid_symbols[ENTER_AWAIT] ||
+        valid_symbols[ENTER_YIELD] || valid_symbols[ENTER_BOTH]) {
+        while (is_extra_space(lexer->lookahead)) skip(lexer);
+        unsigned token = ENTER_PLAIN_EXPRESSION;
+        if (valid_symbols[ENTER_STATIC_BLOCK] && lexer->lookahead == '{') {
+            token = ENTER_STATIC_BLOCK;
+        } else if (lexer->lookahead == '(') {
+            for (token = ENTER_PLAIN; token < ENTER_PLAIN_EXPRESSION && !valid_symbols[token]; token++) {}
+        }
+
+        if (token != ENTER_PLAIN_EXPRESSION) {
+            enter_context(scanner, token == ENTER_STATIC_BLOCK ? AWAIT_CONTEXT : token - ENTER_PLAIN);
+            lexer->result_symbol = token;
+            return true;
+        }
+    }
+
+    if (valid_symbols[CONTEXT_IDENTIFIER]) {
+        while (is_extra_space(lexer->lookahead)) skip(lexer);
+        if (lexer->lookahead == 'a' || lexer->lookahead == 'y') {
+            return scan_context_identifier(scanner, lexer);
+        }
     }
 
     if (valid_symbols[TERNARY_QMARK]) {
