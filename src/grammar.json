@@ -4014,26 +4014,6 @@
               }
             },
             {
-              "type": "CHOICE",
-              "members": [
-                {
-                  "type": "ALIAS",
-                  "content": {
-                    "type": "IMMEDIATE_TOKEN",
-                    "content": {
-                      "type": "STRING",
-                      "value": "&"
-                    }
-                  },
-                  "named": true,
-                  "value": "string_fragment"
-                },
-                {
-                  "type": "BLANK"
-                }
-              ]
-            },
-            {
               "type": "STRING",
               "value": "\""
             }
@@ -4068,26 +4048,6 @@
               }
             },
             {
-              "type": "CHOICE",
-              "members": [
-                {
-                  "type": "ALIAS",
-                  "content": {
-                    "type": "IMMEDIATE_TOKEN",
-                    "content": {
-                      "type": "STRING",
-                      "value": "&"
-                    }
-                  },
-                  "named": true,
-                  "value": "string_fragment"
-                },
-                {
-                  "type": "BLANK"
-                }
-              ]
-            },
-            {
               "type": "STRING",
               "value": "'"
             }
@@ -4102,7 +4062,7 @@
         "value": 1,
         "content": {
           "type": "PATTERN",
-          "value": "([^\"&\\x00]|\\x00+|&([^\"#A-Za-z\\x00]|([A-Za-z]+|#([xX][0-9a-fA-F]*|[0-9]*))?\\x00+))+"
+          "value": "([^\"&\\x00]|\\x00+|&([^#A-Za-z\\x00]|([A-Za-z]+|#([xX][0-9a-fA-F]*|[0-9]*))?\\x00+))+"
         }
       }
     },
@@ -4113,7 +4073,7 @@
         "value": 1,
         "content": {
           "type": "PATTERN",
-          "value": "([^'&\\x00]|\\x00+|&([^'#A-Za-z\\x00]|([A-Za-z]+|#([xX][0-9a-fA-F]*|[0-9]*))?\\x00+))+"
+          "value": "([^'&\\x00]|\\x00+|&([^#A-Za-z\\x00]|([A-Za-z]+|#([xX][0-9a-fA-F]*|[0-9]*))?\\x00+))+"
         }
       }
     },

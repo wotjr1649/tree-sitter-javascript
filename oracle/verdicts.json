@@ -32,7 +32,7 @@
    }
   },
   "cases_file": "cases.jsonl",
-  "cases_sha256": "d54548e728c2400572fb677749fc43d1b96d313a9e5d72c785380b9cc491e076",
+  "cases_sha256": "ec6088008e5b2856fa3d670bb4e80ef8abd762af7e20f190a4fa883ac2736294",
   "runner": "run.mjs",
   "runner_sha256": "06cfe49cd56d0bac9b5c672b1f62fc0f44b37de02c0a2bf04c557e5354c5c24d"
  },
@@ -18904,51 +18904,6 @@
    }
   },
   {
-   "id": "nul/jsx-attr-dq-amp-bare",
-   "sha256": "fb1c53286e0000bb6a3b5f90f36bfbf7ebb59b6352a7b714f757f8b613f91444",
-   "sourceType": "module",
-   "verdict": "accept",
-   "babel": {
-    "class": "accept",
-    "errors": []
-   },
-   "oxc": {
-    "class": "accept",
-    "errors": [],
-    "errorsWithSemantic": []
-   }
-  },
-  {
-   "id": "nul/jsx-attr-dq-amp-ascii-before",
-   "sha256": "b97c8a0fcb4c9587b13f914be07dbbdc9a2e202e64dd74bbdef8bd9e716c3a26",
-   "sourceType": "module",
-   "verdict": "accept",
-   "babel": {
-    "class": "accept",
-    "errors": []
-   },
-   "oxc": {
-    "class": "accept",
-    "errors": [],
-    "errorsWithSemantic": []
-   }
-  },
-  {
-   "id": "nul/jsx-attr-dq-amp-nul-before",
-   "sha256": "3bb53cf3d625a0e178064581acab95ee6fca6519facfe871d48bc0d38d701db2",
-   "sourceType": "module",
-   "verdict": "accept",
-   "babel": {
-    "class": "accept",
-    "errors": []
-   },
-   "oxc": {
-    "class": "accept",
-    "errors": [],
-    "errorsWithSemantic": []
-   }
-  },
-  {
    "id": "nul/jsx-attr-dq-amp-nul-after",
    "sha256": "26d2524f0b78f5d2b0c5091e77516a9f3d1ba77e77d686b28d4cbd800e7a65cd",
    "sourceType": "module",
@@ -18965,7 +18920,7 @@
   },
   {
    "id": "nul/jsx-attr-dq-complete-entities",
-   "sha256": "bd69c13cd4f84260ad88c3770e2c2a9fc951faef62edc35dfb2ecf61923beaa9",
+   "sha256": "be47635387c4cf54fef4e8696717ec7a86460709f412165c5e45e8b88510d1c0",
    "sourceType": "module",
    "verdict": "accept",
    "babel": {
@@ -19054,51 +19009,6 @@
    }
   },
   {
-   "id": "nul/jsx-attr-sq-amp-bare",
-   "sha256": "c168c0669b059e066d97e36b64b4a4099f518a8f24f86a5ec2ee1e1f4e06620f",
-   "sourceType": "module",
-   "verdict": "accept",
-   "babel": {
-    "class": "accept",
-    "errors": []
-   },
-   "oxc": {
-    "class": "accept",
-    "errors": [],
-    "errorsWithSemantic": []
-   }
-  },
-  {
-   "id": "nul/jsx-attr-sq-amp-ascii-before",
-   "sha256": "dca5817db9ac6cfb72ae55803fdb570edbb8b28b8b85c9ef7143bae43511e824",
-   "sourceType": "module",
-   "verdict": "accept",
-   "babel": {
-    "class": "accept",
-    "errors": []
-   },
-   "oxc": {
-    "class": "accept",
-    "errors": [],
-    "errorsWithSemantic": []
-   }
-  },
-  {
-   "id": "nul/jsx-attr-sq-amp-nul-before",
-   "sha256": "a29463cf360e5208985e2d79cb7b6b5a7ad4b4d7b6dcb6cca320f1cd48870043",
-   "sourceType": "module",
-   "verdict": "accept",
-   "babel": {
-    "class": "accept",
-    "errors": []
-   },
-   "oxc": {
-    "class": "accept",
-    "errors": [],
-    "errorsWithSemantic": []
-   }
-  },
-  {
    "id": "nul/jsx-attr-sq-amp-nul-after",
    "sha256": "9bee1cf6d1c4617b4412fe5f42bbe55d065f2e9cf761dd519a75b564acfb62c7",
    "sourceType": "module",
@@ -19115,7 +19025,7 @@
   },
   {
    "id": "nul/jsx-attr-sq-complete-entities",
-   "sha256": "4de66d7b05edf684b3fc595e34f5479d381a7d4b8eb24a24bf09e5569483c053",
+   "sha256": "584d1074d0b45fdc223123dff1ad5a4c9b7a90b7bd22f8f811a1f6873b6752fb",
    "sourceType": "module",
    "verdict": "accept",
    "babel": {
