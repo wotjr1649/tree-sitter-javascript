@@ -391,6 +391,14 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
     lexer->result_symbol = AUTOMATIC_SEMICOLON;
     lexer->mark_end(lexer);
 
+    // A visible ASCII token cannot start ASI trivia; an included-range boundary can still end a statement.
+    int32_t c = lexer->lookahead;
+    if (c > 0 && c < 0x80 && c != '/' && !is_extra_space(c) && !lexer->is_at_included_range_start(lexer)) {
+        *at_next_token = true;
+        *try_ternary = c == '?';
+        return c == '}';
+    }
+
     ASITrivia trivia = {0};
     ASILookahead next = scan_asi_trivia(lexer, &trivia, valid_symbols[HTML_COMMENT], false, true, false);
     *at_next_token = !trivia.comment && !trivia.newline && next == ASI_NEXT_TOKEN;
