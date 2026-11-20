@@ -281,9 +281,15 @@ static ASILookahead scan_asi_trivia(TSLexer *lexer, ASITrivia *trivia, bool anne
 
 // shortcut: split at an ASI boundary; carry trivia across scans to support expression continuations.
 static ASILookahead scan_after_html_open(TSLexer *lexer, bool stop_at_range) {
-    scan_html_comment_body(lexer);
-    ASITrivia trivia = {0};
-    return scan_asi_trivia(lexer, &trivia, false, false, stop_at_range);
+    ASILookahead next;
+    do {
+        scan_html_comment_body(lexer);
+        ASITrivia trivia = {0};
+        next = scan_asi_trivia(lexer, &trivia, true, false, stop_at_range);
+    } while (next == ASI_HTML_OPEN || next == ASI_HTML_OPEN_AFTER_COMMENT);
+    // Preserve the existing ASI decision before an Annex B close comment.
+    if (next == ASI_HTML_CLOSE || next == ASI_HTML_AFTER_COMMENT) return ASI_DOUBLE_MINUS;
+    return next;
 }
 
 // The next character of an identifier name: ASCII letters and digits, `_`, `$`, `\` (an escape), and any other
