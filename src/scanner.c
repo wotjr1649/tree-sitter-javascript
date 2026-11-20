@@ -492,7 +492,7 @@ static bool scan_html_comment(TSLexer *lexer) {
         return false;
     }
 
-    while (!lexer->eof(lexer) && lexer->lookahead != '\n' && lexer->lookahead != 0x2028 &&
+    while (lexer->lookahead != 0 && lexer->lookahead != '\n' && lexer->lookahead != 0x2028 &&
            lexer->lookahead != 0x2029) {
         advance(lexer);
     }
