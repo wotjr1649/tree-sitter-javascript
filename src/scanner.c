@@ -1,7 +1,6 @@
 #include "tree_sitter/parser.h"
 
 #include <stdio.h>
-#include <wctype.h>
 
 enum TokenType {
     AUTOMATIC_SEMICOLON,
@@ -54,6 +53,20 @@ static bool scan_template_chars(TSLexer *lexer) {
     }
 }
 
+// White space and line terminators as the grammar's `extras` regex has them (extras_character_set_1 in parser.c).
+// Explicit, not iswspace: that differs between C runtimes (C locale, glibc, Windows UCRT).
+static bool is_extra_space(int32_t c) {
+    return (c >= '\t' && c <= '\r') || c == ' ' || c == 0xa0 || c == 0x1680 || (c >= 0x2000 && c <= 0x200b) ||
+           c == 0x2028 || c == 0x2029 || c == 0x202f || c == 0x205f || c == 0x2060 || c == 0x3000 || c == 0xfeff;
+}
+
+// Blank in a JSX text line: ASCII white space only (the C locale's iswspace). Any other character is text, as in Babel,
+// which trims only spaces and tabs: U+00A0, U+3000, U+200B, U+FEFF and the others are content, not layout.
+static bool is_jsx_space(int32_t c) { return (c >= '\t' && c <= '\r') || c == ' '; }
+
+// ASCII, not iswdigit: that matches non-ASCII digits on some C runtimes.
+static bool is_digit(int32_t c) { return c >= '0' && c <= '9'; }
+
 typedef enum {
     REJECT,     // Semicolon is illegal, ie a syntax error occurred
     NO_NEWLINE, // Unclear if semicolon will be legal, continue
@@ -67,7 +80,7 @@ static WhitespaceResult scan_whitespace_and_comments(TSLexer *lexer, bool *scann
     bool saw_block_newline = false;
 
     for (;;) {
-        while (iswspace(lexer->lookahead)) {
+        while (is_extra_space(lexer->lookahead)) {
             skip(lexer);
         }
 
@@ -112,13 +125,6 @@ static WhitespaceResult scan_whitespace_and_comments(TSLexer *lexer, bool *scann
     }
 }
 
-// White space and line terminators as the grammar's `extras` regex has them (extras_character_set_1 in parser.c).
-// Explicit, not iswspace: that differs between C runtimes.
-static bool is_extra_space(int32_t c) {
-    return (c >= '\t' && c <= '\r') || c == ' ' || c == 0xa0 || c == 0x1680 || (c >= 0x2000 && c <= 0x200b) ||
-           c == 0x2028 || c == 0x2029 || c == 0x202f || c == 0x205f || c == 0x2060 || c == 0x3000 || c == 0xfeff;
-}
-
 // The next character of an identifier name: ASCII letters and digits, `_`, `$`, `\` (an escape), and any other
 // non-ASCII character that is not white space. ASCII comparisons, not isw*: those differ between C runtimes.
 static bool is_identifier_part(int32_t c) {
@@ -157,7 +163,7 @@ static bool semicolon_before_next_token(TSLexer *lexer, const bool *valid_symbol
         // Insert a semicolon before decimals literals but not otherwise.
         case '.':
             skip(lexer);
-            return iswdigit(lexer->lookahead);
+            return is_digit(lexer->lookahead);
 
         // Insert a semicolon before `--` and `++`, but not before binary `+` or `-`.
         case '+':
@@ -238,7 +244,7 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
             break;
         }
 
-        if (!iswspace(lexer->lookahead)) {
+        if (!is_extra_space(lexer->lookahead)) {
             return false;
         }
 
@@ -262,7 +268,7 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
 
 static bool scan_ternary_qmark(TSLexer *lexer) {
     for (;;) {
-        if (!iswspace(lexer->lookahead)) {
+        if (!is_extra_space(lexer->lookahead)) {
             break;
         }
         skip(lexer);
@@ -280,7 +286,7 @@ static bool scan_ternary_qmark(TSLexer *lexer) {
 
         if (lexer->lookahead == '.') {
             advance(lexer);
-            if (iswdigit(lexer->lookahead)) {
+            if (is_digit(lexer->lookahead)) {
                 return true;
             }
             return false;
@@ -291,7 +297,7 @@ static bool scan_ternary_qmark(TSLexer *lexer) {
 }
 
 static bool scan_html_comment(TSLexer *lexer) {
-    while (iswspace(lexer->lookahead) || lexer->lookahead == 0x2028 || lexer->lookahead == 0x2029) {
+    while (is_extra_space(lexer->lookahead)) {
         skip(lexer);
     }
 
@@ -383,7 +389,7 @@ static bool scan_jsx_text(TSLexer *lexer) {
             at_newline = false;
             continue;
         }
-        bool is_wspace = iswspace(lexer->lookahead);
+        bool is_wspace = is_jsx_space(lexer->lookahead);
         if (lexer->lookahead == '\n') {
             at_newline = true;
         } else {
