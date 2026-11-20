@@ -5,12 +5,78 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [3.1.0] - 2026-11-21
+
+This minor release adds JSX reserved-word names and fixes U+0000 handling (#20, #45). The Windows comparison
+with v3.0.0 covered 57,113 records across the default inputs (corpus, examples, highlights, tags and oracle),
+the fixed N-of-M set, and the 54,596 pinned inputs labeled valid by Discovery. It found zero changed clean CSTs
+and zero clean-to-error records for valid inputs. For the release's SemVer rule, valid input is input accepted
+by both `@babel/parser` and `oxc-parser` as pinned in `oracle/`. Discovery also includes positive tests based on
+test262 metadata. The grammar is `javascript`, the C entry point is `tree_sitter_javascript`, the parser ABI is 15,
+and `src/node-types.json` is byte-identical to v3.0.0.
+
+### Added
+
+- Accept reserved words in JSX tag and attribute names, including namespace components and member names.
+  Examples include `<const />`, `<a extends="y" />`, `<svg:true />` and `<super.Foo />` (#20, #54).
+
+### Fixed
+
+- Parse U+0000 in string literals and their escape sequences, template literals, regular-expression patterns,
+  line and block comments, hashbang comments, JSX text, and quoted JSX attributes (#45, #48).
+- Parse a JSX attribute entity candidate interrupted by U+0000 as a `string_fragment` in either quote style.
+  Complete entities retain `html_character_reference`. Preserve the v3.0.0 tokenization when a bare `&`
+  precedes a closing attribute quote (#45, #48, #53).
+- In the Windows comparison, 80 default, 83 N-of-M and four Discovery records moved from error to clean.
+  Both reference parsers accept all 167. The Discovery records are one test262 template literal and three
+  test262 regular-expression tests containing U+0000. Fifteen records that still report errors have
+  different recovery CSTs.
+
+### Changed
+
+- A bare brace attribute requires a spread (`<a {...props} />`), and a braced attribute value requires a
+  non-empty expression (`<a x={value} />`). Previously accepted invalid forms such as `<a {x} />` and
+  `<a x={} />` now give errors. Empty and comment-only brace expressions are still allowed as children.
+  The two clean-to-error records in the Windows comparison contain the same empty-valued attribute in
+  different source contexts. Both reference parsers reject both records (#20, #54).
+- The manifests and their own lockfile entries carry version 3.1.0. The generated parser metadata carries the
+  same version. The release gate baselines were refreshed. The node-type snapshot checks kind, field, field-type
+  and supertype-subtype removals. Direct `children` types and the `multiple` and `required` flags remain
+  outside its coverage (#38).
+- The generated `src/parser.c` is 3,427,488 bytes (+47,644 bytes, +1.41% from v3.0.0) with 2,263 states
+  (+7, +0.31%). Consumers that persist numeric symbol IDs should refresh them when switching parsers.
+- tree-sitter-typescript vendors this grammar. Apply its matching grammar and scanner changes when vendoring
+  v3.1.0. Those changes are handed to tree-sitter-typescript separately.
 
 ### Known limitations
 
+- HTML-like comments use the v3.0.0 scanner behavior. U+0000 in an HTML-like comment still gives an error.
+  A lone CR may still leave following code inside the comment. The HTML-like comment changes for CR and U+0000
+  are deferred to v4.0.0 (#46). Script-mode Annex B comment trees can differ from Babel.
+- Await and sloppy-script `yield` context handling remain open (#35). In non-async code,
+  `await (x)(y)` or `await[a]++` can parse as an await expression. In an async function, `await (a).x=b` can
+  still parse as an assignment involving the identifier `await`.
+- General ASI still misses some lone CRs (#17) and line terminators inside block comments (#39).
+  #46 also tracks ASI near comments that cuts off declarations, methods or fields, and missed breaks before
+  a standalone prefix update.
+- In both quote styles, U+0000 immediately followed by an ampersand at the end of a JSX attribute value
+  can still give an error. Both reference parsers accept the two corpus examples (#45, #53).
 - JSX opening and closing tag names are parsed independently, so pairs such as `<a></b>` and `<const></span>`,
   as well as mixed fragment and named tags, can parse without an error (#20).
+- Line-break cases involving `using` and `await using` remain in #18. In an async block, `await\nusing x = g();`
+  can parse as two statements even where the references reject it. A block comment with a line terminator
+  after `using` in a block or after `await using` in an async function can keep an assignment inside a
+  declaration. `await using` in a non-async function may still parse (#26). The early-error policy in ADR-0001
+  continues to cover cases such as a bare `using` declaration and duplicate import attribute keys.
+- Optional-chain assignment, update and destructuring targets remain accepted (#19). The invalid constructs
+  documented under v2.2.0 also include some import and export names, call assignment targets, line breaks in
+  async arrows, declarations in statement positions, arrows as operands, unparenthesized mixes of `??` with
+  `||` or `&&`, and some class heritage expressions.
+- The remaining Discovery areas include sloppy `yield` and `await` context, comment ASI, class
+  fields named `get` or `set` before a generator, static import attribute object and pair ranges, and Annex B
+  comment structure. The downstream pin and vendoring criteria remain open in #41.
+- TypeScript still accepts the `import x = a.class;` family (TS1359). The separate J8 TypeScript overrides and
+  inherited build template limitations (#22) continue to apply.
 
 ## [3.0.0] - 2026-11-20
 
@@ -577,6 +643,7 @@ Not fixed in 2.0.0; tracked as GitHub Issues where a number is given:
   build as `cp310-abi3`, and `make install` leaves the pkg-config description empty and prefixes absolute paths
   ([#22](https://github.com/wotjr1649/tree-sitter-javascript/issues/22)).
 
+[3.1.0]: https://github.com/wotjr1649/tree-sitter-javascript/compare/v3.0.0...v3.1.0
 [3.0.0]: https://github.com/wotjr1649/tree-sitter-javascript/compare/v2.2.0...v3.0.0
 [2.2.0]: https://github.com/wotjr1649/tree-sitter-javascript/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/wotjr1649/tree-sitter-javascript/compare/v2.0.0...v2.1.0
