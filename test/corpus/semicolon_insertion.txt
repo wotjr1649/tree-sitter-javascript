@@ -529,8 +529,6 @@ const x
 +y;
 using resource
 (work);
-var [z]
-/pattern/;
 
 ---
 
@@ -542,11 +540,42 @@ var [z]
   (using_declaration
     (variable_declarator name: (identifier)))
   (expression_statement
-    (parenthesized_expression (identifier)))
-  (variable_declaration
-    (variable_declarator name: (array_pattern (identifier))))
+    (parenthesized_expression (identifier))))
+
+============================================================
+A var array pattern requires an initializer before a regular expression
+============================================================
+
+var [z]
+/pattern/;
+
+---
+
+(program
+  (ERROR
+    (array_pattern (identifier)))
   (expression_statement
     (regex pattern: (regex_pattern))))
+
+============================================================
+A lexical array pattern requires an initializer before a regular expression
+:error
+============================================================
+
+let [x]
+/y/
+
+---
+
+============================================================
+A var object pattern requires an initializer before a parenthesized expression
+:error
+============================================================
+
+var {x}
+(y)
+
+---
 
 ============================================================
 The initializer of a for statement needs an explicit semicolon
@@ -555,5 +584,76 @@ The initializer of a for statement needs an explicit semicolon
 
 for (var x
   (y););
+
+---
+
+============================================================
+A line break does not end an initialized declaration in a for header
+:error
+============================================================
+
+for (let x = f()
+y;) {}
+
+---
+
+============================================================
+Recovery after a bare declaration followed by an incomplete unary expression
+============================================================
+
+let x
++;
+let next = 1;
+next();
+
+---
+
+(program
+  (lexical_declaration (variable_declarator name: (identifier)))
+  (ERROR)
+  (empty_statement)
+  (lexical_declaration (variable_declarator name: (identifier) value: (number)))
+  (expression_statement (call_expression function: (identifier) arguments: (arguments))))
+
+============================================================
+Recovery after a bare declaration followed by an unclosed regular expression
+============================================================
+
+let x
+/=
+let next = 1;
+next();
+
+---
+
+(program
+  (lexical_declaration (variable_declarator name: (identifier)))
+  (ERROR (regex_pattern))
+  (lexical_declaration (variable_declarator name: (identifier) value: (number)))
+  (expression_statement (call_expression function: (identifier) arguments: (arguments))))
+
+============================================================
+Recovery after a bare declaration followed by an unclosed parenthesized expression
+============================================================
+
+let x
+(y;
+let next = 1;
+next();
+
+---
+
+(program
+  (lexical_declaration (variable_declarator name: (identifier)))
+  (expression_statement (parenthesized_expression (identifier) (MISSING ")")))
+  (lexical_declaration (variable_declarator name: (identifier) value: (number)))
+  (expression_statement (call_expression function: (identifier) arguments: (arguments))))
+
+============================================================
+A CR line comment does not enable an await using object pattern
+:error
+============================================================
+
+await using {x}//comment= y
 
 ---

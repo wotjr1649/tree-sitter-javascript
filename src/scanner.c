@@ -169,8 +169,8 @@ static bool semicolon_before_next_token(TSLexer *lexer, const bool *valid_symbol
             return binding_end && !valid_symbols[LOGICAL_OR];
 
         case '(':
-            return declaration_end && !defer_declaration;
         case '`':
+            return declaration_end && !defer_declaration;
         case ',':
         case ':':
         case ';':
@@ -238,8 +238,8 @@ static bool semicolon_before_next_token(TSLexer *lexer, const bool *valid_symbol
 static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, bool *scanned_comment) {
     bool comment_condition = !valid_symbols[LOGICAL_OR];
     bool declaration_end = valid_symbols[DECLARATION_END] && comment_condition;
-    bool newline_in_comment = false;
-    bool *declaration_newline = declaration_end ? &newline_in_comment : NULL;
+    bool declaration_break = false;
+    bool *declaration_newline = declaration_end ? &declaration_break : NULL;
     bool comment_before_break = false;
     lexer->result_symbol = AUTOMATIC_SEMICOLON;
     lexer->mark_end(lexer);
@@ -253,7 +253,7 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
             WhitespaceResult result = scan_whitespace_and_comments(
                 lexer, scanned_comment, false, NULL, declaration_newline);
             if (result == REJECT) {
-                return newline_in_comment;
+                return declaration_break;
             }
 
             if (result == ACCEPT && comment_condition && lexer->lookahead != ',' && lexer->lookahead != '=') {
@@ -269,26 +269,28 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
             return true;
         }
 
-        if (is_asi_line_terminator(lexer->lookahead, declaration_end)) {
+        if (is_asi_line_terminator(lexer->lookahead, false)) {
             comment_before_break = *scanned_comment;
             skip(lexer);
             break;
         }
 
-        if (newline_in_comment) {
-            break;
+        // Keep the early comment check after a bare CR so it can end the declaration before the comment.
+        if (declaration_end && lexer->lookahead == '\r') {
+            declaration_break = true;
         }
 
         if (!is_extra_space(lexer->lookahead)) {
-            return false;
+            if (!declaration_break) return false;
+            break;
         }
 
         skip(lexer);
     }
 
     bool break_after_comment = false;
-    WhitespaceResult result = scan_whitespace_and_comments(
-        lexer, scanned_comment, true, &break_after_comment, declaration_newline);
+    // Once a break is known, keep the existing comment attachment and explicit-semicolon decisions.
+    WhitespaceResult result = scan_whitespace_and_comments(lexer, scanned_comment, true, &break_after_comment, NULL);
     bool defer = *scanned_comment && (comment_before_break || break_after_comment);
     if (result == REJECT) {
         return declaration_end && !defer;

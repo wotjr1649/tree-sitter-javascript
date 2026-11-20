@@ -367,14 +367,17 @@ module.exports = grammar({
       optional(choice($._initializer, $._declaration_end)),
     ),
 
-    variable_declarator: $ => seq(
+    _identifier_declarator: $ => seq(
       optional($._keyword_continues),
-      field('name', choice(
-        $.identifier,
-        alias('of', $.identifier),
-        $._destructuring_pattern,
-      )),
+      field('name', choice($.identifier, alias('of', $.identifier))),
       optional(choice($._initializer, $._declaration_end)),
+    ),
+
+    _using_declarator: $ => alias($._identifier_declarator, $.variable_declarator),
+
+    variable_declarator: $ => choice(
+      $._identifier_declarator,
+      seq(optional($._keyword_continues), field('name', $._destructuring_pattern), $._initializer),
     ),
 
     // A statement that starts with `{` is a block, never an object (ECMA-262: an ExpressionStatement cannot start with
@@ -1438,13 +1441,13 @@ module.exports = grammar({
 function usingDeclaration($, semicolon) {
   const kind = field('kind', choice('using', seq('await', 'using')));
   return choice(
-    seq(kind, commaSep1($.variable_declarator), semicolon),
+    seq(kind, commaSep1($._using_declarator), semicolon),
     // TypeScript reads `using as …` and `using satisfies …` as declarations; the static precedence keeps the
     // expression reading (`using as T`) from taking these names at the start of a statement.
     prec(1, seq(
       kind,
       alias($._using_keyword_declarator, $.variable_declarator),
-      repeat(seq(',', $.variable_declarator)),
+      repeat(seq(',', $._using_declarator)),
       semicolon,
     )),
   );
