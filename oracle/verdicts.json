@@ -32,7 +32,7 @@
    }
   },
   "cases_file": "cases.jsonl",
-  "cases_sha256": "9b23f1c39d797472a2f2ccaf92c477f80f7979bae3e1b9b766a826ed2ab4d271",
+  "cases_sha256": "2086ee2694461c879eacc317ab44605a48bcc19f32400a64937870c5c9c39648",
   "runner": "run.mjs",
   "runner_sha256": "06cfe49cd56d0bac9b5c672b1f62fc0f44b37de02c0a2bf04c557e5354c5c24d"
  },
@@ -22251,6 +22251,1506 @@
   {
    "id": "i49/await-operand-after-cr-line-comment",
    "sha256": "542774df195d77eca93143690f960f67c543e7c0516b45eba059db41455f862a",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/space",
+   "sha256": "107282a7687ba0c83ef38754a20b39f97dee0a23dc8d32bc186df6aafa5c705a",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/plain-block",
+   "sha256": "47fbbb556a85e1e71948e83f50c0ecd4bc0c1c23342eccd6b23d48a303b1d160",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/plain-chain",
+   "sha256": "8d8dc842df6780b4603c78c1e2e0e6555de72052013498d087bb8ce8e438e978",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/nul-block",
+   "sha256": "a8f1269f879af26275ac056dea4a054212bfb474adbd34f1e7b2908d356aea67",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/lf-in-block",
+   "sha256": "33ac6b6a8772591e1657841e929f0320f21109e4664387ce9908b54542c65c21",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/lf-after-star",
+   "sha256": "354f75a5e9bcd2733ef575ce73e492a3501d0fc8cf6d6d25d2bb23603a08676d",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/lf-before",
+   "sha256": "2e46ed5904301df759d759ecb7815592cf57d32d861beaa795fa881574eeb509",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/lf-nested-looking",
+   "sha256": "2c34cfeef24dd7c9fea51b2c8e49d7b7c7e3ea9419ad10136827106545711a2d",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/lf-after-two",
+   "sha256": "f33ca78efa8653867a8c672e95e050c0e2e4c092e8ba9dda0c0ef1a621ea26a4",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/lf-two-touching",
+   "sha256": "cafa16a19a1c7a81142eacc3a3a2e95bd9e3bb5570b8ef1cdf446e24cfae0f43",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/lf-two-with-leading",
+   "sha256": "00cfb7d6ea282a19e5c813d22469eb6ce8bb1b246ff40206d2a45bdd3848b09d",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/lf-break-then-break",
+   "sha256": "2222dd7de0d1c21edd4245591fc7d0d46b58d3046dc547d6fbb5882d7c5cd986",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/lf-line-block",
+   "sha256": "6f3dd77a2f61711f4cfe2dde31ef4ff88535c23f456b10381c256f114f997f72",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/lf-bom",
+   "sha256": "55f9f75cf931a2ac0ab2ac11eb5d5e42463eb11641609da0455d86aa39f9e39e",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/lf-nul-in-comment",
+   "sha256": "e2ba1a60986d0dbbbdbfa2615dde2c1de0df66c134920ea1e868dc42bf8c53b9",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/cr-in-block",
+   "sha256": "97b4d3f3abf240e978c64417507ff70361ab9032b7108e1c233c41260af38b37",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/cr-after-star",
+   "sha256": "a84e1eb1fe8f376f678ce8317dfd77be478dce8d6417876ca0bea6d74cce8caa",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/cr-before",
+   "sha256": "660460b8bc77f46da80cc551618c30ae09b4bb4873b52278c1c88a08927ceabd",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/cr-nested-looking",
+   "sha256": "daaa219b6559c954dcb920cace4e46db377f1aa3ca68aa4e8326de2b4c62854c",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/cr-after-two",
+   "sha256": "7597e7f53fb77acc8c9a1a2abf818e20f313a07fde8fa20fd620ea5fd6cd806e",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/cr-two-touching",
+   "sha256": "17340a43219f4cd2109fd816fbc0571c187bf9218f07842d26b0f09a6f743a77",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/cr-two-with-leading",
+   "sha256": "269e58e283ca85a384c3c80a074af8d491b70a74ced7eb89c6f84324eecf53cf",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/cr-break-then-break",
+   "sha256": "8328f566c97a919a5cf00ba02d673ae885b18589bdbb21d5033b9642795c338d",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/cr-line-block",
+   "sha256": "10d8260cb554750ace2f24cd49cf836235d59c9c364561fc35762d27073c25ba",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/cr-bom",
+   "sha256": "3f92fabcae6d0cce06d30ec71d094a783e604c42ba8aa12278bf4cd595032c66",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/cr-nul-in-comment",
+   "sha256": "d36238b77e87036046d4b4f27c4ffa67ff9c2542166e233744f1cf24a00e6713",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/crlf-in-block",
+   "sha256": "a9940c5450a33bef38882c5834a2145143e1414cf5b3a35c1db3e6c4e17e357a",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/crlf-after-star",
+   "sha256": "e7f0039f82998f6625fe2323514858bba456759b89098371caacb75033e1f936",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/crlf-before",
+   "sha256": "26730e96dd18712a9319ddc958e14d948a5231f9fc47056ace9b0bf7ffdb8f43",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/crlf-nested-looking",
+   "sha256": "2e9e0547e8b2a7fe3f670274cc01303fcfd5899313aec5f5661ecbcb24b511e8",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/crlf-after-two",
+   "sha256": "3a5791883b11174045b6550e87e42221a2532b6c0d099f1641608862da02300e",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/crlf-two-touching",
+   "sha256": "bd04306248ab3aa71b0bad747dfe895c56497f6ec10adb48637e1a5c21ad46cf",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/crlf-two-with-leading",
+   "sha256": "b0799045389e0d1f481dafb3e9d7cc36e7a736c69fcd383a4210f05ed0f079e8",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/crlf-break-then-break",
+   "sha256": "f3aeb8257f0b3636ae0d03368dd2ffac719dc26d11639f7e98902f0eda466e90",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/crlf-line-block",
+   "sha256": "db28e5f014cd2792db261b7a36a75c7003822de2d67c2e236e0f0f17e8c9267e",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/crlf-bom",
+   "sha256": "7b47e0d9f6d49fae897b06d71c52deb7e9322be48306a6b1e87c2bdf3019656a",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/crlf-nul-in-comment",
+   "sha256": "1b269c5e90df9b087a12e27b13190a067c757983a6dd1706dfc4484846267402",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/ls-in-block",
+   "sha256": "eb3e49e2c28fa77ac186fed85d581faf4fa1a077a044ef9fe9c086232d9c26ab",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/ls-after-star",
+   "sha256": "b2bc976874c5a302317d737e0796e4b4bc98e218838efeb7455ade137bf63935",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/ls-before",
+   "sha256": "3e7cc68b489ad1acd6ef93a4a4b1782c38926c49bc1e03080c6adc8648bab4b1",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/ls-nested-looking",
+   "sha256": "f6f2edc68fcfa44ef7f5a96f03721aec6dd7636fa11865e3f8f10c606220291c",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/ls-after-two",
+   "sha256": "80215d66b1417b961fbd0d32a0dc7fa8d581667fac72388b919eda2135826cf4",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/ls-two-touching",
+   "sha256": "459287f4280fc0433e9d4da0008a623a49fb8ed808f619f05f91c6ecb24df953",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/ls-two-with-leading",
+   "sha256": "f868cda4f1bd57508e5de57af122f81b100370bf74291000e2f0e4f52818ace6",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/ls-break-then-break",
+   "sha256": "2ccbd1fc46f0c055464787b6d383c40ba29d06531e754c14cf9bade6682c66c0",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/ls-line-block",
+   "sha256": "0eefdde0c773b0d8e2bdd42ff90589826e3164b3d023333620ffcff13056e7bb",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/ls-bom",
+   "sha256": "3bc5675b4a34b1255d2ecf06c82184a7b254947ae4cb70c2432be3431374d766",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/ls-nul-in-comment",
+   "sha256": "3c38b3ad0553e5041ab42e766dc61122dbb54100b0a9f3791ed6d377a58b7d26",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/ps-in-block",
+   "sha256": "48a9ba592d8ca6dfe65a5561e312475454ff456762c18fbbfa2e9b040bcd4d98",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/ps-after-star",
+   "sha256": "015814002abac3bcc40854159602601f66fb755b9f532ff15fc922e3c3bd4826",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/ps-before",
+   "sha256": "0b6769d75e1a37f599e9980cf5f4331abb3d6565e55978295077b8a2e74d3383",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/ps-nested-looking",
+   "sha256": "c948444ba09aca33487e6a541377a7c62ba64a446f8dca7d6d9597bfefb84d42",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/ps-after-two",
+   "sha256": "75dd615fac7ede823f8b2b168e8a57303665bac5455d9b69d25ca4b59c16579e",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/ps-two-touching",
+   "sha256": "d46f32ee9aad12ba501f460c27b7c20b049689c364e60002c240d954626126a9",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/ps-two-with-leading",
+   "sha256": "dc75db60f3b434a8f59a7e696eeab6ee987fdb01e2df30063f78ff265caccd22",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/ps-break-then-break",
+   "sha256": "9229ab594cd35d80e3d7ec0f871c872713e9e47883e4c6c242f6c06fed2160eb",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/ps-line-block",
+   "sha256": "05570b03460d991f80b9c95095f64286ed8b58a1e3e8709223a1d8e7cd954dd1",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/ps-bom",
+   "sha256": "ba11f24f6a168716d38b3e16eb8d2a19a767a776a03af1f5d79d01dc567bbd98",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/html-open/ps-nul-in-comment",
+   "sha256": "9e7cc1d16e646380c8819dd16091134f072d5cd3a449ec28198098711643b6c9",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/concise-minus-comment-lf",
+   "sha256": "7657980fa4549f1fbfd22a39db282698fbefb2801da934dcd4e2e756384bf8ed",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/concise-slash-lf",
+   "sha256": "2092d9d64e5d2e8dca103b6aeefdafb4423cf723f850fa9b414c9d230d2d7e41",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/concise-slash-comment-lf",
+   "sha256": "40ea175c51dd4399e1d1f116007a7bf492d782ccd7d29af57e74af39f2197101",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/concise-double-minus-comment-lf",
+   "sha256": "2e72cdd902f4d166561f3b08e9a394e8d11eb6adde1538fc0316bec7fa668eee",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/concise-annex-in-arrow-lf",
+   "sha256": "8e531ce22e060cf2cad5ebe3f3e2c11cdf2338fbf7d3f162aa7acf1b2500401e",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/concise-annex-open-in-arrow-lf",
+   "sha256": "4d12a5ed1360b3a98325e737a1ef1a48b9aa70bc3b7df76a726cdb8595e1781e",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/concise-minus-cr",
+   "sha256": "4b9d575450bb27f111c8201e8effe12f9aeb01db76ad35ff7ade4a3e4a5d0458",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/concise-minus-comment-cr",
+   "sha256": "beb3ad6dd50bbb9d19ec423b16ae43ad999e7340b2b4c50df3bdb98f299151e3",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/concise-slash-cr",
+   "sha256": "1dd84b679766d9ed0f5cc594b3c9a1fe33199843f976553d05c65cb9a9364845",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/concise-slash-comment-cr",
+   "sha256": "aba5f0e4ab4014ddbc6f0a93b8c581b8c042a39bbf75d3af08853eaa0851e82a",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/concise-double-minus-cr",
+   "sha256": "2d762f1c43f4bab288879e5d5a686458560c2b5618cc5e39f9a09154d9319eb2",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/concise-double-minus-comment-cr",
+   "sha256": "e55b1076e7f4447c72e29c402300fcb35f917a56f98f902e2c8655a5bdc7ede4",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/concise-annex-in-arrow-cr",
+   "sha256": "50f1389f702856c714e63e8573f005366b7e7ceef1223f26d758340d038c9d4f",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/concise-annex-open-in-arrow-cr",
+   "sha256": "72d5302264c139f0b1ec46a8e33a7987b6079e3a84ce93cc7a04aa64002d1141",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/concise-minus-crlf",
+   "sha256": "eb56a716b58929b5d992be81946a5f6e819a77e56bccd4193cc0901615641780",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/concise-minus-comment-crlf",
+   "sha256": "fc76e63115120ee20e0e51769cddbd4ef6d8278d3f55b35855e7894acc8ba4bf",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/concise-slash-crlf",
+   "sha256": "812d21b1e5e294b96f3b1e8d99a80a567135be4107351a967ae10dad85d8a168",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/concise-slash-comment-crlf",
+   "sha256": "deb496e6dbce87c26807dd1b65bf1c12a645604fd503e4f9f917e5ed25251c8d",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/concise-double-minus-crlf",
+   "sha256": "adb934e24a46fbbedb45cb650f710c8ab2c0c134cb46af559094af21ac903930",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/concise-double-minus-comment-crlf",
+   "sha256": "4382e04daef5aa689df7054ba50590227c3ba068070e53eb254da337c57497b0",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/concise-annex-in-arrow-crlf",
+   "sha256": "7f2f324a82451e25b6a8454675200c9ba23d067197e8368ab4e59e793c14ed4f",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/concise-annex-in-arrow-line-comment-crlf",
+   "sha256": "25069e4e1ce047d7a749518d13ab00dec8fef983be1a884db6eb22ca176bccef",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/concise-annex-open-in-arrow-crlf",
+   "sha256": "eded18ba58eb08ed8f9e57264f1c4232d0275690ee3480f353b4486fb568cab1",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/concise-minus-ls",
+   "sha256": "5981eff6c1e3b0bbef046600ab70b6db5bff6198881f9d8be6d0eeb18bed4c53",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/concise-minus-comment-ls",
+   "sha256": "e2039256033cf4213122075aa27c1f2b7995e982428a36209bea55f235ad1b26",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/concise-slash-ls",
+   "sha256": "7bc02d35e2d10c47a8dfb702ef3b07a451b45393455ed030a84d9b2f641124d7",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/concise-slash-comment-ls",
+   "sha256": "5854f249a5ef0ca8c1e759906cc32e5f2f31ce4baa1935acda12616b26aa7a08",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/concise-double-minus-ls",
+   "sha256": "3b1cefd9a0f7ec7db9385217979b9ada42965f1c1d7b42267361b1874c000cc2",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/concise-double-minus-comment-ls",
+   "sha256": "af817d0a261e20cd3b3d4b4bafeb26b47da90b4a67bcdf3341bcb90d8e14ae61",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/concise-annex-in-arrow-ls",
+   "sha256": "345b9485ee4f36b131faadab593ae35e6d6bcfec31fd93ba0e1cf160261b86a3",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/concise-annex-in-arrow-line-comment-ls",
+   "sha256": "c23f4a45b8f7bd657226b873861f6b8e92d9d0191e1d3e76913ac464b69bbbbb",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/concise-annex-open-in-arrow-ls",
+   "sha256": "212c0c5b23df239741b44f1ed1628af6fe3e8f2548652a597012cf439225df23",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/concise-minus-ps",
+   "sha256": "d624330c3901189b35ab161326d1458072805dafdc6be402d9b17d6ffd8466e5",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/concise-minus-comment-ps",
+   "sha256": "6c285d457800ad3e3e596dd67598122d6fc1d76735c5ca04b89fdb51a1737565",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/concise-slash-ps",
+   "sha256": "9148e2c776e815bd5e0c8d5fea5d8390ffad5ad2cfc1c0ded432f75708f490aa",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/concise-slash-comment-ps",
+   "sha256": "65a111ae44fc1012fc6b671d25156d138f7b584812394443a6e32ceff71a1fde",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/concise-double-minus-ps",
+   "sha256": "c7a8170ef97975f635f3517d2962048feff52a99ab7dda37599b0dfb458c925f",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/concise-double-minus-comment-ps",
+   "sha256": "7b2b50583281cede139e0ff8e18d45caa3fe841fb43071a091d20a2bfb6e8142",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/concise-annex-in-arrow-ps",
+   "sha256": "1472c32cb7c7957cb31507ced7c787ae074234963e4b678f015b933cc88d286c",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/concise-annex-in-arrow-line-comment-ps",
+   "sha256": "0bb0372e5f663f7d77d3e9efa025b116dd131be3f521778d6b57a605ac3fdcfb",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i55/concise-annex-open-in-arrow-ps",
+   "sha256": "158d0956c24d8400865242d29772e9e6d926f66144ab224a25483928fdf0ea33",
    "sourceType": "script",
    "verdict": "accept",
    "babel": {

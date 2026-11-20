@@ -151,6 +151,7 @@ typedef enum {
     ASI_DOUBLE_MINUS,
     ASI_HTML_CLOSE,
     ASI_HTML_OPEN,
+    ASI_HTML_OPEN_AFTER_COMMENT,
     ASI_HTML_AFTER_COMMENT,
     ASI_LESS_THAN,
     ASI_END,
@@ -179,10 +180,14 @@ static bool scan_html_open(TSLexer *lexer) {
     return true;
 }
 
-static bool finish_html_comment(TSLexer *lexer) {
+static void scan_html_comment_body(TSLexer *lexer) {
     while (!lexer->eof(lexer) && !is_line_terminator(lexer->lookahead)) {
         advance(lexer);
     }
+}
+
+static bool finish_html_comment(TSLexer *lexer) {
+    scan_html_comment_body(lexer);
     lexer->result_symbol = HTML_COMMENT;
     lexer->mark_end(lexer);
     return true;
@@ -224,8 +229,9 @@ static ASILookahead scan_asi_trivia(TSLexer *lexer, ASITrivia *trivia, bool anne
             if (lexer->lookahead != '>') return ASI_DOUBLE_MINUS;
             // Lex a preceding line comment separately before taking the Annex B token.
             return block_terminator || line_prefix ? ASI_HTML_CLOSE : ASI_HTML_AFTER_COMMENT;
-        } else if (c == '<' && line_prefix && !trivia->comment) {
-            return scan_html_open(lexer) ? ASI_HTML_OPEN : ASI_LESS_THAN;
+        } else if (c == '<' && annex_comments && trivia->newline) {
+            if (!scan_html_open(lexer)) return ASI_LESS_THAN;
+            return trivia->comment ? ASI_HTML_OPEN_AFTER_COMMENT : ASI_HTML_OPEN;
         } else if (c != '/') {
             return ASI_NEXT_TOKEN;
         } else {
@@ -269,6 +275,13 @@ static ASILookahead scan_asi_trivia(TSLexer *lexer, ASITrivia *trivia, bool anne
             trivia->comment = true;
         }
     }
+}
+
+// shortcut: split at an ASI boundary; carry trivia across scans to support expression continuations.
+static ASILookahead scan_after_html_open(TSLexer *lexer, bool stop_at_range) {
+    scan_html_comment_body(lexer);
+    ASITrivia trivia = {0};
+    return scan_asi_trivia(lexer, &trivia, false, false, stop_at_range);
 }
 
 // The next character of an identifier name: ASCII letters and digits, `_`, `$`, `\` (an escape), and any other
@@ -379,6 +392,10 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
     *at_next_token = !trivia.comment && !trivia.newline && next == ASI_NEXT_TOKEN;
     *try_ternary = !trivia.comment && next == ASI_NEXT_TOKEN && lexer->lookahead == '?';
     if (next == ASI_HTML_AFTER_COMMENT) return false;
+    if (next == ASI_HTML_OPEN_AFTER_COMMENT) {
+        next = scan_after_html_open(lexer, true);
+        trivia = (ASITrivia){.newline = true};
+    }
     if (next == ASI_HTML_CLOSE || next == ASI_HTML_OPEN) {
         return finish_html_comment(lexer);
     }
@@ -656,6 +673,11 @@ bool tree_sitter_javascript_external_scanner_scan(void *payload, TSLexer *lexer,
         ASILookahead next = scan_asi_trivia(lexer, &trivia, valid_symbols[HTML_COMMENT], false, false);
         if (next == ASI_HTML_AFTER_COMMENT) return false;
         if (next == ASI_HTML_CLOSE || next == ASI_HTML_OPEN) return finish_html_comment(lexer);
+        if (next == ASI_HTML_OPEN_AFTER_COMMENT) {
+            next = scan_after_html_open(lexer, false);
+            if (next != ASI_END && !semicolon_before_lookahead(lexer, valid_symbols, next, false, false)) return false;
+            return leave_context(scanner, lexer, LEAVE_CONCISE_BODY);
+        }
         if (next == ASI_END || (next == ASI_NEXT_TOKEN && at_concise_body_end(lexer)) ||
             (trivia.newline && semicolon_before_lookahead(lexer, valid_symbols, next, false, false))) {
             return leave_context(scanner, lexer, LEAVE_CONCISE_BODY);
