@@ -37,11 +37,16 @@ module.exports = grammar({
     $.regex_pattern,
     $.jsx_text,
     // Never produced: the scanner only reads whether they are valid, to tell apart parse states that look the same to
-    // it when it decides on an automatic semicolon. Valid after a class field name or a binding without initializer...
+    // it when it decides on an automatic semicolon. Valid after a class field name without an initializer...
     $._binding_end,
     // ...and after a keyword that may still go on: before a declarator (`let`, `using`) or a property name (`get`,
     // `set`, `static`, `async` in a class), after `await` and `yield`.
     $._keyword_continues,
+    // Never produced: the scanner only reads whether it is valid, after `return`, `break`, `continue` and a label, where a
+    // lone CR ends the statement like any other line terminator (ECMA-262 12.9.1: no LineTerminator here).
+    $._restricted_keyword,
+    // A declaration without an initializer can end before an opening parenthesis on the next line.
+    $._declaration_end,
   ],
 
   extras: $ => [
@@ -80,6 +85,8 @@ module.exports = grammar({
     $._lhs_expression,
     $._keyword_identifier,
     $._jsx_keyword_identifier,
+    $._await_operand,
+    $._postfix_expression,
   ],
 
   precedences: $ => [
@@ -106,13 +113,17 @@ module.exports = grammar({
       $.arrow_function,
     ],
     ['assign', $.primary_expression],
-    ['member', 'template_call', 'new', 'call', $.expression],
+    // Postfix operators can extend the operand before await reduces.
+    ['member', 'template_call', 'new', 'call', $.update_expression, 'unary_void', $.expression],
     ['declaration', 'literal'],
     [$.primary_expression, $.statement_block, 'object'],
     [$.meta_property, $.import],
     [$.import_statement, $.import],
     [$.export_statement, $.primary_expression],
     [$.lexical_declaration, $.primary_expression],
+    [$._for_lexical_declaration, $.primary_expression],
+    // `for await (let [a] of b)` has no lexical_declaration item to outrank `let` as an identifier: the declaration wins.
+    ['for_let', $.primary_expression],
     // Unlike `let [`, `using [` starts an expression: a using declaration binds identifiers only.
     [$.primary_expression, $.using_declaration],
     [$.primary_expression, $._for_using_declaration],
@@ -128,7 +139,6 @@ module.exports = grammar({
     [$.primary_expression, $.rest_pattern],
     [$.primary_expression, $.pattern],
     [$.primary_expression, $._for_header],
-    [$.variable_declarator, $._for_header],
     [$.array, $.array_pattern],
     [$.object, $.object_pattern],
     [$.assignment_expression, $.pattern],
@@ -147,7 +157,7 @@ module.exports = grammar({
       repeat($.statement),
     ),
 
-    hash_bang_line: _ => /#!.*/,
+    hash_bang_line: _ => /#![^\r\n\u2028\u2029]*/,
 
     //
     // Export declarations
@@ -171,6 +181,9 @@ module.exports = grammar({
             'default',
             choice(
               field('declaration', $.declaration),
+              // An anonymous function or class here is a declaration (ECMA-262 16.2.3), not an expression statement:
+              // what follows, ';' included, is the next statement.
+              prec(1, field('value', choice($.function_expression, $.generator_function, $.class))),
               seq(
                 field('value', $.expression),
                 $._semicolon,
@@ -341,38 +354,45 @@ module.exports = grammar({
 
     using_declaration: $ => usingDeclaration($, $._semicolon),
 
-    // A plain `for` initializer ends at a real `;`: the automatic semicolon is never inserted in a `for` header.
+    _for_variable_declaration: $ => seq('var', commaSep1($.variable_declarator), ';'),
+
+    _for_lexical_declaration: $ => seq(field('kind', choice('let', 'const')), commaSep1($.variable_declarator), ';'),
+
     _for_using_declaration: $ => usingDeclaration($, ';'),
 
-    // One symbol for the declaration initializers of a plain `for`: the parse states of the rest of the header and
-    // the body are built once for all three, not once per declaration rule.
+    // A plain `for` initializer ends at a real `;`. Share the states after the declaration across all three forms.
     _for_declaration: $ => choice(
-      $.lexical_declaration,
-      $.variable_declaration,
+      alias($._for_lexical_declaration, $.lexical_declaration),
+      alias($._for_variable_declaration, $.variable_declaration),
       alias($._for_using_declaration, $.using_declaration),
     ),
 
     _using_keyword_declarator: $ => seq(
       field('name', alias(choice('as', 'satisfies'), $.identifier)),
-      optional($._initializer),
+      optional(choice($._initializer, $._declaration_end)),
     ),
 
-    variable_declarator: $ => seq(
+    _identifier_declarator: $ => seq(
       optional($._keyword_continues),
-      field('name', choice(
-        $.identifier,
-        alias('of', $.identifier),
-        $._destructuring_pattern,
-      )),
-      optional(choice($._initializer, $._binding_end)),
+      field('name', choice($.identifier, alias('of', $.identifier))),
+      optional(choice($._initializer, $._declaration_end)),
     ),
 
-    statement_block: $ => prec.right(seq(
+    _using_declarator: $ => alias($._identifier_declarator, $.variable_declarator),
+
+    variable_declarator: $ => choice(
+      $._identifier_declarator,
+      seq(optional($._keyword_continues), field('name', $._destructuring_pattern), $._initializer),
+    ),
+
+    // A statement that starts with `{` is a block, never an object (ECMA-262: an ExpressionStatement cannot start with
+    // `{`). `{a:0}` reads both ways; `labeled_statement` has dynamic precedence -1, so the block needs more than 1 to win.
+    statement_block: $ => prec.dynamic(2, prec.right(seq(
       '{',
       repeat($.statement),
       '}',
       optional($._automatic_semicolon),
-    )),
+    ))),
 
     else_clause: $ => seq('else', $.statement),
 
@@ -435,7 +455,7 @@ module.exports = grammar({
               )),
               optional($._initializer),
             ),
-            seq(
+            prec('for_let', seq(
               field('kind', choice('let', 'const')),
               field('left', choice(
                 $.identifier,
@@ -443,20 +463,28 @@ module.exports = grammar({
                 $._destructuring_pattern,
               )),
               optional($._automatic_semicolon),
-            ),
+            )),
           ),
           field('operator', choice('in', 'of')),
         ),
         // A using declaration starts a `for…of` head only: `for…in` passes ~Using to ForDeclaration (ECMA-262 §14.7.5).
         seq(
-          field('kind', choice(
-            'using',
-            seq('await', 'using'),
+          field('kind', 'using'),
+          field('left', choice(
+            $.identifier,
+            // Not `of`: `for (using of of[0])` is the expression `using` over `of[0]` (the grammar has [lookahead ≠ using of]).
+            // In TypeScript, `using as` and `using satisfies` can also start an expression, so these lex as keywords.
+            alias(choice('as', 'satisfies'), $.identifier),
+            $._destructuring_pattern,
           )),
+          optional($._automatic_semicolon),
+          field('operator', 'of'),
+        ),
+        seq(
+          field('kind', seq('await', 'using')),
           field('left', choice(
             $.identifier,
             alias('of', $.identifier),
-            // In TypeScript, `using as` and `using satisfies` can also start an expression, so these lex as keywords.
             alias(choice('as', 'satisfies'), $.identifier),
             $._destructuring_pattern,
           )),
@@ -498,12 +526,14 @@ module.exports = grammar({
     break_statement: $ => seq(
       'break',
       field('label', optional(alias($.identifier, $.statement_identifier))),
+      optional($._restricted_keyword),
       $._semicolon,
     ),
 
     continue_statement: $ => seq(
       'continue',
       field('label', optional(alias($.identifier, $.statement_identifier))),
+      optional($._restricted_keyword),
       $._semicolon,
     ),
 
@@ -514,6 +544,7 @@ module.exports = grammar({
 
     return_statement: $ => seq(
       'return',
+      optional($._restricted_keyword),
       optional($._expressions),
       $._semicolon,
     ),
@@ -925,7 +956,7 @@ module.exports = grammar({
 
     call_expression: $ => choice(
       prec('call', seq(
-        field('function', choice($.expression, $.import)),
+        field('function', choice($.expression, $._postfix_expression, $.import)),
         field('arguments', $.arguments),
       )),
       prec('template_call', seq(
@@ -945,14 +976,27 @@ module.exports = grammar({
       field('arguments', optional(prec.dynamic(1, $.arguments))),
     )),
 
-    await_expression: $ => prec('unary_void', seq(
+    // Prefer the keyword interpretation when await has a unary operand.
+    // A direct assignment is outside that operand, so `await(a).x=b` retains its identifier interpretation.
+    await_expression: $ => prec.dynamic(1, prec('unary_void', seq(
       'await',
       optional($._keyword_continues),
-      $.expression,
-    )),
+      $._await_operand,
+    ))),
+
+    _await_operand: $ => choice(
+      $.primary_expression,
+      $._jsx_element,
+      $.await_expression,
+      $.unary_expression,
+      $.update_expression,
+      $.new_expression,
+    ),
+
+    _postfix_expression: $ => choice($.primary_expression, $.new_expression, $._jsx_element),
 
     member_expression: $ => prec('member', seq(
-      field('object', choice($.expression, $.primary_expression, $.import)),
+      field('object', choice($.expression, $._postfix_expression, $.import)),
       choice('.', field('optional_chain', $.optional_chain)),
       field('property', choice(
         $.private_property_identifier,
@@ -964,7 +1008,7 @@ module.exports = grammar({
     )),
 
     subscript_expression: $ => prec.right('member', seq(
-      field('object', choice($.expression, $.primary_expression)),
+      field('object', choice($.expression, $._postfix_expression)),
       optional(field('optional_chain', $.optional_chain)),
       '[', field('index', $._expressions), ']',
     )),
@@ -1070,7 +1114,7 @@ module.exports = grammar({
 
     update_expression: $ => prec.left(choice(
       seq(
-        field('argument', $.expression),
+        field('argument', choice($.expression, $.primary_expression)),
         field('operator', choice('++', '--')),
       ),
       seq(
@@ -1390,7 +1434,7 @@ module.exports = grammar({
       ']',
     ),
 
-    _reserved_identifier: _ => choice(...CONTEXTUAL_KEYWORDS),
+    _reserved_identifier: _ => choice(...CONTEXTUAL_KEYWORDS.filter(word => word !== 'export')),
 
     // `this`, `super`, `true`, `false` and `null` are named token rules: listing their strings here would turn
     // each into a non-terminal with an anonymous child, so the rules themselves are used instead.
@@ -1415,13 +1459,13 @@ module.exports = grammar({
 function usingDeclaration($, semicolon) {
   const kind = field('kind', choice('using', seq('await', 'using')));
   return choice(
-    seq(kind, commaSep1($.variable_declarator), semicolon),
+    seq(kind, commaSep1($._using_declarator), semicolon),
     // TypeScript reads `using as …` and `using satisfies …` as declarations; the static precedence keeps the
     // expression reading (`using as T`) from taking these names at the start of a statement.
     prec(1, seq(
       kind,
       alias($._using_keyword_declarator, $.variable_declarator),
-      repeat(seq(',', $.variable_declarator)),
+      repeat(seq(',', $._using_declarator)),
       semicolon,
     )),
   );

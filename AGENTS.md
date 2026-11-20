@@ -17,7 +17,7 @@ origin's v0.25.0 is commit `44c892e` in this history, kept as `refs/upstream/v0.
   ASCII-only digit checks for character references (J1b), so it no longer equals that record's result; v1.0.0 kept the
   origin's scanner and left that patch in go-treesitter, which retires it only in a later, separately approved pin move
   to a release containing the fix (its ADR-0024 7.6).
-- Manifests, their lockfiles' own entries and `tree-sitter.json` `metadata.version` carry the release version (2.2.0
+- Manifests, their lockfiles' own entries and `tree-sitter.json` `metadata.version` carry the release version (3.0.0
   now); CLI 0.27.2 compiles `metadata.version` into `parser.c` (`.metadata`), so regenerate `src/` after changing it.
 - Releases are `vMAJOR.MINOR.PATCH` (first independent `v2.0.0` after the `v1.0.0` baseline), each an annotated tag plus
   a GitHub Release without binaries (ADR-0001 amendment 2026-11-19). SemVer: breaking (major) means a node kind, field

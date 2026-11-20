@@ -5,6 +5,162 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.0] - 2026-11-20
+
+This major release changes trees for inputs that already parsed cleanly in v2.2.0 and are accepted by the pinned
+`@babel/parser` and `oxc-parser`. The grammar name, the C entry point and ABI 15 are preserved. The Windows
+comparison with v2.2.0 covered 57,005 records across the release's default inputs (corpus, examples, highlight,
+tags and oracle), the fixed N-of-M set and the 54,596 pinned inputs labeled valid by Discovery, including seven
+Annex B tests accepted only by Babel. Of 355 changed clean trees, 353 agree with the Babel 8.1.2 structure
+comparison. The other two records are copies of the `Objects` fixture, which both reference parsers reject
+as a whole. The two changed labeled blocks in each copy agree with Babel in isolation. Both reference parsers
+reject all 12 clean-to-error records. In the same comparison, 596 records moved from error to clean and 13
+changed their recovery tree.
+
+### Breaking changes
+
+- Calls, member accesses and subscripts can move under `await_expression`. A `for await` declaration with an
+  array binding now has an `array_pattern` on the left (#32).
+- Default-exported functions, generators and classes can appear in `export_statement.value`. Their trailing
+  semicolon becomes a sibling `empty_statement`. Export, restricted-statement and hashbang boundaries also
+  change, as does the tree for `for (using of of [1, 2]);` (#33).
+- Braces at the start of a statement and in an unparenthesized arrow body can form a block with a labeled
+  statement. A trailing semicolon after the block is its own `empty_statement` (#34).
+- Explicit character classes change lookahead and JSX text trees that depended on Windows UCRT (#42, #16).
+  Declaration ASI across CR and consecutive comments changes declaration ranges and comment attachment (#44, #43).
+
+### Fixed
+
+- Parse ambiguous calls, member accesses and subscripts as await operands in forms such as `await (x)(y)` (#32).
+  Keep `await(a).x=b` and `await[a].x ??= b` as assignments to an expression involving the identifier `await`.
+- Parse `let [a]` in `for await (let [a] of b)` as an array binding pattern (#32).
+- Parse the semicolon after a default-exported function, generator or class as a separate `empty_statement`, for
+  example in `export default function(){};` (#33). An anonymous default-exported declaration can end without a
+  semicolon before the next statement, as in `export default function(){}{}`. In `export default function(){}\n(1)`,
+  `(1)` is a separate expression statement. A line break after `export` can precede an export clause or declaration
+  (`export\n{}`, `export\nvar a`), keeping both lines in one `export_statement`.
+- Honor automatic semicolon insertion for restricted statements using the `_restricted_keyword` scanner marker
+  (#33). A lone CR, including one in a block comment, can end a `return`, `break` or `continue` statement before
+  its expression or label. For example, `return\r0` is a bare return followed by an expression statement.
+- Treat the first `using` in `for (using of of [1, 2]);` as the loop's identifier and `of [1, 2]` as the right-hand
+  subscript expression (#33). `for (using of of);` now parses, and `for (using of of y);` now gives a syntax error.
+  The `of` binding in `for (await using of of y);` is still a declaration.
+- End hashbang comments at CR, U+2028 (LS) and U+2029 (PS) as well as LF (#33). The next statement or comment is
+  parsed separately, and the range of a CRLF-terminated `hash_bang_line` excludes the CR.
+- Parse `{a:0}` at the start of a statement and in an arrow body such as `() => {a:0}` as a `statement_block`
+  containing a `labeled_statement` (#34). In `{a:0};`, the semicolon is a separate `empty_statement`. Expression
+  positions such as `({a:0})` and `() => ({a:0})` still contain an `object`.
+- Use explicit code-point classes for scanner whitespace and ASCII digits (#42, #16). On Windows, U+FEFF is treated
+  as whitespace in scanner lookahead, and supplementary-plane code points keep their full value instead of being
+  truncated to 16 bits. The block comment in `a\r\uFEFF/*c*/\n` now lies outside the expression statement. When EOF
+  immediately follows `*/`, the comment remains inside the expression statement. Other affected inputs include
+  `a\n\u{12000}(b)` and `a?.\u{10030}b`. With the new scanner, trees for the compared inputs were identical in
+  Windows UCRT, C locale emulation and glibc-like emulation.
+- Count only ASCII whitespace (U+0009 through U+000D and U+0020) when checking for blank JSX text lines (#42, #16).
+  Lines containing only U+00A0 or U+3000 now yield `jsx_text`. A line break before a comment is also retained for
+  semicolon insertion in `let x\n/**/[y]` and `let x\n\uFEFF/**/[y]`, which now parse as declarations followed by
+  separate array expressions. The ASCII form previously recovered with an error.
+- Insert an automatic semicolon after an uninitialized identifier declaration before a next-line `(`, `+`, `-`,
+  regular expression or template literal (#44, #43). The 2,417 inputs of #42's 28,628-input family that regressed in
+  the #42 comparison parse again. The #44 checks covered Windows UCRT, C-locale emulation and glibc-like
+  emulation.
+- Require an explicit semicolon after a declaration initializer in a plain `for (;;)` header, preserving the
+  public declaration kind in the `initializer` field. Ordinary array and object binding patterns require an
+  initializer. For example, `var [z]\n/pattern/;` reports an error, while `for (var [x] of y) {}` still uses the
+  dedicated loop binding grammar (#44).
+
+### Changed
+
+- In Script mode, Babel reads `await++\n(a)(b);` and `await/*\n*/++(a).x;` as two statements. In Module mode,
+  Babel reports `InvalidLhs` for the first input and reads the second as one `AwaitExpression` statement.
+  This grammar still reads each as one statement and now parses it as an `await_expression` (#32).
+- `await(a)(b;` still has a missing closing parenthesis, now in a call inside the await operand (#32). This also
+  applies across line breaks in `await(a)\n(b;\nx();`. In `await[a]?.[;` the `ERROR` still covers bytes [8, 11),
+  and the preceding `subscript_expression` becomes an `await_expression` with an array operand.
+- `for await(let [a] of) {}` still has a missing right-hand identifier and now has an array pattern on the left (#32).
+- `for await (let[0] of b)` now has a syntax error because `0` cannot bind a declaration (#32).
+- `for await (let[a] in b)` still parses without an error and now has an array pattern on the left (#32).
+- In async code, `await a=b` and `await a+=b` now produce a syntax error (#32).
+- Recovery for `new f() = 1;` places the call under the constructor. Recovery for `a?.delete(;` places an
+  `ERROR` at the opening parenthesis (#32).
+- Invalid `await using [] = null;` recovers as an assignment with an `ERROR` over `using []`. An invalid
+  initializer in `for await (let [x] = 0 of [])` puts the array pattern inside the `ERROR` node (#32).
+- `export default function(){}()` and uses of `export` as an identifier such as `export;`, `export = 1` and
+  `export: 1` now produce syntax errors (#33).
+- Recovery changes for invalid export attributes such as `export {a} from 'x' with {['type']: 'json'};` and for
+  `for (using of of y)` (#33). In `export {a}\nwith {a:1}`, `with` retains its `ERROR` range and the following
+  braces recover as a labeled block. The same block recovery applies to invalid standalone `else{a:0}` and
+  `case 1:{a:0}` (#34).
+- Checking only ASCII digits after `.` and `?.` changes syntax-error outcomes and recovery trees on Windows
+  (#42, #16). For example, `a?.\u0660b` previously produced an error and now produces a `member_expression`.
+- In Script input such as `\u{12000}<!-- comment\nright`, Windows previously skipped the supplementary-plane
+  character and produced an `html_comment`. The scanner now preserves the character and the grammar produces a
+  `binary_expression`. Babel's Script parse treats `<!--` as a comment in this case (#42, #16).
+- In `src/node-types.json`, `await_expression` still has one required direct child. Its declared types narrow from
+  `expression` to `primary_expression`, `await_expression`, `unary_expression`, `update_expression`, `new_expression`,
+  `jsx_element` and `jsx_self_closing_element` (#32). Expanding the supertypes excludes direct assignments, augmented
+  assignments, binary expressions, ternaries and yield expressions. These can still be reached inside parentheses.
+  `export_statement.value` adds `class`, `function_expression` and `generator_function` (#33).
+- Numeric symbol IDs shift after the addition of `_restricted_keyword` (#33) and `_declaration_end` (#44), among
+  other grammar changes. The first ID shifts for 95 of 114 visible named kinds, including `for_statement` from
+  171 to 177, `call_expression` from 219 to 225 and `property_identifier` from 278 to 285.
+- Bare declarations followed by CR and consecutive line and block comments now use the same ranges as Babel and
+  oxc, which changes comment attachment and can turn a following `empty_statement` into the declaration’s
+  semicolon (#44).
+- The manifests and generated parser metadata carry version 3.0.0. The node-kind snapshot adds three
+  `export_statement.value` types. The snapshot checks kind, field, field-type and supertype-subtype removals.
+  Direct `children` types and the `multiple` and `required` flags remain outside its coverage (#38).
+- The generated `src/parser.c` is 3,379,844 bytes (+50,947 bytes, +1.53% from v2.2.0) with 2,256 states
+  (+23, +1.03%). Both release gate baselines move to v3.0.0.
+
+### Migration
+
+- Recheck queries on `await_expression` that match the old direct children and descend through
+  `parenthesized_expression` where appropriate. For `export_statement`, account for the new `value` types and
+  the sibling `empty_statement` after a default-exported declaration. Check sibling-sensitive queries for
+  labeled blocks and declaration ASI too. Regenerate types derived from `node-types.json` and recompute stored
+  numeric symbol IDs from the new parser.
+- tree-sitter-typescript vendors this grammar and needs matching changes: the new external tokens
+  (`_binding_end`, `_keyword_continues`, `_restricted_keyword`, `_declaration_end`) in its scanner enum, the
+  await operand rules for its own expression forms, and a port of the #42 character classes to its own scanner.
+  They are handed to tree-sitter-typescript separately; until then, do not vendor this release there unchanged.
+
+### Known limitations
+
+- Await disambiguation does not yet track whether the enclosing context allows the keyword (#35).
+  In a non-async script or function body, `await (x)(y)`, `await (a).b()`, and `await [0].x` can parse as await
+  expressions even when `await` is an identifier. `await[a]++` can parse as an await of an update to the
+  array literal `[a]`. This also affects nested non-async functions and arrows, for example
+  `async function f(){return ()=>await(a)(b);}`. Conversely, `await (a).x=b` can still parse as an assignment
+  using the identifier `await` in an async function, where both reference parsers reject it.
+  Sloppy-script `yield` identifiers also remain open under #35.
+- General ASI still misses some lone CRs (#17) and line terminators inside block comments (#39). For example,
+  `a\rb` and `a /*\n*/ b` can give errors. #46 also tracks ASI around comments that cuts off a declaration,
+  method or field that should continue, and missed breaks before a standalone prefix update.
+- Some tokens containing U+0000 still give an error, including string literals, comments and regular expressions.
+  #45 tracks strings, templates, comments, regular expressions, hashbangs and HTML-like comments for v3.1.
+- JSX tag names are parsed independently of their matching opening or closing name (#20), so `<a></b>` parses
+  without an error. JavaScript still rejects valid JSX names such as `<const />`, `<a extends="y" />`,
+  `<extends />`, `<svg:true />` and `<super.Foo />`, because changing these rules conflicts with TSX.
+- Line-break cases involving `using` and `await using` remain in #18. In an async block, `await\nusing x = g();`
+  parses as two statements despite the reference parsers rejecting this form. In a non-async function in a Script,
+  the same split is valid. A block comment with a line terminator in `{ using /*\n*/ x = f(); }` or after
+  `await using` in an async function can keep the following assignment inside a `using_declaration`.
+  `await using` in a non-async function can still parse (#26). The existing early-error policy continues to allow
+  cases such as a bare identifier in a `using` declaration and duplicate import attribute keys.
+- Optional-chain assignment, update and destructuring targets remain accepted (#19). The remaining invalid
+  constructs documented under v2.2.0 also include certain import and export names, call assignment targets,
+  line breaks in async arrows, declarations in statement positions, arrows as operands, unparenthesized mixes
+  of `??` with `||` or `&&`, and some class heritage expressions.
+- The pinned Discovery run still reports 22 test262 A1 inputs. They include 11 sloppy `yield` cases, four
+  block-comment ASI cases, four NUL cases, two class fields named `get` or `set` before a generator, and one
+  Annex B HTML-comment case. The structure tool reports 75 test262 differences: 63 `yield` and two `await`
+  context cases, nine static import attribute object and pair ranges, and one Annex B HTML-like comment. The
+  Script interpretation of Annex B HTML-like comments can differ from Babel.
+  The downstream pin and vendoring criteria remain open in #41.
+- The TypeScript `import x = a.class;` family is still accepted by the TS grammar (TS1359). The separate J8
+  TypeScript overrides and inherited build template limitations (#22) continue to apply.
+
 ## [2.2.0] - 2026-11-20
 
 A minor release: the scanner inserts automatic semicolons it missed in class bodies and after declarations, reads
@@ -414,6 +570,7 @@ Not fixed in 2.0.0; tracked as GitHub Issues where a number is given:
   build as `cp310-abi3`, and `make install` leaves the pkg-config description empty and prefixes absolute paths
   ([#22](https://github.com/wotjr1649/tree-sitter-javascript/issues/22)).
 
+[3.0.0]: https://github.com/wotjr1649/tree-sitter-javascript/compare/v2.2.0...v3.0.0
 [2.2.0]: https://github.com/wotjr1649/tree-sitter-javascript/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/wotjr1649/tree-sitter-javascript/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/wotjr1649/tree-sitter-javascript/compare/v1.0.0...v2.0.0

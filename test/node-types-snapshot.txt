@@ -94,7 +94,10 @@ field	export_specifier	name	string
 field	export_statement	declaration	declaration
 field	export_statement	decorator	decorator
 field	export_statement	source	string
+field	export_statement	value	class
 field	export_statement	value	expression
+field	export_statement	value	function_expression
+field	export_statement	value	generator_function
 field	field_definition	decorator	decorator
 field	field_definition	property	computed_property_name
 field	field_definition	property	number
