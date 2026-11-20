@@ -32,7 +32,7 @@
    }
   },
   "cases_file": "cases.jsonl",
-  "cases_sha256": "8503ccd2c2a5dd30d6042fe3905ad3f6974d1b32fb47eefcf136afeadb6b19da",
+  "cases_sha256": "a92886e55511e7e4bdd2e51e8d0276dd762aa1c72f052455ecc4ab2556d2da0c",
   "runner": "run.mjs",
   "runner_sha256": "06cfe49cd56d0bac9b5c672b1f62fc0f44b37de02c0a2bf04c557e5354c5c24d"
  },
@@ -32212,6 +32212,1416 @@
    "id": "i20/empty-child",
    "sha256": "faa84280a5279fdf59147e383bbf33c3294cc8adf8c0c0367a22e34ff96458d1",
    "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/lf/block-inner/o/minus",
+   "sha256": "59f3f38793de3fd84d0c15474c98553f43953bb6c0ee69ac3efb15bedf66a97c",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/lf/block-inner/c/declaration",
+   "sha256": "fc469d029f9d5b521d2ed7d7514008b87ba8b12da2a2e80966a3c9cdac0e528f",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/lf/block-inner/oc/call",
+   "sha256": "b2c35b07718205d3a0ed2bc321ab9690bb8793d1bd81873f7e601f700fabaf4c",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/lf/block-inner/ooo/member",
+   "sha256": "d226b969a929e2dc57f90145b58adaa566d61a669fbeb6b6be9dd5e3a434816b",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/lf/block-inner/oco/template",
+   "sha256": "855879c3afbcabb5999db98f2b77afc88083719e9ce6bdf34865ac94e1a990f8",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/lf/block-after/o/multiply",
+   "sha256": "04c8601631f0530606ea7c6aac5b9217a375ca862719af7c3272508adb12ccde",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/lf/block-after/cc/subscript",
+   "sha256": "5c46a66f950a4dd33298526bb4784fc761ce496550fb09398ea946d5856e39dc",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/lf/block-after/ooc/prefix",
+   "sha256": "9ff0290ace5cfb52ae7240ec4ffbc487892a1351852301bb06601b1e47f7d0ed",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/lf/line-after/o/template",
+   "sha256": "8c57ff788fdeec607e697bc31c9832dbecd5478b4518503caa804022e3cdd484",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/lf/line-after/cc/identifier",
+   "sha256": "ac6eed12776794ac4865d397850dd1f7716a6d870d0308ffa2e2366369120938",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/lf/line-after/coc/call",
+   "sha256": "10aa5db80fcdf2065d15a883640308ea66d9db14772fee535aa81f64a6007627",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/lf/bare/co/member",
+   "sha256": "b1b197eb0a2689bc680a0c5130125b52b8d4f7d3e71ece306e4dc3f2defc9f19",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/lf/bare/ooo/declaration",
+   "sha256": "b7d5b3efb0a479fa27a18c9c07c6228c2c60d0c3e0dd28593bf07a71da48256b",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/lf/bare/ccc/logical",
+   "sha256": "aab5056ca7e40d39743512767b90781fcff60357aaf4f72efaa1695121c1c378",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/lf/break-block/oo/call",
+   "sha256": "c1002b9bd49fb8c5f33377a8cc8b3865332e0adb3acdeade9bd899189d1a82bc",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/lf/break-block/ccc/identifier",
+   "sha256": "d6e2b6c1709531bc278c522b9bf027294537f082c6f6708b6f568719e521ac01",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/lf/two-blocks/ooo/identifier",
+   "sha256": "d7c702ce19a953fc55867344da9edaa66477c804bdf20ee405f907cba60ebd4c",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/lf/two-blocks/ooc/logical",
+   "sha256": "001d82cab947bedf20d84517fe730e6557d7b70b344b13b3c37d3812856baa8c",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/cr/block-inner/o/minus",
+   "sha256": "e8e3f075d02531b9632b836a5568773adb1914309b6e0186be22b50fd871feb3",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/cr/block-inner/c/declaration",
+   "sha256": "5baba4a8d529c9b195aea4cfa4a5ad5ca54902c567e518d3f348b9c2a848c8fb",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/cr/block-inner/oo/plus",
+   "sha256": "ce7ecfc61fb5159e40be455ea8119bd97e6ccc8e327d591d0b1b6f629bbf2a62",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/cr/block-inner/oc/call",
+   "sha256": "56baebd2d27e550bebf3411efacc97016b72ddfb0c7290686c4ea15028be8f26",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/cr/block-inner/ooo/member",
+   "sha256": "272e2340baf065f7a78e5bb8078eb19f8ca6b99423463ee7b6344bb645e2cf26",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/cr/block-inner/oco/template",
+   "sha256": "08383fe53665e72fe2223919ad953f0adc16756a33dbd874927857a076c1fca2",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/cr/block-after/o/multiply",
+   "sha256": "c45643ba598b3ecaae3104c7198f1f1d34a96edb21a195820cd4ebb4a45ea59c",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/cr/block-after/cc/subscript",
+   "sha256": "1e827203df980ab147f910bf4d4a9794cae01957269b9d2f9fdeb93386ee17e4",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/cr/block-after/ooc/prefix",
+   "sha256": "ea9ab21781f468e642491d8c9c61ec4f54b5a952012cd02d6ea476e08f41c77f",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/cr/line-after/o/template",
+   "sha256": "1682f038ca9e06d6a42ba5e9bfaddab0d3371ddad08e76b6fa59266afd29c1e0",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/cr/line-after/cc/identifier",
+   "sha256": "0ae98b9dc8d8f657893768942543d8045bd9a8c975fe677e194cf167de6516a6",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/cr/line-after/coc/call",
+   "sha256": "da43ae6923dd96330cae73e439dc5ac1c590b3618b49efa93f4982a4c762d631",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/cr/bare/co/member",
+   "sha256": "823aa7c8ee1b964cde3d10925e754bcd6eb6d5dd9a1fa9f3e1e25ea3eccd94e9",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/cr/bare/ooo/declaration",
+   "sha256": "7e51dc990e639b13fcfd289697638b725a0dda814dddb248ebd14c50540d1b1e",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/cr/bare/ccc/logical",
+   "sha256": "2b14f495bf88125ff8c74b44415def31087d40e4c0ef189bcaef6e6fa97b2886",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/cr/break-block/oo/call",
+   "sha256": "ff96341eeb9385dc7b63b9cec0f0bce65a6085245d1f3ee0e4677abce916e6ce",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/cr/break-block/ccc/identifier",
+   "sha256": "18fc83e259661677b95011f699b7f2885dd0a7030961754c522fdf5207b2f516",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/cr/two-blocks/ooo/identifier",
+   "sha256": "42e49ab6ad44d60fabf518b6d43fc658e808e018e4f0bd4a0d81e48c99db53d7",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/cr/two-blocks/ooc/logical",
+   "sha256": "e153eaacbcde63b5a21dceac457f73f1a4049344dfab7502773f8f52cd53b0da",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/crlf/block-inner/o/minus",
+   "sha256": "4f25bc63698400b4c9d0f6c55fef6f28768d2895fd63954e786152a043404ef0",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/crlf/block-inner/c/declaration",
+   "sha256": "39cb57e91fd271ec27616fe14884827d012d903479d946f1ef79bc8d5dbf0fa7",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/crlf/block-inner/oo/plus",
+   "sha256": "c5dd55d8a874dad2162a0d0ecac8e3fcef1e5d69c252006252c36a6854d21129",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/crlf/block-inner/oc/call",
+   "sha256": "24424805389f3f4c8da2c7c20762e39d426507e891efce6fd7231debb9348362",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/crlf/block-inner/ooo/member",
+   "sha256": "f7a5201dcddb52f746b83914b8688901e1b5e047f9799d20fda056a46cbc54b8",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/crlf/block-inner/oco/template",
+   "sha256": "1eed2378e22b6a544559b9f1a0bd2b2ad57a26c38251f299862cc43c84ddbdcd",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/crlf/block-after/o/multiply",
+   "sha256": "c89d7b8620892663708b5fa73a6f1ae626e46aaa7aa312cd41a882756a4039f6",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/crlf/block-after/cc/subscript",
+   "sha256": "346b408799ad5e97b026b23c5fcc258aa19602cb39d808780202502da762ee86",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/crlf/block-after/ooc/prefix",
+   "sha256": "709b57f5c2d30ed2a9848782a8b66286b50d43ff6357745d6f34f85f1ca047ab",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/crlf/line-after/o/template",
+   "sha256": "0b091fcb521c6a9a945fd10657a8d165491a0a5e5551bc966a581021a0dbcc79",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/crlf/line-after/cc/identifier",
+   "sha256": "9270301bb75df4c6b91a91855cee7cecd8113a830728937bac7165304f4e1bec",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/crlf/line-after/coc/call",
+   "sha256": "f999cd2e8805098dd2518de402f5dbe9ff3859c1185292b58564af5f5fc33789",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/crlf/bare/co/member",
+   "sha256": "0765832b2649279495d271ad1b3016797c32990abcebd6b92d86d9bb4f0bad33",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/crlf/bare/ooo/declaration",
+   "sha256": "951051ceabca0a14ea4448b2bda4c1281523449e4bc9a8508be8a40b5c0d6503",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/crlf/bare/ccc/logical",
+   "sha256": "b9689164abe392db6da9620ebf76e6d66b811b6a88c49212e17ab9cd27927fd5",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/crlf/break-block/oo/call",
+   "sha256": "88352ea09f28aec09831414513ca6013ca7acf3107fd57d364ee22894dec6004",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/crlf/break-block/ccc/identifier",
+   "sha256": "ac9e4e3886cde8a2d57d8d71984bfe41f4ede0a1c474513f0198ace963dd52ef",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/crlf/two-blocks/ooo/identifier",
+   "sha256": "264ddc0f77009ca41924f11a8ba57d8f4c4c1c997714f302e5cc6a2aa7250413",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/crlf/two-blocks/ooc/logical",
+   "sha256": "7e858a2dc75f146a6abee6e7ba7b77e96008843344f7ee9ed0532d704914ab6d",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/ls/block-inner/o/minus",
+   "sha256": "2b722c34ca34d4cde2b4ef80e65fb050530c5c7bc12c913005b944916be00a09",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/ls/block-inner/c/declaration",
+   "sha256": "d52ac4aa503f146d425f31ad5edf6db58094688346b5ae376889c266d4a47b35",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/ls/block-inner/oo/plus",
+   "sha256": "1f5313f44e114a5fb429999adf97363b5e481ed1846e62219d6b6f9239b5a88f",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/ls/block-inner/oc/call",
+   "sha256": "130bb19f7821bbd2eb1deb05695a681b060187c818d052563fa7393bd052559a",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/ls/block-inner/ooo/member",
+   "sha256": "9985ef11e9cadd0f68dc66a8e8c9b55d4f4e9d1f2cc567d07c51d4baf0862c8a",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/ls/block-inner/oco/template",
+   "sha256": "478f18ec72425b652682bbf53aa32040e4d5f184368c169fe8aa9c22372fb185",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/ls/block-after/o/multiply",
+   "sha256": "993fd70e70cb8fe4178d2b2c45022da0c3c8e137f4bc29e8a2dd19c0da5f1221",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/ls/block-after/cc/subscript",
+   "sha256": "70a7e85d053fb1ac9e11452dd98c06dabc2b1d12460eac56dc40a36356cd992a",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/ls/block-after/ooc/prefix",
+   "sha256": "e3fedcbaad9eb39ee6a00a65d7ae7162bf9c279fbcbe21799c0174dad8eb1991",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/ls/line-after/o/template",
+   "sha256": "87b77f1a36e658af028391aed122c361db93a6a4b02358968b16c50220e3c27a",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/ls/line-after/cc/identifier",
+   "sha256": "94e0d72b6fe0b43f84f31a8cef57a9ed83e42c782f90ff105c7eedda28bc37af",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/ls/line-after/coc/call",
+   "sha256": "d77304756e6b6b569afee9f1c18e01c298027f8f12a2c6b750cc078029e5931d",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/ls/bare/co/member",
+   "sha256": "4fca2da58c2ae582088e32b391e364372ac5ee192557c2fb5b16b955d5e6cdee",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/ls/bare/ooo/declaration",
+   "sha256": "5b0c2e1fdeb8cca6363d6f9ebccf1d1b929dbcaa7ddc8093519333eb5b383e94",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/ls/bare/ccc/logical",
+   "sha256": "8e83733b39d7d5e9001aa913e6a75cc67bf8b62573b845e2c27d87097c89275c",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/ls/break-block/oo/call",
+   "sha256": "e18c00868c8af0a491b73ebf1f9513dc1914970aa23eb83f89edbcf1d7f3718e",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/ls/break-block/ccc/identifier",
+   "sha256": "7b45854868ae87fa276fe457c0a6b3b921f6ea664354424bbe5f8f7e346dd236",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/ls/two-blocks/ooo/identifier",
+   "sha256": "ac37fa21d7f102647be8a8469ceaee33b5445c0a74b7d47eda49ab2c07ac5b41",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/ls/two-blocks/ooc/logical",
+   "sha256": "ab10b6f3ca569385c7d9e79a7d6074b9e49207c9fea8c15e6500e345aa740278",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/ps/block-inner/o/minus",
+   "sha256": "42b7673c1aa24a76f79c7742d5e9fc19d5538ff3b054619d2d1a6bbc759b59b8",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/ps/block-inner/c/declaration",
+   "sha256": "61fbf9bc9829c1e8e91ec959592be5ba557a91a84f005bdc7430cfca4181bfac",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/ps/block-inner/oo/plus",
+   "sha256": "35a0086bfd40c1a95c09aeba06029032c8a834b91f175688269f38ec797a6ed9",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/ps/block-inner/oc/call",
+   "sha256": "a4589900b86a374c452da09e38f9131ee0538c410ad82ae9acb41093f07cffa1",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/ps/block-inner/ooo/member",
+   "sha256": "9751c2a1ead4d0c0eb691d378ab3781906b55020b0d6728e92d1decb6b2f2f43",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/ps/block-inner/oco/template",
+   "sha256": "91740ded36eaf2c567cdf329ecce3bb78603e908dde6464b54fbc3d90eaaef48",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/ps/block-after/o/multiply",
+   "sha256": "dda62f3b08baca86b7c6e8518c2baf77a6449f8500585529e52bc452df9cf483",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/ps/block-after/cc/subscript",
+   "sha256": "8637568398d299f2f42addf3363858a9415920cd063fbb861ad12b79a9d49473",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/ps/block-after/ooc/prefix",
+   "sha256": "7248245241d452282144e1c241370bbdf85eb11a214cd434606a7ddd0754c20e",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/ps/line-after/o/template",
+   "sha256": "06018b7754d8986aa860d6d05232161c338c8f78d6990c1f5a3d6b367ec5eb14",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/ps/line-after/cc/identifier",
+   "sha256": "0fcfda73436c36541e82c754a7d583d0673887c8c8a14db179f99eba3a159226",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/ps/line-after/coc/call",
+   "sha256": "24230f2d6c391439b61c26209793b044cf56affff36ccfcd1f3a3b16cc956992",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/ps/bare/co/member",
+   "sha256": "80afcfa55c7f5195e57d04869eeff14214db95104fb138105e30562fd1a89319",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/ps/bare/ooo/declaration",
+   "sha256": "0bb9cf05bfb7bac39295f3109154d8bd27090ae717baf7407379098cbb54bcd3",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/ps/bare/ccc/logical",
+   "sha256": "79abf0e23933f94fd51de5b41171e3a3a235b5cf822855b575472e274a6676c3",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/ps/break-block/oo/call",
+   "sha256": "4b62dc66c4a170528786b5b68422924ac58145e6c571d5e3ed328432013268c2",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/ps/break-block/ccc/identifier",
+   "sha256": "81ae08d60cce2882d7fa3eec7e5180daa74c320242e6ba64d8c3a9d9dc1b31b1",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/ps/two-blocks/ooo/identifier",
+   "sha256": "3fec800f7cdbc8d3aa8cf0eb5db1478b53189c7379ded27a854701f10af535d9",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/ps/two-blocks/ooc/logical",
+   "sha256": "77f04dbf18b3e0ff43707c671d8f57cf0ec14624da40b3b06388f8b8548cd402",
+   "sourceType": "script",
    "verdict": "accept",
    "babel": {
     "class": "accept",
