@@ -278,7 +278,7 @@ static bool scan_restricted_semicolon(TSLexer *lexer) {
         if (c == '\n' || c == '\r' || c == 0x2028 || c == 0x2029) {
             newline = true;
             skip(lexer);
-        } else if (iswspace(c)) {
+        } else if (is_extra_space(c)) {
             skip(lexer);
         } else if (c != '/') {
             return newline && c != ';';

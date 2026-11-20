@@ -32,7 +32,7 @@
    }
   },
   "cases_file": "cases.jsonl",
-  "cases_sha256": "2a5e20871d7ad98877aa44dc8306e2ca6309dd2d5835c090edd48963feb9ab34",
+  "cases_sha256": "3055e1c5076a8fd89a7d82a5c39825780158f3b56163b0a33444ab3e47e5133e",
   "runner": "run.mjs",
   "runner_sha256": "06cfe49cd56d0bac9b5c672b1f62fc0f44b37de02c0a2bf04c557e5354c5c24d"
  },
@@ -5886,6 +5886,126 @@
   {
    "id": "v3b/return-lf-semi",
    "sha256": "037c2a9d316e8165fa068ea2a91354f225d58d60c9720c98a14fe5edca6217a7",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/return-non-bmp-call",
+   "sha256": "c5bd79daa576773cfd99cd3682c7ef666225810c8b73be3780b4eeda409473c6",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/return-u2000-paren",
+   "sha256": "0429e94128f8934852128261f93cf3a2598defb8f55dc75db161e5aaea5247a8",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/break-non-bmp-label",
+   "sha256": "f4ae740800117fc5da90c396eb58843d6c7018fcb3c1a419e58c90d1c71061e1",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/break-u2000-array",
+   "sha256": "e261d33088a984cf2886bd484e06b47090d0900cc9b1a1e74b58d10964875352",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/continue-non-bmp-label",
+   "sha256": "8f8227605e6715b2108201f59f3f29802900924cfa307c467ccd5d1171b58635",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/continue-u2000-plus",
+   "sha256": "f8cd2c49ac3107980574d07222b056e9fa8243b9a80dc66e4e1eaf5db3de8c95",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/return-bom-before-lf",
+   "sha256": "0c552dfc5bbd47471ed2f3de4f2587841685ca4ffea2f2045d4f2c6455c95e07",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/return-bom-explicit-semicolon",
+   "sha256": "8b91fec5a4b6feaf3cefcd9a03b72c377eb7c49c7ce968038241f2b3b2e2297d",
    "sourceType": "script",
    "verdict": "accept",
    "babel": {
