@@ -32,7 +32,7 @@
    }
   },
   "cases_file": "cases.jsonl",
-  "cases_sha256": "3055e1c5076a8fd89a7d82a5c39825780158f3b56163b0a33444ab3e47e5133e",
+  "cases_sha256": "dcfeb5e206e298919de900b378145469d0463f29f56f836bae1d1909e703d05d",
   "runner": "run.mjs",
   "runner_sha256": "06cfe49cd56d0bac9b5c672b1f62fc0f44b37de02c0a2bf04c557e5354c5c24d"
  },
@@ -5272,6 +5272,1221 @@
    "id": "v3d/paren-object",
    "sha256": "17fa3bd06b276f6c1c93c4e8260a3a0d54e091766c22d40a1e1f3eb3d09752a2",
    "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/one-asi-lf-call-feff",
+   "sha256": "6e38e9cb85a165b17e1f0fa40054e1f3a23c44b742091cab8303ab83a3a5fc23",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/one-asi-lf-index-feff",
+   "sha256": "3930614bf2f507f5962f7680755cd2ee4501036414a4ca92f894b3efd2385a56",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/one-asi-lf-in-feff",
+   "sha256": "ddcb2bca426d50bd1ae0372044aeac3f99ab105332338168a482b896048ec0de",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/one-asi-ls-call-feff",
+   "sha256": "377e6166567207a0a0f83fa0dee1442bae8d7a7b0fe29614dca8175b3b880df6",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/one-ternary-lf-feff",
+   "sha256": "d2a796a4b04017c916287d85ed5dc96907dfb20373be5b7060eab825ef912b8f",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/one-asi-lf-call-00a0",
+   "sha256": "14621b541fafadf2163c3115e5d2464d58b3c6166378957bf96a83cc23597352",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/one-asi-lf-call-1680",
+   "sha256": "3e48f375ef67ecb25264f219a564ede4ddad942432f4dc411ce0f1a1cf29a699",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/one-asi-lf-call-2007",
+   "sha256": "233b7b1180ad99c24083da238bda3c3e48cb6f35f82b5ac8d64aff789aa378c6",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/one-asi-lf-call-202f",
+   "sha256": "a25b347f2e49aacc33bae724df82a3cc3a823597de2d38f24960b94223a4e3f9",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/one-asi-lf-call-3000",
+   "sha256": "4ddee47b2b9e3e2d7ac74f12103b63046cab8937ea9b9b12fe1007e90e6b3534",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/one-asi-lf-call-12000",
+   "sha256": "d7bdc4e188aac392b4d5673ea75707342f7555dbb174eeb913e739216497e397",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/one-asi-lf-call-10020",
+   "sha256": "666242d60b2a45405c3a862f633d3069a10b51b69bd1aa7a2583c9ba42be7752",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/one-asi-lf-index-10009",
+   "sha256": "4b15512277af94b5b2dbe1962c848d923add04fa7a85ca9f7e3812a06dd62846",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/one-asi-before-lf-feff",
+   "sha256": "951d538cd9d6fd48910b03c1a620f566db1ff84a9ca49e758c4d2eb88450c504",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/one-asi-lf-dotid-10030",
+   "sha256": "d236dbc4ede0796386bd6be67c34405c9b8f34b86dd7c4b6876ac562daf41cb1",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/one-asi-lf-dotdigit-10030",
+   "sha256": "7c89a93d75c32ebad18a8d5c23dcad3b17bbd0914ec90fa28f644b1f85343cf6",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/one-optchain-x-10030",
+   "sha256": "cbe91961abcefecc741ee9799e62310898550b62c3ad9c0d06a2399fdbf1010d",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/one-optchain-x-call-10660",
+   "sha256": "f3d8364974c132b6a8f30726854cbdc27025f74eb7b5296942f5d4f81e022fbd",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/one-ternary-lf-12000",
+   "sha256": "27832e16ed3e95d51c3495ffb9af7589986d5eeaf73361b759c96dfb4f0d37cb",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/one-ternary-lf-dotx-10039",
+   "sha256": "9907b40df2baf26927dfee96d2bb4c7330e7721063e2219c079d99248024687c",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/one-asi-lf-dot-12000",
+   "sha256": "5e9d644c7378a374930eeacdd8e684958fbc3724160a36de3a0fccfe848af091",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/one-jsx-nl-only-12000",
+   "sha256": "6622ba07047ad80632e2df65a9cf2a3178c63cd8d0f06bddeb7ae1116965e876",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/one-jsx-nl-only-0085",
+   "sha256": "bb7313e6acba07a3659d612c54996eb55e6979ea7a4d35395379eac8192ab996",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/one-jsx-nl-only-180e",
+   "sha256": "e700b629dd2985d1b3ddcd146e3b27854a92553409410a0c3635bbb7f086adda",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/one-jsx-nl-only-00a0",
+   "sha256": "02cfdd82ee3ae70d85575da701a9609a818a5769535a571ff9ec9255a846567c",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/one-jsx-nl-only-2007",
+   "sha256": "2560ba57b75613a12b6647787a0b8d63f38f9ca70467fd6af0dec9dafb282b2f",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/one-jsx-nl-only-3000",
+   "sha256": "f3ef43f1b242d2ef2c66ea96dd29890adb927be03dba6b3dada1028108057fcc",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/one-jsx-nl-only-2028",
+   "sha256": "15dcbcbb6ffa74b5feef4cc080f282752d6d734ed2de19ea9f11116573b2b138",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/one-jsx-nl-only-202f",
+   "sha256": "906b2d684f7815cc3a893818c6c6c90d321c14a8b41be20d7330ebc6f08cc2d8",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/one-jsx-nl-only-1680",
+   "sha256": "3eddc4ea1db9f7118487681e43428a75436277a7bb690680cd30fc4ede288064",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/one-html-close-12000",
+   "sha256": "12dfc7bc3034af1feab05f6c0ced35fadee34f6e13bc78d45e2aeeaf52d2b5ca",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/one-html-open-12000",
+   "sha256": "0a97406307a2ef88386945713768f62c84cd0196ead15a357b8dac15228743b8",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/one-html-close-first-12000",
+   "sha256": "462e79c4991b17b88620c93fa2797b6e2bf4cd8f38090aa2f9a05fb3660e858f",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/two-asi-lf-in-0020-feff",
+   "sha256": "f65b06eb6310b9612afebd4ea5640d0fca7c26cf2387ba13bf66608dcf0164e5",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/two-asi-lf-feff-00a0",
+   "sha256": "ca0802576e14826e948fb3d922934bb6a5189e5ff162f19fc057780b33bcbbd4",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/two-asi-before-0020-12000",
+   "sha256": "21882d77e430da0b33d030b0e747e366a994f8b3f8efa10afea7283cb2d72fad",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/two-ternary-lf-feff-0020",
+   "sha256": "b86da07fca05f3b1ea82b76cdaa4a062e02364e4cea4ca26b66fad74f9c79981",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/fixed-cuneiform-id",
+   "sha256": "73a2f15b491165e1c65d4da63382a956c5b7f1e2767e761ed663ff92d497e4ae",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-01",
+   "sha256": "48f95c5f445cd61cc82fd5f98e238d635f9c781f7b6579dfb348f6e7f7dba4e2",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-02",
+   "sha256": "268c43a789d65746b5c05f673f5ecb13fcbe97db2976583ce1058572ef340183",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-03",
+   "sha256": "566e5877bc6fbfca3c656fb2c25d36c41897acaaa70d274e50b2b5aae6adef67",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-04",
+   "sha256": "589456cee0a1bd48da3d5f252d179a6e7454c55774786f288bb57125b305c33c",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-05",
+   "sha256": "d1875f72fa18a1e6fe69fff9131273cd3374167f86f52857ff11e87005fdde49",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-06",
+   "sha256": "853aa443ec65dd73642d9b1d05150d556bb1a81cfe79ff701383e565e44cf422",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-07",
+   "sha256": "9e5d106d5ee2c0bdac8ec6fd453b7a4df7df366bd54caa3b96a6c80548cd58da",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-08",
+   "sha256": "46ffaf33630ef23c6c38d4361c4a84b18b404824a1e278ce0ce856f3a5379b8c",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-09",
+   "sha256": "b2acd80c3a1b21cb28527bb3989930857475a0a0d9e63b4c4f8039a29ab033f6",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-10",
+   "sha256": "19b8ea208f64c218e9d9898f6f1a27231bf6267b3302fcb52b7a4f8c1fac1de5",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-11",
+   "sha256": "a64fe6c5f198b29cacf090f2fa8cf3fcdbd7703118dda4b756c2dc443bed57fc",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-12",
+   "sha256": "8de05ef9e7fe287a9c87ee845ea07cb4d1a968e243e7f57ac16987002a563200",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-13",
+   "sha256": "f17be6c2c0081fbad513b8e4de84db8021d6ba9ae51b36a290ca07c0925eea33",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-14",
+   "sha256": "6a7e262c5dbaaf0a03d273d91f445691c5b48069f1b172a08965a05f6b6f55f9",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-15",
+   "sha256": "90e84341b16a88c4cf9289127c82ccd39b96724f2244a2fba22aff17e40dbda5",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-16",
+   "sha256": "9875c6e146a5bf0fd09400be25629812e9c1bca712453e93d451a938a46f8ec1",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-17",
+   "sha256": "500e29eb671a583da5b26426cf0aafd33f715cc51ff53bfe4c336e167abca600",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-18",
+   "sha256": "f4e417499f50e881fa68a3ab33768b4eb951d6acb4f7cb76b98d13593d9d85f5",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-19",
+   "sha256": "61f29bb8694eff395b7d3a4024db19fc5d462513615613c77dc5cd6ec396ba94",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-20",
+   "sha256": "2d9ce14d65d107b0283a9ac6c3290eec9d471b00ba77de00cec3f0e7d64ca878",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-21",
+   "sha256": "a37e7fec79e4328c6cea63451fd05cc7283c6d6f0eb5355b815aa960c0b2ecc7",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-22",
+   "sha256": "0fb104e02d8439568b167e6e8ed81afee5533f38c411a602c6e71105f4925a78",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-23",
+   "sha256": "2c7176fa3ea30969544b20180c12293a54d55aabe974f3cd4d53aded9dbed989",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-24",
+   "sha256": "ab8dd5353d7088e6862948254ca2cd8996e83d3844c4831d38685584415ea82d",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-25",
+   "sha256": "ab95627370c5cac28aecb2fe5995181f04b9dc2fccc6dac7ebaf5381b792d9d7",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-26",
+   "sha256": "c75b0ebb64e58c17eee125e86a87faafd1c655b2553ce8da6708abc597b19161",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-27",
+   "sha256": "f17c8cdddd2f32b924ce101ea97835b74cce615a8c23a0e46cd382215b3a4296",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-28",
+   "sha256": "e2be248241748c290248ad833c3aa120c5139caf00e096d30d32cc8633f11d58",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-29",
+   "sha256": "26fe69486425ab5882f3cf341fe5a1dafa5774735f67bf1a87ad3c27d173842c",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-30",
+   "sha256": "8d5e3d2ed6f95161cc20a565a3ba50b59b472475b3ea3082655a727ba1efc78f",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-31",
+   "sha256": "007f75c10dfa7d497764ecce11e44bcce905ceb26ef550435b907ea6aa028ae4",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-32",
+   "sha256": "9b824c5de5b4fe559effd6691f94515f1d31b09ca56fb79dbc2ba885f521e0c2",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-33",
+   "sha256": "b47d530d5a147a0a412f732f89a7e371dec9ba92f1e08d38a58777020d751a61",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-34",
+   "sha256": "5f04736bdb29c436a038e2a58746ee19bc851832bce57a281fcd92016c9de730",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-35",
+   "sha256": "3992be1b80d041decde73e0e56bb629411e55980f802c47b8f06b73e36c7d0bf",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-36",
+   "sha256": "6512d9ceea8b37b92a36b0b1c1012be0f4e67b7741140b116d6894fb0c2c17b2",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-37",
+   "sha256": "0d16c823694385a8c047111d4339303028f1f22e7f4e730a5f44e67a359a14a6",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-38",
+   "sha256": "1b6cbc8a63f143b4c01546d4752b026356b68529f7086df70b3085036070ce59",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-39",
+   "sha256": "428a6d095f7af407ca135c93d5f5184c5ecb95010e1f7a59ea3c94cf003aa659",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-40",
+   "sha256": "cfe74b096ec3fc112c973c64b8268c3a6dd85159e112ed7aedf8423ca96e3efe",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-41",
+   "sha256": "8f3b4602dbbb85f1980db5ad97a40f47bfdffc0a8eca9e2b6b0f101ae5e864bc",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-42",
+   "sha256": "3a025afcef5beef05c67d1ccb81845ba2b770efca112b0fdc2164a5d0dfb6c27",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i16/asi-cmt-43",
+   "sha256": "b020a129cb7fc5c0e7c8fec2ec83bb296ce78af964ee306d9aa266272b1fa8f9",
+   "sourceType": "module",
    "verdict": "accept",
    "babel": {
     "class": "accept",
