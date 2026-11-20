@@ -29,7 +29,7 @@
     },
     "hash_bang_line": {
       "type": "PATTERN",
-      "value": "#!.*"
+      "value": "#![^\\r\\n\\u2028\\u2029]*"
     },
     "export_statement": {
       "type": "CHOICE",
@@ -139,6 +139,31 @@
                           "content": {
                             "type": "SYMBOL",
                             "name": "declaration"
+                          }
+                        },
+                        {
+                          "type": "PREC",
+                          "value": 1,
+                          "content": {
+                            "type": "FIELD",
+                            "name": "value",
+                            "content": {
+                              "type": "CHOICE",
+                              "members": [
+                                {
+                                  "type": "SYMBOL",
+                                  "name": "function_expression"
+                                },
+                                {
+                                  "type": "SYMBOL",
+                                  "name": "generator_function"
+                                },
+                                {
+                                  "type": "SYMBOL",
+                                  "name": "class"
+                                }
+                              ]
+                            }
                           }
                         },
                         {
@@ -1760,24 +1785,83 @@
                   "type": "FIELD",
                   "name": "kind",
                   "content": {
+                    "type": "STRING",
+                    "value": "using"
+                  }
+                },
+                {
+                  "type": "FIELD",
+                  "name": "left",
+                  "content": {
                     "type": "CHOICE",
                     "members": [
                       {
-                        "type": "STRING",
-                        "value": "using"
+                        "type": "SYMBOL",
+                        "name": "identifier"
                       },
                       {
-                        "type": "SEQ",
-                        "members": [
-                          {
-                            "type": "STRING",
-                            "value": "await"
-                          },
-                          {
-                            "type": "STRING",
-                            "value": "using"
-                          }
-                        ]
+                        "type": "ALIAS",
+                        "content": {
+                          "type": "CHOICE",
+                          "members": [
+                            {
+                              "type": "STRING",
+                              "value": "as"
+                            },
+                            {
+                              "type": "STRING",
+                              "value": "satisfies"
+                            }
+                          ]
+                        },
+                        "named": true,
+                        "value": "identifier"
+                      },
+                      {
+                        "type": "SYMBOL",
+                        "name": "_destructuring_pattern"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "SYMBOL",
+                      "name": "_automatic_semicolon"
+                    },
+                    {
+                      "type": "BLANK"
+                    }
+                  ]
+                },
+                {
+                  "type": "FIELD",
+                  "name": "operator",
+                  "content": {
+                    "type": "STRING",
+                    "value": "of"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "FIELD",
+                  "name": "kind",
+                  "content": {
+                    "type": "SEQ",
+                    "members": [
+                      {
+                        "type": "STRING",
+                        "value": "await"
+                      },
+                      {
+                        "type": "STRING",
+                        "value": "using"
                       }
                     ]
                   }
@@ -2037,6 +2121,18 @@
           }
         },
         {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "_restricted_keyword"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
           "type": "SYMBOL",
           "name": "_semicolon"
         }
@@ -2071,6 +2167,18 @@
           }
         },
         {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "_restricted_keyword"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
           "type": "SYMBOL",
           "name": "_semicolon"
         }
@@ -2095,6 +2203,18 @@
         {
           "type": "STRING",
           "value": "return"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "_restricted_keyword"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
         },
         {
           "type": "CHOICE",
@@ -7779,10 +7899,6 @@
         },
         {
           "type": "STRING",
-          "value": "export"
-        },
-        {
-          "type": "STRING",
           "value": "let"
         },
         {
@@ -8312,6 +8428,10 @@
     {
       "type": "SYMBOL",
       "name": "_keyword_continues"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_restricted_keyword"
     }
   ],
   "inline": [

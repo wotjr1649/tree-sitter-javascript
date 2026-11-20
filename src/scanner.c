@@ -14,6 +14,7 @@ enum TokenType {
     // Never returned: only their validity is read (see grammar.js).
     BINDING_END,
     KEYWORD_CONTINUES,
+    RESTRICTED_KEYWORD, // Never returned: only its validity is read (see grammar.js).
 };
 
 void *tree_sitter_javascript_external_scanner_create() { return NULL; }
@@ -75,12 +76,20 @@ typedef enum {
 
 /**
  * @param consume If false, only consume enough to check if comment indicates semicolon-legality
+ * @param break_after_comment If not NULL: set when a line terminator follows a comment of this scan, in white space or
+ *        inside a later block comment (the next call then sees it and decides)
  */
-static WhitespaceResult scan_whitespace_and_comments(TSLexer *lexer, bool *scanned_comment, bool consume) {
+static WhitespaceResult scan_whitespace_and_comments(TSLexer *lexer, bool *scanned_comment, bool consume,
+                                                     bool *break_after_comment) {
     bool saw_block_newline = false;
+    bool seen_comment = false;
 
     for (;;) {
         while (is_extra_space(lexer->lookahead)) {
+            if (seen_comment && break_after_comment &&
+                (lexer->lookahead == '\n' || lexer->lookahead == 0x2028 || lexer->lookahead == 0x2029)) {
+                *break_after_comment = true;
+            }
             skip(lexer);
         }
 
@@ -94,6 +103,7 @@ static WhitespaceResult scan_whitespace_and_comments(TSLexer *lexer, bool *scann
                     skip(lexer);
                 }
                 *scanned_comment = true;
+                seen_comment = true;
             } else if (lexer->lookahead == '*') {
                 skip(lexer);
                 while (lexer->lookahead != 0) {
@@ -102,6 +112,7 @@ static WhitespaceResult scan_whitespace_and_comments(TSLexer *lexer, bool *scann
                         if (lexer->lookahead == '/') {
                             skip(lexer);
                             *scanned_comment = true;
+                            seen_comment = true;
 
                             if (lexer->lookahead != '/' && !consume) {
                                 return saw_block_newline ? ACCEPT : NO_NEWLINE;
@@ -111,6 +122,9 @@ static WhitespaceResult scan_whitespace_and_comments(TSLexer *lexer, bool *scann
                         }
                     } else if (lexer->lookahead == '\n' || lexer->lookahead == 0x2028 || lexer->lookahead == 0x2029) {
                         saw_block_newline = true;
+                        if (seen_comment && break_after_comment) {
+                            *break_after_comment = true;
+                        }
                         skip(lexer);
                     } else {
                         skip(lexer);
@@ -222,7 +236,7 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
         }
 
         if (lexer->lookahead == '/') {
-            WhitespaceResult result = scan_whitespace_and_comments(lexer, scanned_comment, false);
+            WhitespaceResult result = scan_whitespace_and_comments(lexer, scanned_comment, false, NULL);
             if (result == REJECT) {
                 return false;
             }
@@ -253,17 +267,70 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
 
     skip(lexer);
 
-    if (scan_whitespace_and_comments(lexer, scanned_comment, true) == REJECT) {
+    bool comment_before_break = *scanned_comment;
+    bool break_after_comment = false;
+    if (scan_whitespace_and_comments(lexer, scanned_comment, true, &break_after_comment) == REJECT) {
         return false;
     }
 
     // After a comment the next call decides, as before: where the comment holds a line break the base scanner
-    // takes the semicolon after it (`let x<LF>/*<LF>*//*<LF>*/[b]`), so the declaration keeps its comment.
-    if (*scanned_comment && (lexer->lookahead == '*' || lexer->lookahead == '[' || lexer->lookahead == '<')) {
+    // takes the semicolon after it (`let x<LF>/*<LF>*//*<LF>*/[b]`), so the declaration keeps its comment. Only where
+    // that call will still see a line terminator (a comment came before the break, or one follows the first comment).
+    // Otherwise the break scanned here is the only one and decides now (`let x<LF>/**/[y]`, `let x<LF>U+FEFF/**/[y]`).
+    if (*scanned_comment && (comment_before_break || break_after_comment) &&
+        (lexer->lookahead == '*' || lexer->lookahead == '[' || lexer->lookahead == '<')) {
         return false;
     }
 
     return semicolon_before_next_token(lexer, valid_symbols);
+}
+
+// After `return`, `break`, `continue` and a label (ECMA-262 12.9.1, no LineTerminator here): a line terminator ends the
+// statement whatever follows it, unless it is an explicit `;`. A lone CR is a line terminator, and so is one in a block
+// comment. The statement also ends at an included range start, a `}` and the end of the input.
+static bool scan_restricted_semicolon(TSLexer *lexer) {
+    lexer->result_symbol = AUTOMATIC_SEMICOLON;
+    lexer->mark_end(lexer);
+
+    bool newline = false;
+    for (;;) {
+        int32_t c = lexer->lookahead;
+        if (c == 0 || c == '}' || lexer->is_at_included_range_start(lexer)) {
+            return true;
+        }
+
+        if (c == '\n' || c == '\r' || c == 0x2028 || c == 0x2029) {
+            newline = true;
+            skip(lexer);
+        } else if (is_extra_space(c)) {
+            skip(lexer);
+        } else if (c != '/') {
+            return newline && c != ';';
+        } else {
+            skip(lexer);
+            if (lexer->lookahead == '/') {
+                while (lexer->lookahead != 0 && lexer->lookahead != '\n' && lexer->lookahead != '\r' &&
+                       lexer->lookahead != 0x2028 && lexer->lookahead != 0x2029) {
+                    skip(lexer);
+                }
+            } else if (lexer->lookahead == '*') {
+                skip(lexer);
+                while (lexer->lookahead != 0) {
+                    c = lexer->lookahead;
+                    skip(lexer);
+                    if (c == '*' && lexer->lookahead == '/') {
+                        skip(lexer);
+                        break;
+                    }
+                    if (c == '\n' || c == '\r' || c == 0x2028 || c == 0x2029) {
+                        newline = true;
+                    }
+                }
+            } else {
+                return newline; // A regular expression, or a division
+            }
+        }
+    }
 }
 
 static bool scan_ternary_qmark(TSLexer *lexer) {
@@ -434,7 +501,9 @@ bool tree_sitter_javascript_external_scanner_scan(void *payload, TSLexer *lexer,
 
     if (valid_symbols[AUTOMATIC_SEMICOLON]) {
         bool scanned_comment = false;
-        bool ret = scan_automatic_semicolon(lexer, valid_symbols, &scanned_comment);
+        bool ret = valid_symbols[RESTRICTED_KEYWORD]
+                       ? scan_restricted_semicolon(lexer)
+                       : scan_automatic_semicolon(lexer, valid_symbols, &scanned_comment);
         if (!ret && !scanned_comment && valid_symbols[TERNARY_QMARK] && lexer->lookahead == '?') {
             return scan_ternary_qmark(lexer);
         }
