@@ -5,6 +5,146 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2026-11-20
+
+A minor release: the scanner inserts automatic semicolons it missed in class bodies and after declarations, reads
+identifiers such as `in_` after a line break, and accepts U+0000 in templates (J7, #29). An unescaped LF or CR
+immediately before a string's closing quote is now an error, as are CR, U+2028 and U+2029 inside a regular expression
+literal. No breaking change under the SemVer rule in `AGENTS.md`, where valid input is input that `@babel/parser` and
+`oxc-parser`, as pinned in `oracle/`, both accept. The comparison with v2.1.0 (`oracle/replay -dump`,
+`scripts/tree-diff.mjs`) found no changed-clean trees over 56,138 inputs: the 474 default inputs (corpus, examples,
+highlight, tags, oracle cases), 1,068 N-of-M inputs and the 54,596 inputs that the discovery run labels valid (test262
+positive tests, Babel JSX fixtures, npm files; 7 of them, Annex B tests, are accepted by Babel only). The nine inputs
+that became errors (five string and regular expression literals of that kind, and four `for` heads in which `using` is
+followed by an LF and a name such as `in_`) are rejected by both reference parsers. `src/node-types.json` is
+byte-identical to 2.1.0: no node kind, field or type is added, removed or renamed. 32 inputs that gave an error parse
+now, and 3 that are an error before and after get a different recovery tree. The grammar name, the C symbol and ABI 15
+are unchanged.
+
+### Added
+
+- Corpus entries and oracle cases for J7 (`tree-sitter test`: 172/172 at the tag, 165 at `v2.1.0`; 292 oracle cases
+  at the tag, 237 accept, 39 syntax, 6 early, 10 disagree; 184 at `v2.1.0`). 92 of the cases (`j7/fix2-*`) pin the
+  2.1.0 trees of valid input that combines white space, line terminators, line and block comments with the forms below.
+  Eight of them end in U+2028 or U+2029 after a lone CR and two comments; they check only that the tree is clean and the
+  comment ranges, because the statement that holds the first comment depends on the platform (#16, see Known
+  limitations).
+
+### Changed
+
+- An unescaped LF or CR immediately before a string's closing quote is now an error, as are CR, U+2028 and U+2029 inside
+  a regular expression literal (J7; ECMA-262 §12.9.4, §12.9.5): `'a` + LF + `'` and `'` + CR + `'`, which 2.1.0 skipped
+  as white space, and `/` + CR + `/` and `/a` + U+2029 + `b/`, which 2.1.0 read as pattern characters. Babel and oxc
+  reject them (11 test262 negative tests of the discovery run). A line break elsewhere in a string and an LF in a
+  regular expression were already errors in 2.1.0; U+2028 and U+2029 in strings and an escaped line break (`'a\` + LF +
+  `b'`) stay valid and keep their trees.
+- `for (using` + LF + `in_ = f();;) {}` (also with `in$`, `in0` or `instanceof_`, and with CRLF, U+2028 or U+2029
+  instead of the LF) is an error now (J7, #17); 2.1.0 read a `using_declaration`. ECMA-262 forbids a line terminator
+  between `using` and its binding, and the semicolons that separate the parts of a `for` header are not inserted
+  automatically, so the text has no valid reading; Babel, oxc and TypeScript reject it. With a lone CR it is still read
+  as a `using_declaration` (#17, see Known limitations).
+- Recovery trees change for input that is an error before and after (J7): in the comparison
+  `export {a} from 'x' with {['type']: 'json'};`, `<a extends="y" />` and a test262 file with U+0000 in a string
+  literal (see Known limitations); and a regular expression recovered after a block comment that holds a CR, CRLF,
+  U+2028 or U+2029 followed by U+0000 (the `regex_pattern` ends before the line terminator).
+- The grammar gains two external tokens, `_binding_end` and `_keyword_continues` (J7): hidden markers that the parser
+  marks valid after a binding and after a keyword such as `get` or `let`, so the scanner can tell where a semicolon is
+  needed. They add no node kind. tree-sitter-typescript appends its own external tokens to this grammar's list, so its
+  `common/scanner.h` enum must gain both before `FUNCTION_SIGNATURE_AUTOMATIC_SEMICOLON` when it vendors this
+  `grammar.js` (handed over as a patch); without it its TypeScript and TSX corpus fail 4 entries instead of 1.
+- Numeric symbol ids change, because the grammar gains tokens and states: 109 of the 114 named kinds get a new id
+  (`for_statement` 167 to 171, `member_expression` 199 to 204, `call_expression` 214 to 219, `property_identifier` 273
+  to 278). Consumers that store numeric `KindId()` values must recompute them.
+- Versions: manifests and `tree-sitter.json` `metadata.version` are `2.2.0` (compiled into `src/parser.c`).
+- Generated size: `src/parser.c` is 3,328,897 bytes with 2,233 parse states and 278 symbols (3,212,460 bytes, 2,105
+  states and 273 symbols at `v2.1.0`, +3.62 %); `src/scanner.c` grows from 12,386 to 14,826 bytes. The release gates
+  moved to this release; the node-kind snapshot does not change.
+
+### Fixed
+
+- Insert the automatic semicolon after a class field when the next line starts a generator method or a computed member
+  (J7; 20 test262 tests): `class C { x` + line break + `*g() {} }` and `class C { static x` + line break +
+  `['y']() {} }` gave `ERROR`. `class C { get` + line break + `[x]() {} }` is still a getter, and a field with an
+  initializer still continues into the next line (`x = a` + line break + `* b`, `x = 1` + line break + `[k]`).
+- Insert the automatic semicolon after a `let` or `var` declaration when the next line starts with `<` or `[` (J7; Babel
+  JSX fixture `jsx/basic/asi`): `{let a` + line break + `<a/>}` and `var a` + line break + `[0].forEach(f)` gave
+  `ERROR`. `let` + line break + `[a] = b` is still a destructuring declaration.
+- Read identifiers that begin with `in` or `instanceof` after a line break as identifiers (J7, part of #17): `a` + line
+  break + `in_b`, `in$`, `in0` or `instanceof_b` gave `ERROR`, because the scanner took the prefix for the operator.
+- Accept U+0000 in a template (J7): `` `a<U+0000>b` `` gave `ERROR`; the scanner took it for the end of input.
+
+### Known limitations
+
+Not fixed in 2.2.0; tracked as GitHub Issues where a number is given:
+
+- No automatic semicolon after a block comment that holds a line terminator
+  ([#39](https://github.com/wotjr1649/tree-sitter-javascript/issues/39)): `a /*` + line break + `*/ b`, `''/*` + line
+  break + `*/''` and `let x = 1 /*` + line break + `*/ x++` give `ERROR` (test262 `language/comments/multi-line-asi-*`,
+  4 tests). J7 left it out because every attempt changed clean trees of other valid input. For the same reason a
+  comment between a declaration and a next-line `<`, `[` or `*` keeps the error (`{let a` + line break + `/*c*/<a/>}`).
+- A lone CR (U+000D) is not a line terminator for automatic semicolons (#17): `a` + CR + `b` and `this` + CR + `{}` give
+  `ERROR`, and `for (using` + CR + `x = f();;) {}` and `for (using` + CR + `in_ = f();;) {}` are read as a
+  `using_declaration`, although Babel, oxc and TypeScript reject them. The TS/TSX grammars, whose scanner checks only
+  LF, also accept U+2028/U+2029 there. The `in_`/`instanceof_` part of #17 is fixed in this release for LF, CRLF, U+2028
+  and U+2029, not for a lone CR.
+- Valid input that parses without an error but with a wrong tree, found by the structure comparison (#30); fixing them
+  changes those trees, so they wait for v3.0.0: `await (x)(y)`, `await (a).b()` and `await[0]` in async code read
+  `await` as a called identifier (#32; seen in 48 npm files); `for await (let [a] of b)` reads `let [a]` as a subscript
+  (#32); sloppy-mode `yield` as an identifier (`yield + 1`) and `await(x)` outside async code are read as keywords
+  (#35, upstream #303); statement boundaries such as `export default function(){};`, `export` + line break + `{}`,
+  `return` + lone CR or U+2028/U+2029, and `for (using of of [0]);` (#33); a statement that starts with `{a: 0}` is read
+  as an object instead of a block (#34, upstream #259).
+- 28 of the 54,596 inputs that the discovery run labels valid still give an error (49 at `v2.1.0`), all from test262:
+  11 with sloppy-mode `yield` as an identifier (#35), 4 block-comment ASI (#39), 3 `export default` boundaries (#33),
+  3 hashbang lines ended by CR, U+2028 or U+2029, 4 with U+0000 in a string literal (below), 2 class fields named `get`
+  or `set` before a next-line generator (`get` + line break + `*g() {}`; J7 left them out, +1.77 % `parser.c`), and the
+  Annex B `0/*` + line break + `*/-->` (kept out to keep the tree of the clean `0/*` + line break + `*/--> c`).
+- U+0000 in a string literal or a comment gives an error: the generated lexer stops there, which the grammar cannot
+  change (J7 fixed it for templates, which the scanner reads).
+- J8 accepts some invalid input: `import { if } from 'x'` and `export { if }`; call expressions beyond the
+  web-compatible form as assignment targets (`import('x') = 1`, `f?.() = 1`, tagged templates, `super() = 1`,
+  `typeof f() = 1`), and `f() = 1` also in strict code and modules; in `for (async of => {};;)` a line break after
+  `async` or before `=>` (ECMA-262 §15.9 forbids it; rejecting it costs +1.2 % to +5.3 % `parser.c`).
+- Invalid input that stays accepted, found by the discovery run, with the stricter grammar planned for v3.0.0: optional
+  chains as assignment, update or destructuring targets (`a?.b = 1`, `a?.b++`, `[a?.b] = c`; #19), class declarations as
+  the body of `if`, loops and labels, an arrow function as an operand of a binary operator, `??` mixed with `||`/`&&`
+  without parentheses, and `class extends` with an expression that is not a LeftHandSideExpression.
+- JSX names that conflict with TypeScript rules in TSX stay errors: `<const />`, `extends` as an element or attribute
+  name, reserved words in namespace names (`<svg:true />`), reserved words other than `this` as the object of a member
+  tag (`<super.Foo />`, `<class.Foo />`). The grammar does not compare opening and closing tag names (#20).
+- `using` line breaks (#18): in a `for` header a line break after `await using` or between `await` and `using`, and a
+  line break inside a block comment after `using`, are accepted; so is `for (using of of y);`. In a block in an async
+  function, `{ await` + line break + `using x = g(); }` is accepted and read as `await;` and a `using_declaration`,
+  although the line break is not allowed there (Babel early error, oxc syntax error); in a non-async function in a
+  script the same text is valid and that reading is right. Valid forms with a wrong tree: in a block, `{ using /*` +
+  line break + `*/ x = f(); }` (`using;` and an assignment, as Babel and oxc read it) and, in an async function,
+  `await using /*` + line break + `*/ x = g();` are read as a `using_declaration`, which misses the line break.
+  Rejecting `for (using of of y);` changes the tree of the valid `for (using of of [1, 2]);`, and the block-comment fix
+  changes valid trees, so these wait for v3.0.0.
+- `await using` in a non-async function (`function f() { await using x = g(); }`) is accepted, although the ECMAScript
+  grammar excludes it; Babel and oxc reject it (#26). It needs the await context of the v3.0.0 work (#35).
+  `await using` at module top level and in async functions is valid.
+- Early errors are a non-goal (ADR-0001): for example a `using` declaration without an initializer,
+  `for (using x;;);`, and duplicate import attribute keys are accepted.
+- Other `isw*` calls in `src/scanner.c` (`iswspace` in `scan_jsx_text` and the calls on the automatic-semicolon,
+  ternary and HTML-comment paths) still use the platform classification (#16), so a few inputs get a different clean
+  tree on Windows (UCRT) than in the C locale (Linux): for example in `a//c` + CR + `/**/` + U+2028 at the end of
+  input, Windows skips U+2028 as white space and puts the first comment in the statement, the C locale puts it in
+  `program`. Eight oracle cases of this form check only what holds on both (see Added). The new
+  check for an identifier after `in`/`instanceof` uses an explicit list rather than `iswalpha`, so for rare non-ASCII
+  letters its result can differ from the platform classification used before.
+- The node-kind snapshot gate does not check the types of `children` or the `multiple` and `required` flags (#38); in
+  this release `src/node-types.json` does not change at all.
+- TypeScript: `import x = a.class;` (and `export import`, `import x = a.class.b;`) is accepted, although TypeScript
+  rejects it (TS1359); the fix belongs in tree-sitter-typescript. The J8 fixes for the import line break,
+  tagged-template escapes, `f() = 1` and the attribute restriction need their own changes in tree-sitter-typescript's
+  `define-grammar.js` (handed over); `f() += 1` and the `for` heads follow by inheritance. The J7 scanner rules do not
+  reach TS/TSX, which use their own scanner; vendoring this `grammar.js` there needs the two external tokens in its
+  `scanner.h` (see Changed).
+- Inherited build templates: a fresh CMake build needs the tree-sitter CLI, `setup.py` tags a free-threaded CPython
+  build as `cp310-abi3`, and `make install` leaves the pkg-config description empty and prefixes absolute paths
+  ([#22](https://github.com/wotjr1649/tree-sitter-javascript/issues/22)).
+
 ## [2.1.0] - 2026-11-20
 
 A minor release: valid syntax that gave an error now parses (J8), invalid `using` and import-attribute forms that parsed
@@ -274,5 +414,6 @@ Not fixed in 2.0.0; tracked as GitHub Issues where a number is given:
   build as `cp310-abi3`, and `make install` leaves the pkg-config description empty and prefixes absolute paths
   ([#22](https://github.com/wotjr1649/tree-sitter-javascript/issues/22)).
 
+[2.2.0]: https://github.com/wotjr1649/tree-sitter-javascript/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/wotjr1649/tree-sitter-javascript/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/wotjr1649/tree-sitter-javascript/compare/v1.0.0...v2.0.0
