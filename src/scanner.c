@@ -15,6 +15,7 @@ enum TokenType {
     // Never returned: only their validity is read (see grammar.js).
     BINDING_END,
     KEYWORD_CONTINUES,
+    RESTRICTED_KEYWORD, // Never returned: only its validity is read (see grammar.js).
 };
 
 void *tree_sitter_javascript_external_scanner_create() { return NULL; }
@@ -260,6 +261,54 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
     return semicolon_before_next_token(lexer, valid_symbols);
 }
 
+// After `return`, `break`, `continue` and a label (ECMA-262 12.9.1, no LineTerminator here): a line terminator ends the
+// statement whatever follows it, unless it is an explicit `;`. A lone CR is a line terminator, and so is one in a block
+// comment. The statement also ends at an included range start, a `}` and the end of the input.
+static bool scan_restricted_semicolon(TSLexer *lexer) {
+    lexer->result_symbol = AUTOMATIC_SEMICOLON;
+    lexer->mark_end(lexer);
+
+    bool newline = false;
+    for (;;) {
+        int32_t c = lexer->lookahead;
+        if (c == 0 || c == '}' || lexer->is_at_included_range_start(lexer)) {
+            return true;
+        }
+
+        if (c == '\n' || c == '\r' || c == 0x2028 || c == 0x2029) {
+            newline = true;
+            skip(lexer);
+        } else if (is_extra_space(c)) {
+            skip(lexer);
+        } else if (c != '/') {
+            return newline && c != ';';
+        } else {
+            skip(lexer);
+            if (lexer->lookahead == '/') {
+                while (lexer->lookahead != 0 && lexer->lookahead != '\n' && lexer->lookahead != '\r' &&
+                       lexer->lookahead != 0x2028 && lexer->lookahead != 0x2029) {
+                    skip(lexer);
+                }
+            } else if (lexer->lookahead == '*') {
+                skip(lexer);
+                while (lexer->lookahead != 0) {
+                    c = lexer->lookahead;
+                    skip(lexer);
+                    if (c == '*' && lexer->lookahead == '/') {
+                        skip(lexer);
+                        break;
+                    }
+                    if (c == '\n' || c == '\r' || c == 0x2028 || c == 0x2029) {
+                        newline = true;
+                    }
+                }
+            } else {
+                return newline; // A regular expression, or a division
+            }
+        }
+    }
+}
+
 static bool scan_ternary_qmark(TSLexer *lexer) {
     for (;;) {
         if (!iswspace(lexer->lookahead)) {
@@ -428,7 +477,9 @@ bool tree_sitter_javascript_external_scanner_scan(void *payload, TSLexer *lexer,
 
     if (valid_symbols[AUTOMATIC_SEMICOLON]) {
         bool scanned_comment = false;
-        bool ret = scan_automatic_semicolon(lexer, valid_symbols, &scanned_comment);
+        bool ret = valid_symbols[RESTRICTED_KEYWORD]
+                       ? scan_restricted_semicolon(lexer)
+                       : scan_automatic_semicolon(lexer, valid_symbols, &scanned_comment);
         if (!ret && !scanned_comment && valid_symbols[TERNARY_QMARK] && lexer->lookahead == '?') {
             return scan_ternary_qmark(lexer);
         }

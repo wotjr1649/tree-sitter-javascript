@@ -42,6 +42,9 @@ module.exports = grammar({
     // ...and after a keyword that may still go on: before a declarator (`let`, `using`) or a property name (`get`,
     // `set`, `static`, `async` in a class), after `await` and `yield`.
     $._keyword_continues,
+    // Never produced: the scanner only reads whether it is valid, after `return`, `break`, `continue` and a label, where a
+    // lone CR ends the statement like any other line terminator (ECMA-262 12.9.1: no LineTerminator here).
+    $._restricted_keyword,
   ],
 
   extras: $ => [
@@ -147,7 +150,7 @@ module.exports = grammar({
       repeat($.statement),
     ),
 
-    hash_bang_line: _ => /#!.*/,
+    hash_bang_line: _ => /#![^\r\n\u2028\u2029]*/,
 
     //
     // Export declarations
@@ -171,6 +174,9 @@ module.exports = grammar({
             'default',
             choice(
               field('declaration', $.declaration),
+              // An anonymous function or class here is a declaration (ECMA-262 16.2.3), not an expression statement:
+              // what follows, ';' included, is the next statement.
+              prec(1, field('value', choice($.function_expression, $.generator_function, $.class))),
               seq(
                 field('value', $.expression),
                 $._semicolon,
@@ -451,14 +457,22 @@ module.exports = grammar({
         ),
         // A using declaration starts a `for…of` head only: `for…in` passes ~Using to ForDeclaration (ECMA-262 §14.7.5).
         seq(
-          field('kind', choice(
-            'using',
-            seq('await', 'using'),
+          field('kind', 'using'),
+          field('left', choice(
+            $.identifier,
+            // Not `of`: `for (using of of[0])` is the expression `using` over `of[0]` (the grammar has [lookahead ≠ using of]).
+            // In TypeScript, `using as` and `using satisfies` can also start an expression, so these lex as keywords.
+            alias(choice('as', 'satisfies'), $.identifier),
+            $._destructuring_pattern,
           )),
+          optional($._automatic_semicolon),
+          field('operator', 'of'),
+        ),
+        seq(
+          field('kind', seq('await', 'using')),
           field('left', choice(
             $.identifier,
             alias('of', $.identifier),
-            // In TypeScript, `using as` and `using satisfies` can also start an expression, so these lex as keywords.
             alias(choice('as', 'satisfies'), $.identifier),
             $._destructuring_pattern,
           )),
@@ -500,12 +514,14 @@ module.exports = grammar({
     break_statement: $ => seq(
       'break',
       field('label', optional(alias($.identifier, $.statement_identifier))),
+      optional($._restricted_keyword),
       $._semicolon,
     ),
 
     continue_statement: $ => seq(
       'continue',
       field('label', optional(alias($.identifier, $.statement_identifier))),
+      optional($._restricted_keyword),
       $._semicolon,
     ),
 
@@ -516,6 +532,7 @@ module.exports = grammar({
 
     return_statement: $ => seq(
       'return',
+      optional($._restricted_keyword),
       optional($._expressions),
       $._semicolon,
     ),
@@ -1392,7 +1409,7 @@ module.exports = grammar({
       ']',
     ),
 
-    _reserved_identifier: _ => choice(...CONTEXTUAL_KEYWORDS),
+    _reserved_identifier: _ => choice(...CONTEXTUAL_KEYWORDS.filter(word => word !== 'export')),
 
     // `this`, `super`, `true`, `false` and `null` are named token rules: listing their strings here would turn
     // each into a non-terminal with an anonymous child, so the rules themselves are used instead.

@@ -32,7 +32,7 @@
    }
   },
   "cases_file": "cases.jsonl",
-  "cases_sha256": "c484dbfa61e81718ac1ed486c9350c25a9c404aae8ca13ce0362eca8b7538a17",
+  "cases_sha256": "3055e1c5076a8fd89a7d82a5c39825780158f3b56163b0a33444ab3e47e5133e",
   "runner": "run.mjs",
   "runner_sha256": "06cfe49cd56d0bac9b5c672b1f62fc0f44b37de02c0a2bf04c557e5354c5c24d"
  },
@@ -5271,6 +5271,741 @@
   {
    "id": "v3d/paren-object",
    "sha256": "17fa3bd06b276f6c1c93c4e8260a3a0d54e091766c22d40a1e1f3eb3d09752a2",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/export-default-fn-semicolon",
+   "sha256": "278fbff8183dacfc9f73e6ad7ed9e1c444590ce1488333757c90c143797d2129",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/export-default-class-semicolon",
+   "sha256": "c2a35172cbdbfea0cc5832990bbd661758791d6f462fd2ccf0467cbb0852ac3b",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/export-default-class-extends-semicolon",
+   "sha256": "dc9a296edb416a91f9fc79dc53f747f2b754de568ffca2c3cd9c7c6b18599264",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/export-default-generator-semicolon",
+   "sha256": "505fffa1272d9ad46bbc50b3b2494608dbf9a5bbb4bcf4fb9f82e26a8e67cfad",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/export-default-async-fn-semicolon",
+   "sha256": "a564aacf6c02303a24e22b07b6af6c89d3d60c62018ffb700bcbc1652bcb46a1",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/export-default-fn-block",
+   "sha256": "630a56231e03020570b7902cc1ad117182d6b7a18bf61938e05965a90760f508",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/export-default-class-if",
+   "sha256": "007491d2c8b340be4854dc5869055ef60616c9bb0b49dc5fc620604ba5f9aafc",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/export-default-fn-paren-next-line",
+   "sha256": "4028258f5223b5f8d0423eaca80517ed599788b32692963fcc3543cc6d33fb30",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/export-default-class-bracket-next-line",
+   "sha256": "38b7195d9768ab57d4a9c203fb0231a641ae9f6ad1745c78db5490c136eb0afd",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/export-default-class-then-class",
+   "sha256": "4fcba2bc05299f88144baee5c6f415da7d4c17584f7acc8198cb121f477df3e6",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/export-default-parenthesized-fn-semicolon",
+   "sha256": "64f8c0a6ea9ef669492cda09f4b650aeb2727ee115b2dc2ea5816028cc9a7cc6",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/export-default-arrow-semicolon",
+   "sha256": "c77f5248c534fdc4c6404cc4a6d6143ad088458344096ed613e5e7755b132324",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/reject-export-default-fn-call",
+   "sha256": "18975de51679482d6bb9f5168c9ce5d5b39131262370371f8760700e18e96384",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (1:28)",
+      "at": 28
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Empty parenthesized expression",
+      "at": 27
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Empty parenthesized expression",
+      "at": 27
+     }
+    ]
+   }
+  },
+  {
+   "id": "v3b/export-newline-clause",
+   "sha256": "d88183d07168b36ac0e5894b52f8d02a61addc222b0313fab1211ce041b010ad",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/export-newline-var",
+   "sha256": "71fa50187191aac4f61b818af2a9334259f74d4873e0196bbe8a957c86b32dba",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/export-newline-clause-from",
+   "sha256": "9eab21ad5ffefd97df0190a43f30c13ea35d0dbd56870ba7037895e4beac76dd",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/export-newline-default",
+   "sha256": "78697574b011c28905818cd9139b41ca97b049a107697dbe0e16dba90f062ae9",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/return-cr",
+   "sha256": "37655b836e7bbb74438a237d2461ce1c3719efeca4697e8f753aedd79eb87aed",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/return-crlf",
+   "sha256": "190552602b2369e2973e508a69a67ac92d8db425d0d877f4fc9c5611b3baf4b9",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/break-cr",
+   "sha256": "b4242d8833ad0ecbe355cbb75cbd61f5ab2f8c28a086ac2e56d66e10aeb8ac15",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/continue-cr",
+   "sha256": "f9899578f824fc11f6234866efad82fca79d870e24cfecd513d8cb88aaebc1f6",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/for-using-of-of-subscript",
+   "sha256": "10102bfe8b0ee6e92b9fda8b62ec1aaccb77f02358f4d6a0152c392679b5f80c",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/for-using-of-of-sequence-index",
+   "sha256": "0d37b1ad470968c919a4f497c04cac27f1514e4b60848f7b3e8b13ff76c30729",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/for-await-using-of-of",
+   "sha256": "2e65024aaa8e6e28029a151b2bfc87722accf672b55862ce768d67bda0d1e3a2",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/reject-for-using-of-of",
+   "sha256": "ec90573105fcab0966bceab2279ad5ed414f40501c5ebc6daa597609a321868a",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token, expected \")\" (1:16)",
+      "at": 16
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected `)` but found `Identifier`",
+      "at": 16
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected `)` but found `Identifier`",
+      "at": 16
+     }
+    ]
+   }
+  },
+  {
+   "id": "v3b/reject-for-using-of-in",
+   "sha256": "e73964027afdfb42526e0031e2e38d6f61636c4891806cec275422e719737c93",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (1:13)",
+      "at": 13
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token",
+      "at": 13
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Unexpected token",
+      "at": 13
+     }
+    ]
+   }
+  },
+  {
+   "id": "v3b/hashbang-ls",
+   "sha256": "cab91b05cfa39962c3557db9d7380f2f8f5d4f394ef349961f04ae14de5e6a9d",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/hashbang-ps",
+   "sha256": "31b7059cebd48c252480a8decef0795a4e61a18d578ca18c1f9dc5843fb52c69",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/hashbang-cr",
+   "sha256": "66b1ae05ab005e5550696cad2839b950b677203538afee9882999bfc93fc5078",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/return-lf-paren",
+   "sha256": "ca282a5c324a7e01054728200c6f6c338d4339104375e08a4c510055ffbcdc04",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/return-cr-array",
+   "sha256": "7a66926a076103aa24fce73aac17df1a0bb01d0074d0c1b54f804bc84a20be92",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/return-ls-plus",
+   "sha256": "4c32f1a25ec22a720b8ac25b3956a89393cb19a845c3a86bc1318864df03ad2c",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/break-lf-array",
+   "sha256": "6c7670d61d0f1c101ea7a8614e9ab76daf837852f52d984291556aa152a81c8b",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/continue-label-cr-plus",
+   "sha256": "b4fdbf056d1fdc428d6e331fb7b80dfd4d976b5dc26382ea7ffc6dae4a6794d4",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/return-block-cr-semi",
+   "sha256": "d283c9b33ef16365fff5ef2de1f48c62ff60f3f04b2c934b5a1638bbb823a7da",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/break-block-cr-semi",
+   "sha256": "6523aca7e2a7082ab8b9d17e9a3eaa3fe83facfc2c82c733a0306a5510291975",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/return-block-cr-regex",
+   "sha256": "b8e2ade64b3f2ff3c851322457d6174b75a8e043cd7f0d42d4565947e5469f06",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/return-lf-semi",
+   "sha256": "037c2a9d316e8165fa068ea2a91354f225d58d60c9720c98a14fe5edca6217a7",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/return-non-bmp-call",
+   "sha256": "c5bd79daa576773cfd99cd3682c7ef666225810c8b73be3780b4eeda409473c6",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/return-u2000-paren",
+   "sha256": "0429e94128f8934852128261f93cf3a2598defb8f55dc75db161e5aaea5247a8",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/break-non-bmp-label",
+   "sha256": "f4ae740800117fc5da90c396eb58843d6c7018fcb3c1a419e58c90d1c71061e1",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/break-u2000-array",
+   "sha256": "e261d33088a984cf2886bd484e06b47090d0900cc9b1a1e74b58d10964875352",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/continue-non-bmp-label",
+   "sha256": "8f8227605e6715b2108201f59f3f29802900924cfa307c467ccd5d1171b58635",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/continue-u2000-plus",
+   "sha256": "f8cd2c49ac3107980574d07222b056e9fa8243b9a80dc66e4e1eaf5db3de8c95",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/return-bom-before-lf",
+   "sha256": "0c552dfc5bbd47471ed2f3de4f2587841685ca4ffea2f2045d4f2c6455c95e07",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3b/return-bom-explicit-semicolon",
+   "sha256": "8b91fec5a4b6feaf3cefcd9a03b72c377eb7c49c7ce968038241f2b3b2e2297d",
    "sourceType": "script",
    "verdict": "accept",
    "babel": {
