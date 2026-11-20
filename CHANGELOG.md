@@ -7,26 +7,73 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Planned for v3.0.0.
+Planned for v3.0.0. This is a breaking release under the SemVer rule in `AGENTS.md`: valid inputs that previously
+parsed without errors now have different trees, including await and `for await` forms (#32), exports and restricted
+statements (#33), labeled blocks (#34), and scanner-dependent inputs on Windows (#42, #16).
 
 ### Fixed
 
-- Parse ambiguous calls, member accesses and subscripts as await operands in forms such as `await (x)(y)`.
+- Parse ambiguous calls, member accesses and subscripts as await operands in forms such as `await (x)(y)` (#32).
   Keep `await(a).x=b` and `await[a].x ??= b` as assignments to an expression involving the identifier `await`.
-- Parse `let [a]` in `for await (let [a] of b)` as an array binding pattern.
+- Parse `let [a]` in `for await (let [a] of b)` as an array binding pattern (#32).
+- Parse the semicolon after a default-exported function, generator or class as a separate `empty_statement`, for
+  example in `export default function(){};` (#33). A line break after `export` can precede an export clause or
+  declaration (`export\n{}`, `export\nvar a`), keeping both lines in one `export_statement`.
+- Honor automatic semicolon insertion for restricted statements using the `_restricted_keyword` scanner marker
+  (#33). A lone CR, including one in a block comment, can end a `return`, `break` or `continue` statement before
+  its expression or label. For example, `return\r0` is a bare return followed by an expression statement.
+- Treat the first `using` in `for (using of of [1, 2]);` as the loop's identifier and `of [1, 2]` as the right-hand
+  subscript expression (#33). `for (using of of);` now parses, and `for (using of of y);` now gives a syntax error.
+  The `of` binding in `for (await using of of y);` is still a declaration.
+- End hashbang comments at CR, U+2028 (LS) and U+2029 (PS) as well as LF (#33). The next statement or comment is
+  parsed separately, and the range of a CRLF-terminated `hash_bang_line` excludes the CR.
+- Parse `{a:0}` at the start of a statement and in an arrow body such as `() => {a:0}` as a `statement_block`
+  containing a `labeled_statement` (#34). Expression positions such as `({a:0})` and `() => ({a:0})` still contain
+  an `object`.
+- Use explicit code-point classes for scanner whitespace and ASCII digits (#42, #16). On Windows, U+FEFF is treated
+  as whitespace in scanner lookahead, and supplementary-plane code points keep their full value instead of being
+  truncated to 16 bits. This changes trees such as a trailing block comment after `a\r\uFEFF`, which now lies outside
+  the statement, `a\n\u{12000}(b)` and `a?.\u{10030}b`. The three tested classification modes (Windows UCRT, C locale
+  emulation and glibc-like emulation) produce identical trees with the new scanner.
+- Count only ASCII whitespace (U+0009 through U+000D and U+0020) when checking for blank JSX text lines (#42, #16).
+  Lines containing only U+00A0 or U+3000 now yield `jsx_text`. A line break before a comment is also retained for
+  semicolon insertion in forms such as `let x\n\uFEFF/**/[y]`, which now parses as a declaration and a separate
+  array expression.
 
 ### Changed
 
-- `await++\n(a)(b);` and `await/*\n*/++(a).x;` still form one statement and now parse as await expressions.
-- `await(a)(b;` still has a missing closing parenthesis, now in a call inside the await operand.
-- `for await(let [a] of) {}` still has a missing right-hand identifier and now has an array pattern on the left.
-- `for await (let[0] of b)` now has a syntax error because `0` cannot bind a declaration.
-- `for await (let[a] in b)` still parses without an error and now has an array pattern on the left.
-- In async code, `await a=b` and `await a+=b` now produce a syntax error.
+- Babel reads `await++\n(a)(b);` and `await/*\n*/++(a).x;` as two statements. This grammar still reads each as one
+  statement and now parses it as an `await_expression` (#32).
+- `await(a)(b;` still has a missing closing parenthesis, now in a call inside the await operand (#32). This also
+  applies across line breaks in `await(a)\n(b;\nx();`. In `await[a]?.[;` the `ERROR` still covers bytes [8, 11),
+  and the preceding `subscript_expression` becomes an `await_expression` with an array operand.
+- `for await(let [a] of) {}` still has a missing right-hand identifier and now has an array pattern on the left (#32).
+- `for await (let[0] of b)` now has a syntax error because `0` cannot bind a declaration (#32).
+- `for await (let[a] in b)` still parses without an error and now has an array pattern on the left (#32).
+- In async code, `await a=b` and `await a+=b` now produce a syntax error (#32).
 - Recovery for `new f() = 1;` places the call under the constructor. Recovery for `a?.delete(;` places an
-  `ERROR` at the opening parenthesis.
+  `ERROR` at the opening parenthesis (#32).
 - Invalid `await using [] = null;` recovers as an assignment with an `ERROR` over `using []`. An invalid
-  initializer in `for await (let [x] = 0 of [])` puts the array pattern inside the `ERROR` node.
+  initializer in `for await (let [x] = 0 of [])` puts the array pattern inside the `ERROR` node (#32).
+- Recovery changes for invalid export attributes such as `export {a} from 'x' with {['type']: 'json'};` and for
+  `for (using of of y)` (#33). In `export {a}\nwith {a:1}`, `with` retains its `ERROR` range and the following
+  braces recover as a labeled block. The same block recovery applies to invalid standalone `else{a:0}` and
+  `case 1:{a:0}` (#34).
+- In `src/node-types.json`, `await_expression` still has one required direct child. Its declared types narrow from
+  `expression` to `primary_expression`, `await_expression`, `unary_expression`, `update_expression`, `new_expression`,
+  `jsx_element` and `jsx_self_closing_element` (#32). Expanding the supertypes excludes direct assignments, augmented
+  assignments, binary expressions, ternaries and yield expressions. These can still be reached inside parentheses.
+  `export_statement.value` adds `class`, `function_expression` and `generator_function` (#33).
+- Numeric symbol IDs shift as external tokens are added, including `_restricted_keyword` (#33). Recompute stored
+  numeric IDs against the new parser.
+
+### Migration
+
+- Recheck queries on `await_expression` that match the old direct children and descend through
+  `parenthesized_expression` where appropriate. For `export_statement`, account for the new `value` types and
+  the sibling `empty_statement` after a default-exported declaration. Regenerate types derived from `node-types.json`.
+- When vendoring into tree-sitter-typescript, apply the handoff patches `ts-scanner-j7-externals.patch`,
+  `ts-v3b-restricted-keyword.patch` and `ts-v3a-await-operand.patch` alongside the JavaScript grammar.
 
 ### Known limitations
 
@@ -34,7 +81,13 @@ Planned for v3.0.0.
   In a non-async script or function body, `await (x)(y)`, `await (a).b()`, and `await [0].x` can parse as await
   expressions even when `await` is an identifier. `await[a]++` can parse as an await of an update to the
   array literal `[a]`. This also affects nested non-async functions and arrows, for example
-  `async function f(){return ()=>await(a)(b);}`.
+  `async function f(){return ()=>await(a)(b);}`. Conversely, `await (a).x=b` can still parse as an assignment
+  using the identifier `await` in an async function, where both reference parsers reject it.
+- In the 28,628-input whitespace and comment family tested for #42, 2,417 inputs accepted by Babel and oxc
+  had parsed on Windows because scanner lookahead stopped at a non-ASCII space after a line break. These now
+  give errors across platforms, like their ASCII counterparts. Examples are `let x\n\uFEFF(y)`,
+  `let x\n\u3000+y`, `let x\n\u00A0-y` and `let x\n\uFEFF/y/`. Declaration-ending semicolon insertion before
+  `(`, `+`, `-` or `/` after a line break is tracked in #43.
 
 ## [2.2.0] - 2026-11-20
 
