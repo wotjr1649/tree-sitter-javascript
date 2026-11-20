@@ -40,13 +40,18 @@ module.exports = grammar({
     // it when it decides on an automatic semicolon. Valid after a class field name without an initializer...
     $._binding_end,
     // ...and after a keyword that may still go on: before a declarator (`let`, `using`) or a property name (`get`,
-    // `set`, `static`, `async` in a class), after `await` and `yield`.
+    // `set`, `static`, `async` in a class), and after `yield`.
     $._keyword_continues,
     // Never produced: the scanner only reads whether it is valid, after `return`, `break`, `continue` and a label, where a
     // lone CR ends the statement like any other line terminator (ECMA-262 12.9.1: no LineTerminator here).
     $._restricted_keyword,
     // A declaration without an initializer can end before an opening parenthesis on the next line.
     $._declaration_end,
+    // Only the validity of this marker is used, to tell a modifier from a field before '*'.
+    $._generator_method_continues,
+    $._static_before_get_field,
+    // Never produced. An await operand may follow a line terminator in trivia.
+    $._await_operand_continues,
     // The scanner returns the same identifier token for await and yield when their keyword is inactive.
     $.identifier,
     $._enter_plain,
@@ -996,7 +1001,7 @@ module.exports = grammar({
     // A direct assignment is outside that operand, so `await(a).x=b` retains its identifier interpretation.
     await_expression: $ => prec.dynamic(1, prec('unary_void', seq(
       'await',
-      optional($._keyword_continues),
+      optional($._await_operand_continues),
       $._await_operand,
     ))),
 
@@ -1385,7 +1390,7 @@ module.exports = grammar({
 
     field_definition: $ => seq(
       repeat(field('decorator', $.decorator)),
-      optional('static'),
+      optional(choice('static', alias($._static_before_get_field, 'static'))),
       field('property', $._property_name),
       optional(choice($._field_initializer, $._binding_end)),
     ),
@@ -1433,15 +1438,16 @@ module.exports = grammar({
       repeat(field('decorator', $.decorator)),
       optional(choice(
         'static',
+        alias($._static_before_get_field, 'static'),
         alias(token(seq('static', /\s+/, 'get', /\s*\n/)), 'static get'),
       )),
       choice(
         seq($._ordinary_method_name, field('parameters', alias($._ordinary_method_parameters, $.formal_parameters))),
         seq(
           choice(
-            seq('async', optional(choice('get', 'set')), field('name', $._property_name), $._enter_await),
-            seq('*', field('name', $._property_name), $._enter_yield),
-            seq('async', '*', field('name', $._property_name), $._enter_both),
+            seq('async', optional($._restricted_keyword), optional(choice('get', 'set')), field('name', $._property_name), $._enter_await),
+            seq(optional($._generator_method_continues), '*', field('name', $._property_name), $._enter_yield),
+            seq('async', optional($._restricted_keyword), optional($._generator_method_continues), '*', field('name', $._property_name), $._enter_both),
           ),
           field('parameters', $.formal_parameters),
         ),
