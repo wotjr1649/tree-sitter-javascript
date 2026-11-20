@@ -470,9 +470,8 @@ static bool scan_automatic_semicolon(Scanner *scanner, TSLexer *lexer, const boo
     if (async_field && next == ASI_NEXT_TOKEN && (lexer->lookahead == '*' || lexer->lookahead == '[')) {
         return true;
     }
-    bool explicit_end = next == ASI_NEXT_TOKEN && lexer->lookahead == ';';
     if (semicolon_before_lookahead(lexer, valid_symbols, next, declaration_end, defer_binding)) return true;
-    return needs_prefix && !explicit_end && remember_html_open(scanner, lexer, valid_symbols);
+    return needs_prefix && remember_html_open(scanner, lexer, valid_symbols);
 }
 
 // A line break before an operand or '*' cannot be skipped, even where ASI is unavailable.
@@ -765,8 +764,8 @@ bool tree_sitter_javascript_external_scanner_scan(void *payload, TSLexer *lexer,
             bool needs_prefix = trivia.html_open_needs_prefix;
             next = scan_after_html_open(lexer, false);
             bool delimiter = next == ASI_NEXT_TOKEN && at_concise_body_end(lexer);
-            if (next != ASI_END && !semicolon_before_lookahead(lexer, valid_symbols, next, false, false)) {
-                return needs_prefix && !delimiter && remember_html_open(scanner, lexer, valid_symbols);
+            if (!delimiter && next != ASI_END && !semicolon_before_lookahead(lexer, valid_symbols, next, false, false)) {
+                return needs_prefix && remember_html_open(scanner, lexer, valid_symbols);
             }
             return leave_context(scanner, lexer, LEAVE_CONCISE_BODY);
         }

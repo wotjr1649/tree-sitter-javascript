@@ -32,7 +32,7 @@
    }
   },
   "cases_file": "cases.jsonl",
-  "cases_sha256": "a92886e55511e7e4bdd2e51e8d0276dd762aa1c72f052455ecc4ab2556d2da0c",
+  "cases_sha256": "846aeae62d1a6fbdbf559234143ee657ab3cb022613d663a058c2fdfb746373d",
   "runner": "run.mjs",
   "runner_sha256": "06cfe49cd56d0bac9b5c672b1f62fc0f44b37de02c0a2bf04c557e5354c5c24d"
  },
@@ -33621,6 +33621,3021 @@
   {
    "id": "iab/ps/two-blocks/ooc/logical",
    "sha256": "77f04dbf18b3e0ff43707c671d8f57cf0ec14624da40b3b06388f8b8548cd402",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/lf/inner/oc/class/end",
+   "sha256": "2143dd40a91b9c46871f1d3c6cb4a9317af6a33e8fac39d6e789404c24215b2e",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/lf/inner/oc/class/explicit",
+   "sha256": "b8596ab8ea5fb519ed83b064bb3d16daed38126564924be17297cedba9af5966",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/lf/inner/ooc/class/end",
+   "sha256": "54e2e3aa18562602d0290bfcbf2ae6209a1f9fb5b6377536154a1be70fe10713",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/lf/inner/ooc/class/explicit",
+   "sha256": "62dffe3a1535e2cf532962380590b03f7340d2609e06486282611ff021999ddf",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/lf/inner/oco/class/end",
+   "sha256": "57e0bf182eabaf72ab4e96e2d6c80ac62ec371ae857829c0853d40a276f4dc3c",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/lf/inner/oco/class/explicit",
+   "sha256": "945513693fcd0207426a4e0522ce6ffc72bc68de34964b4e64653bda41127906",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/lf/inner/occ/class/end",
+   "sha256": "b96e6c765b27fc55c1b85acf4031d982a938252bccedfaadd79553a14496fba6",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/lf/inner/occ/class/explicit",
+   "sha256": "02e20988ba3504642bbffad73cbab4f0b0b2f12ebecae2835a6acb7c918d2807",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/lf/after/oc/arrowarg/end",
+   "sha256": "5b7d407931e7b8815b8b83650b48470b0d4724f8ab54eb62344e11378d48161e",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/lf/after/oc/arrowarg/comma",
+   "sha256": "99ddc487464d3d2169e898dd37ce1e8f45fa23a158414895f8258173a0dba65c",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/lf/after/ooc/arrowarg/end",
+   "sha256": "19c991591437f65625850e97dfc2a16fe6b445f0ac58e26665756427683cc752",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/lf/after/ooc/arrowarg/comma",
+   "sha256": "25a26ac8ecd53ba536dda9dedb2aeecc86f0ee5ac9355979282300ca5c8b9734",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/lf/after/oco/arrowarg/end",
+   "sha256": "d7f71109bc1d599b1d9c80d895b8860592ff731a53febd24254e0dfa0b7a52bc",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/lf/after/oco/arrowarg/comma",
+   "sha256": "5f5475a07b51d3e9cec4f09d10e29c43394f85bb74b8f6bbfcadc347ddd55c42",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/lf/after/occ/arrowarg/end",
+   "sha256": "1717014764b97b7d2aa2056a172a422e26a3810c533fd7500b4fb3d5fe2a7ec7",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/lf/after/occ/arrowarg/comma",
+   "sha256": "c5079539d806baabec7f116e9c8431ca7d4bfa5b313c8df4363a663e2cdc0c8f",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/lf/before/oc/class/end",
+   "sha256": "ae308900475ba53da7393f4f3c8e80f5041b8d86606f3a3daca22460a0de1f7e",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/lf/before/oc/class/explicit",
+   "sha256": "f1581284766f4d1bed9d446522394ad7d961512123eafc8c4b3b908787ae142f",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/lf/before/ooc/class/end",
+   "sha256": "467c29462e8275d805e78889d1c165b85e8ef458ac0b92b25a016b18b67c30bb",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/lf/before/ooc/class/explicit",
+   "sha256": "c52cc34f6c8bcc2d4087cc7e54df5ffd142c9e0593aab16363471acbe5afffde",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/lf/before/oco/class/end",
+   "sha256": "4501dfc778c3fa7c5f4ddf1eabd0c0ef5b0f70220e1b7db172045272117d5bd6",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/lf/before/oco/class/explicit",
+   "sha256": "1c59473541411ee29d92c6c05a2d7d5d36a1dab768c93cb100bdde78ec2fabc7",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/lf/before/occ/class/end",
+   "sha256": "dbc255bf547d0f4309c1b894bfa8cb91266f03aa6014195ef432a30081da0381",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/lf/before/occ/class/explicit",
+   "sha256": "92b2a163d58a3005e7bb7dbf76b237d25653c99ce3eefe1dfbea6f7a9845bbc0",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/lf/double/oc/class/end",
+   "sha256": "694b7433ceee5467c17ad0aaf1cab296cd352078c26adf3ef43edba7d4fce242",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/lf/double/oc/class/explicit",
+   "sha256": "f15b80c8e9dfc91066d5e4bc458decccdf55456d3849a7f2b508031fb11fe8d9",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/lf/double/ooc/class/end",
+   "sha256": "db88f4b1784a4dc6982466362a7ccc6e477b5cf24207aef17fa8eab6d31162ee",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/lf/double/ooc/class/explicit",
+   "sha256": "1728c50d4731d89a44737f480bc70429a1354d0c3ff9f9ceb9f742528c7bb9e8",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/lf/double/oco/class/end",
+   "sha256": "fbbf22bc3fb2f2a5676aab20cad9d5cc7da9031fa32e3cfb0630d629c6537ace",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/lf/double/oco/class/explicit",
+   "sha256": "0353da1c3c4b8ce5b260463deb3e8b252ef89d10c88de1c84ebaf7be8d3f9110",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/lf/double/occ/class/end",
+   "sha256": "3440e9bc1dce3dfdc20dfd73da7894d87c2b960955af832d5c90acf97d91b6ef",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/lf/double/occ/class/explicit",
+   "sha256": "229cd6ddf89b6a59e3f32ce8f22ee415281b856d603275606a408cc11c7e9e0b",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/lf/line/oc/arrowarg/end",
+   "sha256": "46b7f797f24ba4798351fc67e2dbcd43a7630211063b272a7c652fddeea4566c",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/lf/line/oc/arrowarg/comma",
+   "sha256": "58859d7fbc193e0606e0f963e904819642ccc8d4c4f5409d5cbd7eb5e7d0eb2c",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/lf/line/ooc/arrowarg/end",
+   "sha256": "89dcf706a38ff25f77416f122c81014d1d34a1641d887cc33458173498429693",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/lf/line/ooc/arrowarg/comma",
+   "sha256": "5496cfa75253852edbd550a022387de79b9fc80a13a2053ecfaa165220835fae",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/lf/line/oco/arrowarg/end",
+   "sha256": "a37374be321426d8d18e7dbf4f06c3b96066fd9a8a667f328d48ec4ef4905cbf",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/lf/line/oco/arrowarg/comma",
+   "sha256": "b9acd6f1e20be57029c888676901fdc79a63a1c316f930d8c6c925a6609a7b6f",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/lf/line/occ/arrowarg/end",
+   "sha256": "32e4a1bb89c97185df4b0a529ac3756d1299538874728302144955820484eb36",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/lf/line/occ/arrowarg/comma",
+   "sha256": "a61bcdfd6d2c1530a8c47c4ab9345b8b4722e38ee2249410f0aea0fc40ae6a71",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/cr/inner/oc/class/end",
+   "sha256": "d03e388d9505e4533262d7053f86f132600039b369b067222302ee9539bf5070",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/cr/inner/oc/class/explicit",
+   "sha256": "fb8c44d13bf547f34391ea2e9c135b3d596ef1d9986a53a080a75d342ea37bb7",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/cr/inner/ooc/class/end",
+   "sha256": "3627bff6bffa85e85cece831736d9c70951c8460eae97ccf256744c8ca05df7a",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/cr/inner/ooc/class/explicit",
+   "sha256": "c75a0c27263a6cafaf82b0bfb0acced3d4be5207aad37d84141d21d7ebe69bae",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/cr/inner/oco/class/end",
+   "sha256": "2de84212c06cb8f0cfbbbd0a120158993f37af4ead71f56df20690926fa0043d",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/cr/inner/oco/class/explicit",
+   "sha256": "e62a09442b8aac312a221ff3435749fb3400dcfc5511e541c7123cbf6df7e917",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/cr/inner/occ/class/end",
+   "sha256": "f775f869cafb13ee1462d60258d9ed4cda65ec5b889e667de2dcc445a785ef7b",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/cr/inner/occ/class/explicit",
+   "sha256": "29b1c1599121744ca31513e25861cf6dba460cd89b66be7d4155607cdaed8e45",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/cr/after/oc/arrowarg/end",
+   "sha256": "ba2460b7c3c56e487a6996119020811ac944a3e0f435b123b49aec7137f9d35f",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/cr/after/oc/arrowarg/comma",
+   "sha256": "701f868eca7b5ca6786a927d7eca16f6f1a734cc1b39466ac9a99a0f5b5fe07c",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/cr/after/ooc/arrowarg/end",
+   "sha256": "d189c4707270dd059597fe392eebf3c542ef16ca92f8f8215aa04970424ed069",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/cr/after/ooc/arrowarg/comma",
+   "sha256": "41e2a4e61f986fd6530b588bf7f7e953aab2aa67d989c87504a96d5d807532fb",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/cr/after/oco/arrowarg/end",
+   "sha256": "103725bb6aac5e4ae816149c9452c743b700f05f48e04c300e3dab29bcefab50",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/cr/after/oco/arrowarg/comma",
+   "sha256": "03b207f34f1e21e9d785cff537885ce78effc0131aa658cb58ec6f629ad7448b",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/cr/after/occ/arrowarg/end",
+   "sha256": "b20afad9f967e7dd3df54a502743fcd6d7601ca1f938a253e29e5b1e840b235d",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/cr/after/occ/arrowarg/comma",
+   "sha256": "45f55e4f69b7fe2260f63428eb45d60d685ba000db5ec85b0d1372b260ca2872",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/cr/before/oc/class/end",
+   "sha256": "2a905be80200e0c2ec8f5e92f315a69c7406faea584afaa42c43739e21ff8b46",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/cr/before/oc/class/explicit",
+   "sha256": "06767b75ab1492b3bc7e11254326acc4add98a8000cee739315fe0c6b4b37d64",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/cr/before/ooc/class/end",
+   "sha256": "056d5277fdc18e45f1f08e836b53da2f664959a6434048890348ee19b6e56e3f",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/cr/before/ooc/class/explicit",
+   "sha256": "b3f49517cd793851423a5105b013a863953ae5a361ed3939094a92b73e0525bc",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/cr/before/oco/class/end",
+   "sha256": "d0e8fea18155bf2addea449847ea531a4e9aee57e9e5c740b96052b58f53f52f",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/cr/before/oco/class/explicit",
+   "sha256": "8865e1b29c42d0f214b2da8ce0d474c75a419c041be7d52b78bf8ffe87f1b9c3",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/cr/before/occ/class/end",
+   "sha256": "272f7617490e8457cbcc0f3053e975250e563e6799fe76e6d253041c34d315ae",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/cr/before/occ/class/explicit",
+   "sha256": "3fcdb430328c21fdaf585fb3f22c96daae5dc57df446aae2e79e2cb934062a9a",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/cr/double/oc/class/end",
+   "sha256": "c91fe651a0525c2720d14a610571a28f95bdddf8db4961a286e19146c36379d9",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/cr/double/oc/class/explicit",
+   "sha256": "b71fe9f285e1311fb5cb992e7031d48d97fdff461a626f2e3d1c3c2f2cc3006b",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/cr/double/ooc/class/end",
+   "sha256": "8dfa77e51329c34cd0ba1b1970e1ff58860e20102574180406f481616a72dba3",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/cr/double/ooc/class/explicit",
+   "sha256": "d49c60c6bd3aff18fa0767e86ee1534f152d3c9222fd790bdc6799177b638654",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/cr/double/oco/class/end",
+   "sha256": "6b21319e42cf23455c53fe23a27bfed081435043dcf2a04a8a5fdd4f01703ad3",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/cr/double/oco/class/explicit",
+   "sha256": "f2cf2876d6523ff38c64e422ced8b2651585f7d4d59cb334843f3a30ca5a74ab",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/cr/double/occ/class/end",
+   "sha256": "8e3383977fa2fba31014f34b5f7d02f9ceb2a088664b6a7a9803d0f18316e49c",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/cr/double/occ/class/explicit",
+   "sha256": "6831f3d46f402a530a7695409b44876f5507c6281fcdc798ecdf97b6c0974d01",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/cr/line/oc/arrowarg/end",
+   "sha256": "c2383d6ab1b2e03472a8c2eceaa9719881081a360eb166d2e9b865393f746f6d",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/cr/line/oc/arrowarg/comma",
+   "sha256": "799d630adc3474075bb3ca3dae3a0d101eff46701400f0346319ab55acd1743e",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/cr/line/ooc/arrowarg/end",
+   "sha256": "d1ab867494ce6bdce8ebbdacff9a11c43cf62c002d7ae203898716457935ac4c",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/cr/line/ooc/arrowarg/comma",
+   "sha256": "8d93c744d8ddb38b31296da80d1a603f4ff82a6e32b291f1af43cd114d7eff7d",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/cr/line/oco/arrowarg/end",
+   "sha256": "5b39033ae67a8907ac827fb0278fc43f1d2785ab9a4ec3aa556e225fb5393518",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/cr/line/oco/arrowarg/comma",
+   "sha256": "ef51b6cd67f8884523c7a76aaf651016e9a5a3906c34a03e786aedd5c208c32d",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/cr/line/occ/arrowarg/end",
+   "sha256": "3b834236f75ac4a64dc6acba3c51b9d66f7d6842d17881a3d2e5a9712170684e",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/cr/line/occ/arrowarg/comma",
+   "sha256": "d570b24c17ded911605e1233baf92ad7c4803e2af80a689cdd0a7565d4fa7193",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/crlf/inner/oc/class/end",
+   "sha256": "f6f9265de6b37ee64d98f6a57a2d639a39879b1272769cf7a9f835e23b651556",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/crlf/inner/oc/class/explicit",
+   "sha256": "5c14adf0cdfb8385a8ff80fe651433c296a3d6cb587e2ebc4b5812b92c60997b",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/crlf/inner/ooc/class/end",
+   "sha256": "026458c6f4ea4620d5237a61fb3d55b75a51ad356b8dfce8ddf23d22b5c6372a",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/crlf/inner/ooc/class/explicit",
+   "sha256": "f1443fb046bea41f5d5f968acf03cc919bcf3a48b0ef12a0996cd3f15fe6f3b8",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/crlf/inner/oco/class/end",
+   "sha256": "16f82593fd06f53ec42f61ce933b93f502f2cc8335362e54d3ed1a1431b542df",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/crlf/inner/oco/class/explicit",
+   "sha256": "6153ea7c984847b1352f72e49c6f7f23cd3367b5c4a9feb08c0b8c059ca4cc98",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/crlf/inner/occ/class/end",
+   "sha256": "e4f9889f78ea7c0e5b95a05e5aecb168f6ce2272f9a9d484fc1d50fbfd11386a",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/crlf/inner/occ/class/explicit",
+   "sha256": "6b625f4233587599288fa7b47d019f5d10b5ffefdd7018a5f9da533107f2e903",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/crlf/after/oc/arrowarg/end",
+   "sha256": "1b878cdfc86c484a1d8e59072f66b1507b193d02c5690ec185619e1b8c6c0c11",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/crlf/after/oc/arrowarg/comma",
+   "sha256": "ab920f12b8e7c909c68c0586e2d34b49e864e18e9ec115aa09494efdee6cb07a",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/crlf/after/ooc/arrowarg/end",
+   "sha256": "8bf9adb9094b00533b991e4106b28879c7bf206bf0788828ce6d3c957a30dc4c",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/crlf/after/ooc/arrowarg/comma",
+   "sha256": "5798f0f60e0cd28b9ed17a7ad0b46587c35e30f245188ac2494e273a696f6b36",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/crlf/after/oco/arrowarg/end",
+   "sha256": "317c0e53b75ec51f3b4aea269ecb3e71f9601cabcd68b01abe2add5776a7ecc2",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/crlf/after/oco/arrowarg/comma",
+   "sha256": "36871c585944093beac947f757d80221794a5d1bae38439db33c62b1c0af08e8",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/crlf/after/occ/arrowarg/end",
+   "sha256": "974fbacea0cec53e6d7b54c68777d51bfcb50ef556b8949efb1ddda62e60d175",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/crlf/after/occ/arrowarg/comma",
+   "sha256": "2d187036b4233f586cd5d5ba3f74a97cfe842409d66a5507bf2363d0dd074aba",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/crlf/before/oc/class/end",
+   "sha256": "af3e6c406d860e855f41e6356a78882a35592edc98fe0816a0e7133f2e1d876b",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/crlf/before/oc/class/explicit",
+   "sha256": "61ac3b8efc1d858ddd88ba16e4b7a39c6cb727f209a66427816fd2abbed6e684",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/crlf/before/ooc/class/end",
+   "sha256": "ed3139bd147143f95188c268f206eb3c04d6c0bd487b3b86d641ba91c9545fc7",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/crlf/before/ooc/class/explicit",
+   "sha256": "0e390c05c7f388d6026acc3153e152d925945ebef5586192f64bcef71b078b5c",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/crlf/before/oco/class/end",
+   "sha256": "1017b3438604a2f07c3a014bbbe5b0756389512068695a5da5e25822880b2c5b",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/crlf/before/oco/class/explicit",
+   "sha256": "9e542c563d45c1884f1cfb0cc67ba82d6b2daee6d7c4f0fb6412b93699c5d63a",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/crlf/before/occ/class/end",
+   "sha256": "ab32c9b3e1c60313851630633d7d0ca6a4a96c03b747689c7b703d376dd24c8a",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/crlf/before/occ/class/explicit",
+   "sha256": "0c14c12cc0bd2b84d453cd9c753b23eae4820719c51b4a751f5ce8481c7572ee",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/crlf/double/oc/class/end",
+   "sha256": "bd9b58dcc5095c61405c3337d2965946f6725f8d2674b62fa1c5ab140e3ccc8b",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/crlf/double/oc/class/explicit",
+   "sha256": "d6fb1b81e95d09a53a7cfd8d3af184cac866b6972964c9840bad70d8a722600b",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/crlf/double/ooc/class/end",
+   "sha256": "aca1e837ba10480e7e6f9416d37b0e4e8a5249a302729bd950990645067e7ab6",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/crlf/double/ooc/class/explicit",
+   "sha256": "a471aa178cf673e92104d26a9c30585ab6841eab8e2a349906160555c6ae3f55",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/crlf/double/oco/class/end",
+   "sha256": "ef5d858aeca00e7df6df3c0e12aa1e086cf7ff46c2c10979e7f4c68b88163d8c",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/crlf/double/oco/class/explicit",
+   "sha256": "5020a69319acea5091aaeddb6ee73f1bca5d141b45ac465dc626d810b9b43a9d",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/crlf/double/occ/class/end",
+   "sha256": "51e41b6149046ccb401a9258d108b730f6c259f11ae0f07d6e6d63e98e16a682",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/crlf/double/occ/class/explicit",
+   "sha256": "dfa597030876c0759bd2c622f2a05c2eba2b074297efb7261f6e238d892f314b",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/crlf/line/oc/arrowarg/end",
+   "sha256": "f0364a23f1c8cf0bcdddc80212a1e2939d0e4e6328c5fa470c722692f304176b",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/crlf/line/oc/arrowarg/comma",
+   "sha256": "6bf916d45fdca4b7fae1fb5c05fe7ee62c3b25921037c460da61b19e5681c7f8",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/crlf/line/ooc/arrowarg/end",
+   "sha256": "dfddb3c9185819e550938662465e5cb708385031c5e302956f077755d846ade5",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/crlf/line/ooc/arrowarg/comma",
+   "sha256": "86dd1756f04d43112e9f57a423e92419a3e9569cc3f8678ca6073056c65ca80d",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/crlf/line/oco/arrowarg/end",
+   "sha256": "041f08ec3cdeef6f2da5196347d3a2963080cea88b28997c17b41f78eb0a5043",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/crlf/line/oco/arrowarg/comma",
+   "sha256": "bbac366044914f7d77072397b73d2ea368817ad653574d1e74c887a016c32997",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/crlf/line/occ/arrowarg/end",
+   "sha256": "53399f0f6868706f55fbee2c209542e257301d3a1499685e54af236c339c21b8",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/crlf/line/occ/arrowarg/comma",
+   "sha256": "42cf2f279c78d368bc43b69aa3e7cf8fb4a1685bf19b911ef64cbf1a81037f5f",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ls/inner/oc/class/end",
+   "sha256": "6a0a54b2dcca83c6a703b992fa8d040e26db1ae77172be83690b3bceb553406e",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ls/inner/oc/class/explicit",
+   "sha256": "bafe250be90181ff44b5a50b5c7ae342c38bd86c6d90a55d4a6a64219cb39420",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ls/inner/ooc/class/end",
+   "sha256": "7d11da93fab337b20becbda6b18a11570c88f1e4e669a8a335b447e0420e8fb3",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ls/inner/ooc/class/explicit",
+   "sha256": "840546856efae1ad9fa15c44c75b547f5fc3689a97a3dfbc2f5a71a6e7428e02",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ls/inner/oco/class/end",
+   "sha256": "21d74a69e8c89545ea54f04e4d65f05f8d50e4994db464e7ce7c711fd329d9e0",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ls/inner/oco/class/explicit",
+   "sha256": "74b9c158405b7f0b4f1fdfe36457ca69bd1ef6f4efdf058b770f475fe7c830cf",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ls/inner/occ/class/end",
+   "sha256": "088e03f26d893636ea7888bf530d1615cb269c88ad647d56f7f39eb8ed7e599a",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ls/inner/occ/class/explicit",
+   "sha256": "767d507698ba60bd826d170cf573607f5a8635493ac4af77b458c06277a629c2",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ls/after/oc/arrowarg/end",
+   "sha256": "2e1379ed500a965b740ebf705cf3bc904bd8d36399dff060609bf7f6de181950",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ls/after/oc/arrowarg/comma",
+   "sha256": "c8288477f7e58dd55ceded2e3d5b4a1030c02cf089a5ddd27d8b596c8d535cae",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ls/after/ooc/arrowarg/end",
+   "sha256": "ccde79a870970c704fd967074694817eba784dac077ee18c323231d22d2aa2f8",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ls/after/ooc/arrowarg/comma",
+   "sha256": "d28ee591da5c628e162ef9f1304ffde22c9745f132a734722d127a7600f4c807",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ls/after/oco/arrowarg/end",
+   "sha256": "e2fdb63596cdc22035c7adf9415b09498f67ea858ed2c21ca9caa789ccbe7f35",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ls/after/oco/arrowarg/comma",
+   "sha256": "a3d38b5e570ac02c0b359dceabd8e18d72fcbf120af9e51e229c74820a3ddf36",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ls/after/occ/arrowarg/end",
+   "sha256": "95744e77c67615d75b8b2a0ecaa13ac68c1e1b6a7f589323156991c27f8a3a7d",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ls/after/occ/arrowarg/comma",
+   "sha256": "15c9d2473fc76ea9f6f0cc8c5165dd9428c6d5cf192511d7c32fe51fbe495a74",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ls/before/oc/class/end",
+   "sha256": "3a44dee2a3e16bdbb3fec90e4e23c568342c29a98f844253f7db5b0008f179e5",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ls/before/oc/class/explicit",
+   "sha256": "5fe7404dfa5f45fba23f4601550f72d932c7e64ca6d5175f6ec7cf8ece745ea2",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ls/before/ooc/class/end",
+   "sha256": "e0747ac47513883646745518c697f5eac6eb66dd71a697d20b2c918ced1969db",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ls/before/ooc/class/explicit",
+   "sha256": "17c6356c73df5024745e9cc0634793a970a9fa6aecfa860ce21df30b355f0a76",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ls/before/oco/class/end",
+   "sha256": "25c55cd0d0bc2d8ab9a31343f634a9834a9667ca48be61d5d581082f164f936a",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ls/before/oco/class/explicit",
+   "sha256": "49acab9136ad22b5d326f540c1e7efc08298341a5ecff1e0f29fb017ea400333",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ls/before/occ/class/end",
+   "sha256": "0e63beb91d77464a8ea862fdf9014072f484b0a28bcee10338cd7671c7d635e4",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ls/before/occ/class/explicit",
+   "sha256": "e9690013ed267dbd186dd11cc44a5ba870319e74af1b1c3bb1abf1a33aba185b",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ls/double/oc/class/end",
+   "sha256": "bd4a94b828def55f97cf8c8a35551d88eff28853d8cf464a17be938a2e9739c5",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ls/double/oc/class/explicit",
+   "sha256": "63def51d39262dee44b5c95345d0aea45972ddea05d58b98627a53617051c452",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ls/double/ooc/class/end",
+   "sha256": "7c29abacf72de79feb1e214b095a7c38ff484215288aa16562acb865dc129047",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ls/double/ooc/class/explicit",
+   "sha256": "8ef68bfdc97f68febed79471e42c152cdeed2241f99c56106d935dd8158c4d92",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ls/double/oco/class/end",
+   "sha256": "93ec9a7fd7994380b5ba9c8661b4029c4372ffdf43a70738cb0bcc9223380164",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ls/double/oco/class/explicit",
+   "sha256": "6a55efc3f972f3344664ed5d97942782ed15bd9d30ad779a252fc28a8422722a",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ls/double/occ/class/end",
+   "sha256": "8369000afc223e420e49b9fbb4a612a81d4a9b8582c3c22d61982d794dc60eca",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ls/double/occ/class/explicit",
+   "sha256": "f8214683b2632dcbb7de24b85ec10e3028f13d2bfe66904725343a94812c9a5a",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ls/line/oc/arrowarg/end",
+   "sha256": "a89c341441cef2453c7c35162d0c3f8c6faa0dd4a0c3a8144b1293659f18dbaf",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ls/line/oc/arrowarg/comma",
+   "sha256": "7bd30b49808f4b45ddd525f9f3af0fd37f19267916b2572a2fefc39a517d9374",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ls/line/ooc/arrowarg/end",
+   "sha256": "0c011f0624f57c64287ff4e92266edce84bb760d7f7ec39709a11dbc6051002f",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ls/line/ooc/arrowarg/comma",
+   "sha256": "98a59b0b32c4c49e6e063378246940d4872b8dceb4c6422d343a0d140c660f8e",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ls/line/oco/arrowarg/end",
+   "sha256": "8147baa6ec90268f5c845ba1ad7ec87ba56e8af95edd42de180d09f1883ef832",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ls/line/oco/arrowarg/comma",
+   "sha256": "3416f278027084e633964ddca932b77f0b4d23e01c9acf0a3be12ed3ad90676d",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ls/line/occ/arrowarg/end",
+   "sha256": "6ab2d4e7a16b934c23f96e530dfff5e67137b36e85bc8221db648bd7d5f0e24d",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ls/line/occ/arrowarg/comma",
+   "sha256": "c6e509e9238ab2b0be25b47d9d29af25f1ad527883a9188533c1c34daf9ea0ce",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ps/inner/oc/class/end",
+   "sha256": "bc6857c79121a4628a4927763ee4578db3f180daa4ff6fc8c5bd3ab5e1190f28",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ps/inner/oc/class/explicit",
+   "sha256": "ffc3e1a18337731915f0562d1d96f9385dc681a977cd69fb0eab636eb653048a",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ps/inner/ooc/class/end",
+   "sha256": "0f3b2604f332b4b0d770cae34d8ecab400f266c9e612ec2b010ded51306b0c5c",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ps/inner/ooc/class/explicit",
+   "sha256": "f18d92e81d18653dbab62c1d5f04843384c8adf294e65805b484a2b46ee12609",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ps/inner/oco/class/end",
+   "sha256": "7b88f5b10f59682236d4499adb791def95065f73fe66ea7204874ceef3a406ff",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ps/inner/oco/class/explicit",
+   "sha256": "6ab88cfa9ae2230b8af9f529ac5c3f49764f9cedd428e424617ea1c51b1a5c3f",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ps/inner/occ/class/end",
+   "sha256": "c23074bb4e7415148a73c5661c4d96774f243c7709387eb7d6b84729a5c8b061",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ps/inner/occ/class/explicit",
+   "sha256": "a591e94538ab49cadf930ccc33544c00f0dc2e73ee20e914bebe192df25d22f9",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ps/after/oc/arrowarg/end",
+   "sha256": "feabc8580db45afc71297587803b2d674c8d55dfa9fa4061e8a114002dcf44bd",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ps/after/oc/arrowarg/comma",
+   "sha256": "12b5c6b19d2df8145422dffc0b453a1a4c29fc836797bcee0217c6ecfa87e063",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ps/after/ooc/arrowarg/end",
+   "sha256": "d5ffd1a22fba36d3d54ee4cc9ecafa0c3c23325c373de8c97a97103a6f725198",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ps/after/ooc/arrowarg/comma",
+   "sha256": "c892da8ac7ddb89701e03e5094c9de3bbcfce10736e784840d4a0ca9c80508c5",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ps/after/oco/arrowarg/end",
+   "sha256": "64d1d9a0ff3cbdd23e251116e7a202ef10a7fb1c61cfca47b4b64cb49c82a2e1",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ps/after/oco/arrowarg/comma",
+   "sha256": "d2d0f4af6c01d477f29b89dfa9f12d1785c237f887a2cea042f4b0fcb0ff1a60",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ps/after/occ/arrowarg/end",
+   "sha256": "ac8e64621730b6e22fa9f4a8255e691e99b39a98d8a3ff694c1526fe4326293b",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ps/after/occ/arrowarg/comma",
+   "sha256": "ca8f61e58a4090b8e07cc672b8a4684d049862f918e38f0ed2d82b5e76fc7e12",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ps/before/oc/class/end",
+   "sha256": "5a561f7fba54b3e433616b3fd5c87b38ec5f4dd2ffb52c4e08a8c42fcad14f30",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ps/before/oc/class/explicit",
+   "sha256": "47d54d18d328181dc53b968d8ed71f79ef588df187f2d215bb1231d4ccdc4117",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ps/before/ooc/class/end",
+   "sha256": "03c3d1af582d5706bfc28434f7c9d234efeabe11012528bc459e4a1817a21a52",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ps/before/ooc/class/explicit",
+   "sha256": "f968add2924b9d30a895ae91a516dd721006ecafa4ff6fc8ee1c12c8d12d1e01",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ps/before/oco/class/end",
+   "sha256": "223d26ad7956c84ee02540223b6f6b30583aeed9d49cfaae00a9b07049ee8af0",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ps/before/oco/class/explicit",
+   "sha256": "5c71f4fce5057374707c68f0b492ece5f779b50a6da5e2872442c53b7f6d518d",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ps/before/occ/class/end",
+   "sha256": "2eb7405f6912c8f494d193d4de68234582831d0240c8d5840f6128f01680559f",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ps/before/occ/class/explicit",
+   "sha256": "17eb5cb784333c2bcc741f8b2e8a7975d94b3f58b0949f68be948604d2b439be",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ps/double/oc/class/end",
+   "sha256": "8acfb3f6108a6db2e4a1fc25046a9877961f69f24230f5665dab0d912bff03bd",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ps/double/oc/class/explicit",
+   "sha256": "70ba34be60d07923e876a4253a1242699d57287dac5992698f59dd839ab95e85",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ps/double/ooc/class/end",
+   "sha256": "2e742ce75881fe46a132a4eaa7f88294e2731575212c07d450290d14e17093bd",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ps/double/ooc/class/explicit",
+   "sha256": "f92b36a1b4797630a61302c213b422b3d58cd874b15003545022d091a200bbf3",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ps/double/oco/class/end",
+   "sha256": "6a35f9290f448d43094dfd90f5a7dfae4e3d7eaa3353be2a3a9e5ecd27f6fc05",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ps/double/oco/class/explicit",
+   "sha256": "2a5b89ec334268a84a0caf2324e336843d2a0371d360fd1fd9124e62a0a58883",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ps/double/occ/class/end",
+   "sha256": "5444321f46f66faff899bb0d2f374c1485a5ac4306ee1e7f39ff4fec31e87354",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ps/double/occ/class/explicit",
+   "sha256": "6c40e3c57d9fda86f0149dcb3e1c057d95ca358dfd7911725f1fb12aacfdecac",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ps/line/oc/arrowarg/end",
+   "sha256": "b18c754d1de9f6f6b88f897968806e0ebfaddaa7c66a9d66ad2ff5575777d36b",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ps/line/oc/arrowarg/comma",
+   "sha256": "6e30dd6ee4e62998bbbde095c3c3842af16190f5cee53e1d824cbe9a5610d101",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ps/line/ooc/arrowarg/end",
+   "sha256": "102843989e94c659cbd3ad656e685faf028f768faf5bbc077d4c7209c5cb5354",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ps/line/ooc/arrowarg/comma",
+   "sha256": "8a8ab050c800c03beef67dd65185a0835f4c7e48865a4373d7a4e85f1274a6ca",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ps/line/oco/arrowarg/end",
+   "sha256": "469ec7210be15766323d101f58c36411046231d8c018fc0daaa2ebd0e9496887",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ps/line/oco/arrowarg/comma",
+   "sha256": "591802594edacdcf493fe9b3d9b60a6973dbebbea1c0c9fd43da56592c167234",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ps/line/occ/arrowarg/end",
+   "sha256": "9959363a15ad4ed489d7b8684b6b39b3f98eb2b6bacb11844c586888cd244318",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/ps/line/occ/arrowarg/comma",
+   "sha256": "8c718a20ee732000e134dcc5b6660628c78bb23d36d5a10f057e823e8698fc0e",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "iab/review-59/lf/inner/o/top/explicit",
+   "sha256": "e155c5e1e8e6d3898d0bff40b92a99d631847d32b39bf4277116254729676ffa",
    "sourceType": "script",
    "verdict": "accept",
    "babel": {
