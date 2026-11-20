@@ -367,12 +367,14 @@ module.exports = grammar({
       optional(choice($._initializer, $._binding_end)),
     ),
 
-    statement_block: $ => prec.right(seq(
+    // A statement that starts with `{` is a block, never an object (ECMA-262: an ExpressionStatement cannot start with
+    // `{`). `{a:0}` reads both ways; `labeled_statement` has dynamic precedence -1, so the block needs more than 1 to win.
+    statement_block: $ => prec.dynamic(2, prec.right(seq(
       '{',
       repeat($.statement),
       '}',
       optional($._automatic_semicolon),
-    )),
+    ))),
 
     else_clause: $ => seq('else', $.statement),
 

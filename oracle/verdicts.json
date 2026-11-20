@@ -32,7 +32,7 @@
    }
   },
   "cases_file": "cases.jsonl",
-  "cases_sha256": "efdba11c97d922f5d40e898cb486c522c8b8f591a7e7884ea547800d539eef54",
+  "cases_sha256": "c484dbfa61e81718ac1ed486c9350c25a9c404aae8ca13ce0362eca8b7538a17",
   "runner": "run.mjs",
   "runner_sha256": "06cfe49cd56d0bac9b5c672b1f62fc0f44b37de02c0a2bf04c557e5354c5c24d"
  },
@@ -5206,6 +5206,81 @@
       "at": 0
      }
     ]
+   }
+  },
+  {
+   "id": "v3d/block-label",
+   "sha256": "0e5b217e6f00a32c62df35df10e911e71015f66d4abe88da56fc4c4c1c575aa1",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3d/block-label-after-function",
+   "sha256": "fdda3d2e96d4406458afc7db4fca948105359e809d0e1d6e31e3d65ac0a4bed3",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3d/if-block-label",
+   "sha256": "fc4418bc8d6b0aae2b3cef15805af9017b0e034e7771ef7acefb78636b2032c5",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3d/block-label-nested",
+   "sha256": "4928dd79f495cd9ee264cdcf6b02766939d5dc3f7af881e1e789e2896e3d6101",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "v3d/paren-object",
+   "sha256": "17fa3bd06b276f6c1c93c4e8260a3a0d54e091766c22d40a1e1f3eb3d09752a2",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
    }
   }
  ]

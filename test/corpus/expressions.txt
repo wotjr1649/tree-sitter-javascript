@@ -491,12 +491,13 @@ Objects
 (program
   (statement_block)
   (empty_statement)
-  (expression_statement
-    (object
-      (pair
-        (property_identifier)
+  (statement_block
+    (labeled_statement
+      (statement_identifier)
+      (expression_statement
         (string
           (string_fragment)))))
+  (empty_statement)
   (expression_statement
     (object
       (pair
@@ -510,10 +511,10 @@ Objects
       (pair
         (number)
         (number))))
-  (expression_statement
-    (object
-      (pair
-        (property_identifier)
+  (statement_block
+    (labeled_statement
+      (statement_identifier)
+      (expression_statement
         (identifier))))
   (expression_statement
     (object
