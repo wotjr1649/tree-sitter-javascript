@@ -475,15 +475,17 @@ async /*
 ---
 
 (program
+  (expression_statement (identifier))
+  (comment)
   (expression_statement
     (arrow_function
-      (comment)
       parameter: (identifier)
       (comment)
       body: (identifier)))
+  (expression_statement (identifier))
+  (comment)
   (expression_statement
     (arrow_function
-      (comment)
       parameter: (identifier)
       body: (identifier))))
 
@@ -657,3 +659,38 @@ A CR line comment does not enable an await using object pattern
 await using {x}//comment= y
 
 ---
+
+============================================================
+Comments before declarators, a prefix update, and a method
+============================================================
+
+let a/*
+*/
+,b
+let x=y/*
+*/++z
+class C {
+  m//
+  (){}
+}
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator name: (identifier))
+    (comment)
+    (variable_declarator name: (identifier)))
+  (lexical_declaration
+    (variable_declarator name: (identifier) value: (identifier)))
+  (comment)
+  (expression_statement
+    (update_expression argument: (identifier)))
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      member: (method_definition
+        name: (property_identifier)
+        (comment)
+        parameters: (formal_parameters)
+        body: (statement_block)))))

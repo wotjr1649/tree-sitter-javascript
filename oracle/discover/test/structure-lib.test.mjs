@@ -10,7 +10,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const { parse } = createRequire(join(here, "../../run.mjs"))("@babel/parser");
 const KINDS = ["end", "program", "expression_statement", "call_expression", "arrow_function", "identifier", "for_statement", "empty_statement",
   "if_statement", "parenthesized_expression", "comment", "statement_block", "number", "yield_expression",
-  "switch_case", "class_declaration", "class_body", "class_static_block"];
+  "switch_case", "class_declaration", "class_body", "class_static_block", "export_statement", "import_attribute", "object", "pair", "property_identifier", "string"];
 const FIELDS = ["", "body", "condition", "initializer"];
 // a fake tsparse dump: rows of [kind name, start, end, parent index, field name]
 const dump = (rows) => rows.flatMap(([k, s, e, p, f]) => [KINDS.indexOf(k), s, e, p, FIELDS.indexOf(f ?? "")]);
@@ -48,6 +48,21 @@ test("for-header statements and the parenthesized head of if are normalised away
   const r = run(src, rows);
   assert.deepEqual(r.diffs, []);
   assert.deepEqual(r.norm, { forHeaderStatement: 2, headParen: 1 });
+});
+
+test("static export attributes are normalised without dropping exported objects", () => {
+  const src = 'export * from "m" with {type:"json"}; export default {type:"json"};';
+  const rows = [
+    ["program", 0, 67, -1],
+    ["export_statement", 0, 37, 0], ["string", 14, 17, 1],
+    ["import_attribute", 18, 36, 1], ["object", 23, 36, 3], ["pair", 24, 35, 4],
+    ["property_identifier", 24, 28, 5], ["string", 29, 35, 5],
+    ["export_statement", 38, 67, 0], ["object", 53, 66, 8], ["pair", 54, 65, 9],
+    ["property_identifier", 54, 58, 10], ["string", 59, 65, 10],
+  ];
+  const r = run(src, rows, "module");
+  assert.deepEqual(r.diffs, []);
+  assert.deepEqual(r.norm, { importAttributes: 2 });
 });
 
 test("#259 and `yield` as an identifier are reported on both sides", () => {

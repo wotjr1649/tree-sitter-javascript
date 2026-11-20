@@ -4996,7 +4996,7 @@
               "members": [
                 {
                   "type": "SYMBOL",
-                  "name": "_keyword_continues"
+                  "name": "_await_operand_continues"
                 },
                 {
                   "type": "BLANK"
@@ -7951,8 +7951,22 @@
           "type": "CHOICE",
           "members": [
             {
-              "type": "STRING",
-              "value": "static"
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "STRING",
+                  "value": "static"
+                },
+                {
+                  "type": "ALIAS",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "_static_before_get_field"
+                  },
+                  "named": false,
+                  "value": "static"
+                }
+              ]
             },
             {
               "type": "BLANK"
@@ -8180,6 +8194,15 @@
                 {
                   "type": "ALIAS",
                   "content": {
+                    "type": "SYMBOL",
+                    "name": "_static_before_get_field"
+                  },
+                  "named": false,
+                  "value": "static"
+                },
+                {
+                  "type": "ALIAS",
+                  "content": {
                     "type": "TOKEN",
                     "content": {
                       "type": "SEQ",
@@ -8255,6 +8278,18 @@
                           "type": "CHOICE",
                           "members": [
                             {
+                              "type": "SYMBOL",
+                              "name": "_restricted_keyword"
+                            },
+                            {
+                              "type": "BLANK"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "CHOICE",
+                          "members": [
+                            {
                               "type": "CHOICE",
                               "members": [
                                 {
@@ -8290,6 +8325,18 @@
                       "type": "SEQ",
                       "members": [
                         {
+                          "type": "CHOICE",
+                          "members": [
+                            {
+                              "type": "SYMBOL",
+                              "name": "_generator_method_continues"
+                            },
+                            {
+                              "type": "BLANK"
+                            }
+                          ]
+                        },
+                        {
                           "type": "STRING",
                           "value": "*"
                         },
@@ -8313,6 +8360,30 @@
                         {
                           "type": "STRING",
                           "value": "async"
+                        },
+                        {
+                          "type": "CHOICE",
+                          "members": [
+                            {
+                              "type": "SYMBOL",
+                              "name": "_restricted_keyword"
+                            },
+                            {
+                              "type": "BLANK"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "CHOICE",
+                          "members": [
+                            {
+                              "type": "SYMBOL",
+                              "name": "_generator_method_continues"
+                            },
+                            {
+                              "type": "BLANK"
+                            }
+                          ]
                         },
                         {
                           "type": "STRING",
@@ -9149,6 +9220,18 @@
     {
       "type": "SYMBOL",
       "name": "_declaration_end"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_generator_method_continues"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_static_before_get_field"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_await_operand_continues"
     },
     {
       "type": "SYMBOL",
