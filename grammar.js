@@ -40,7 +40,7 @@ module.exports = grammar({
     // it when it decides on an automatic semicolon. Valid after a class field name without an initializer...
     $._binding_end,
     // ...and after a keyword that may still go on: before a declarator (`let`, `using`) or a property name (`get`,
-    // `set`, `static`, `async` in a class), after `await` and `yield`.
+    // `set`, `static`, `async` in a class), and after `await`.
     $._keyword_continues,
     // Never produced: the scanner only reads whether it is valid, after `return`, `break`, `continue` and a label, where a
     // lone CR ends the statement like any other line terminator (ECMA-262 12.9.1: no LineTerminator here).
@@ -59,6 +59,8 @@ module.exports = grammar({
     $._enter_ordinary_method,
     $._leave_context,
     $._leave_concise_body,
+    $._yield_operand,
+    $._yield_line_terminator,
   ],
 
   extras: $ => [
@@ -665,15 +667,14 @@ module.exports = grammar({
       $.call_expression,
     ),
 
-    // A hidden rule, so that the marker does not split the productions of yield_expression (parser size).
-    _yield_keyword: $ => seq('yield', optional($._keyword_continues)),
-
     yield_expression: $ => prec.right(seq(
-      $._yield_keyword,
-      choice(
-        seq('*', $.expression),
-        optional($.expression),
-      ))),
+      'yield',
+      optional(choice(
+        seq($._yield_operand, optional('*'), $.expression),
+        // Require a semicolon for recovery if a line break cannot end the expression by ASI.
+        seq($._yield_line_terminator, ';'),
+      )),
+    )),
 
     object: $ => prec('object', seq(
       '{',

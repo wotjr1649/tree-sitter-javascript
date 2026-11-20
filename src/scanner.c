@@ -29,6 +29,8 @@ enum TokenType {
     ENTER_ORDINARY_METHOD,
     LEAVE_CONTEXT,
     LEAVE_CONCISE_BODY,
+    YIELD_OPERAND,
+    YIELD_LINE_TERMINATOR,
 };
 
 enum Context {
@@ -436,6 +438,34 @@ static bool scan_restricted_semicolon(TSLexer *lexer, bool *at_next_token) {
     }
 }
 
+// A line break before an operand or '*' cannot be skipped, even where ASI is unavailable.
+static bool scan_yield_operand(TSLexer *lexer, const bool *valid_symbols) {
+    lexer->mark_end(lexer);
+    bool comment = false;
+    bool newline = false;
+    WhitespaceResult result = scan_whitespace_and_comments(lexer, &comment, true, NULL, &newline);
+    int32_t next = lexer->lookahead;
+    if (result != REJECT) {
+        if (next == ';' || next == ',' || next == ':' || next == ')' || next == ']') {
+            return false;
+        }
+        if (lexer->eof(lexer) || next == '}') {
+            lexer->result_symbol = AUTOMATIC_SEMICOLON;
+            return valid_symbols[AUTOMATIC_SEMICOLON];
+        }
+    }
+    if (newline) {
+        if (valid_symbols[AUTOMATIC_SEMICOLON]) {
+            lexer->result_symbol = AUTOMATIC_SEMICOLON;
+            return true;
+        }
+        lexer->result_symbol = YIELD_LINE_TERMINATOR;
+        return valid_symbols[YIELD_LINE_TERMINATOR];
+    }
+    lexer->result_symbol = YIELD_OPERAND;
+    return true;
+}
+
 static bool scan_ternary_qmark(TSLexer *lexer) {
     for (;;) {
         if (!is_extra_space(lexer->lookahead)) {
@@ -655,6 +685,10 @@ bool tree_sitter_javascript_external_scanner_scan(void *payload, TSLexer *lexer,
         enter_context(scanner, token == ENTER_ASYNC_ARROW ? AWAIT_CONTEXT : 0);
         lexer->result_symbol = token;
         return true;
+    }
+
+    if (valid_symbols[YIELD_OPERAND]) {
+        return scan_yield_operand(lexer, valid_symbols);
     }
 
     if (valid_symbols[LEAVE_CONCISE_BODY]) {
