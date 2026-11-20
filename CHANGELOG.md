@@ -8,15 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.2.0] - 2026-11-20
 
 A minor release: the scanner inserts automatic semicolons it missed in class bodies and after declarations, reads
-identifiers such as `in_` after a line break, and accepts U+0000 in templates (J7, #29); line terminators that string
-and regex literals must not hold are errors now. No breaking change under the SemVer rule in `AGENTS.md`, where valid
-input is input that `@babel/parser` and `oxc-parser`, as pinned in `oracle/`, both accept. The comparison with v2.1.0
-(`oracle/replay -dump`, `scripts/tree-diff.mjs`) found no changed-clean trees over 56,138 inputs: the 474 default inputs
-(corpus, examples, highlight, tags, oracle cases), 1,068 N-of-M inputs and the 54,596 inputs that the discovery run
-labels valid (test262 positive tests, Babel JSX fixtures, npm files; 7 of them, Annex B tests, are accepted by Babel
-only). The nine inputs that became errors (line terminators in string and regex literals, and a `using` declaration in a
-`for` head whose name such as `in_` follows a line break) are rejected by both reference parsers. `src/node-types.json`
-is byte-identical to 2.1.0: no node kind, field or type is added, removed or renamed. 32 inputs that gave an error parse
+identifiers such as `in_` after a line break, and accepts U+0000 in templates (J7, #29). An unescaped LF or CR
+immediately before a string's closing quote is now an error, as are CR, U+2028 and U+2029 inside a regular expression
+literal. No breaking change under the SemVer rule in `AGENTS.md`, where valid input is input that `@babel/parser` and
+`oxc-parser`, as pinned in `oracle/`, both accept. The comparison with v2.1.0 (`oracle/replay -dump`,
+`scripts/tree-diff.mjs`) found no changed-clean trees over 56,138 inputs: the 474 default inputs (corpus, examples,
+highlight, tags, oracle cases), 1,068 N-of-M inputs and the 54,596 inputs that the discovery run labels valid (test262
+positive tests, Babel JSX fixtures, npm files; 7 of them, Annex B tests, are accepted by Babel only). The nine inputs
+that became errors (five string and regular expression literals of that kind, and four `for` heads in which `using` is
+followed by an LF and a name such as `in_`) are rejected by both reference parsers. `src/node-types.json` is
+byte-identical to 2.1.0: no node kind, field or type is added, removed or renamed. 32 inputs that gave an error parse
 now, and 3 that are an error before and after get a different recovery tree. The grammar name, the C symbol and ABI 15
 are unchanged.
 
@@ -31,14 +32,17 @@ are unchanged.
 
 ### Changed
 
-- Line terminators that ECMA-262 excludes from literals (§12.9.4, §12.9.5) are errors now (J7): an LF or CR right
-  before the closing quote of a string (`'a` + LF + `'`, `'` + CR + `'`), which 2.1.0 skipped as white space, and a
-  CR, U+2028 or U+2029 inside a regular expression literal (`/` + CR + `/`, `/a` + U+2029 + `b/`), which 2.1.0 read as
-  pattern characters. Babel and oxc reject them (11 test262 negative tests of the discovery run). A line break
-  elsewhere in a string and an LF in a regular expression were already errors; U+2028 and U+2029 stay allowed in
-  strings, and an escaped line break (`'a\` + line break + `b'`) keeps its tree.
-- `for (using` + line break + `in_ = f();;) {}` (also `in$`, `in0`, `instanceof_`) is an error now (J7, #17): the line
-  break ends the statement after `using`, as in Babel, oxc and TypeScript. 2.1.0 read a `using` declaration.
+- An unescaped LF or CR immediately before a string's closing quote is now an error, as are CR, U+2028 and U+2029 inside
+  a regular expression literal (J7; ECMA-262 §12.9.4, §12.9.5): `'a` + LF + `'` and `'` + CR + `'`, which 2.1.0 skipped
+  as white space, and `/` + CR + `/` and `/a` + U+2029 + `b/`, which 2.1.0 read as pattern characters. Babel and oxc
+  reject them (11 test262 negative tests of the discovery run). A line break elsewhere in a string and an LF in a
+  regular expression were already errors in 2.1.0; U+2028 and U+2029 in strings and an escaped line break (`'a\` + LF +
+  `b'`) stay valid and keep their trees.
+- `for (using` + LF + `in_ = f();;) {}` (also with `in$`, `in0` or `instanceof_`, and with CRLF, U+2028 or U+2029
+  instead of the LF) is an error now (J7, #17); 2.1.0 read a `using_declaration`. ECMA-262 forbids a line terminator
+  between `using` and its binding, and the semicolons that separate the parts of a `for` header are not inserted
+  automatically, so the text has no valid reading; Babel, oxc and TypeScript reject it. With a lone CR it is still read
+  as a `using_declaration` (#17, see Known limitations).
 - Recovery trees change for input that is an error before and after (J7): in the comparison
   `export {a} from 'x' with {['type']: 'json'};`, `<a extends="y" />` and a test262 file with U+0000 in a string
   literal (see Known limitations); and a regular expression recovered after a block comment that holds a CR, CRLF,
@@ -79,9 +83,10 @@ Not fixed in 2.2.0; tracked as GitHub Issues where a number is given:
   4 tests). J7 left it out because every attempt changed clean trees of other valid input. For the same reason a
   comment between a declaration and a next-line `<`, `[` or `*` keeps the error (`{let a` + line break + `/*c*/<a/>}`).
 - A lone CR (U+000D) is not a line terminator for automatic semicolons (#17): `a` + CR + `b` and `this` + CR + `{}` give
-  `ERROR`, and `for (using` + CR + `x = f();;) {}` is accepted, although Babel, oxc and TypeScript reject it. The TS/TSX
-  grammars, whose scanner checks only LF, also accept U+2028/U+2029 there. The `in_`/`instanceof_` part of #17 is
-  fixed in this release.
+  `ERROR`, and `for (using` + CR + `x = f();;) {}` and `for (using` + CR + `in_ = f();;) {}` are read as a
+  `using_declaration`, although Babel, oxc and TypeScript reject them. The TS/TSX grammars, whose scanner checks only
+  LF, also accept U+2028/U+2029 there. The `in_`/`instanceof_` part of #17 is fixed in this release for LF, CRLF, U+2028
+  and U+2029, not for a lone CR.
 - Valid input that parses without an error but with a wrong tree, found by the structure comparison (#30); fixing them
   changes those trees, so they wait for v3.0.0: `await (x)(y)`, `await (a).b()` and `await[0]` in async code read
   `await` as a called identifier (#32; seen in 48 npm files); `for await (let [a] of b)` reads `let [a]` as a subscript
