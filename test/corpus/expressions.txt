@@ -2565,7 +2565,7 @@ e = <Foo bar/>
 f = <Foo bar="string" baz={2} data-i8n="dialogs.welcome.heading" bam />
 g = <Avatar userId={foo.creatorId} />
 h = <input checked={this.state.selectedNewStreetType === 'new-street-default' || !this.state.selectedNewStreetType}> </input>
-i = <Foo:Bar bar={}>{...children}</Foo:Bar>
+i = <Foo:Bar bar={value}>{...children}</Foo:Bar>
 
 ---
 
@@ -2686,7 +2686,8 @@ i = <Foo:Bar bar={}>{...children}</Foo:Bar>
             (identifier))
           attribute: (jsx_attribute
             (property_identifier)
-            (jsx_expression)))
+            (jsx_expression
+              (identifier))))
         (jsx_expression
           (spread_element
             (identifier)))
@@ -2783,3 +2784,29 @@ await = 1;
     (assignment_expression
       (identifier)
       (number))))
+
+============================================
+JSX with an empty attribute value
+:error
+============================================
+
+var a = <Foo></Foo>
+b = <Foo.Bar></Foo.Bar>
+c = <> <Foo /> </>
+d = <Bar> <Foo /> </Bar>
+e = <Foo bar/>
+f = <Foo bar="string" baz={2} data-i8n="dialogs.welcome.heading" bam />
+g = <Avatar userId={foo.creatorId} />
+h = <input checked={this.state.selectedNewStreetType === 'new-street-default' || !this.state.selectedNewStreetType}> </input>
+i = <Foo:Bar bar={}>{...children}</Foo:Bar>
+
+---
+
+============================================
+Yield operand outside a generator
+:error
+============================================
+
+yield db.users.where('[endpoint+email]')
+
+---

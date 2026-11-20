@@ -1,11 +1,12 @@
 // Compares two tree dumps of `oracle/replay -dump` (base, then head) input by input, matched by id.
 //
-// Classes: same (equal tree), changed-clean (both without ERROR/MISSING, tree differs), clean-to-error, error-to-clean,
+// Classes: same (equal tree and flags), changed-clean (both without ERROR/MISSING, tree differs), clean-to-error, error-to-clean,
 // error-changed (both with errors, tree differs), and only-base / only-head for ids in one dump. An input whose source
 // differs between the dumps (sha256) is refused: the dumps must come from the same inputs.
 //
-// Usage: node scripts/tree-diff.mjs BASE.jsonl HEAD.jsonl [--trees]
-//   prints a markdown summary and the ids of every class but `same`; --trees adds both trees. Exit 0; 2 bad input.
+// Usage: node scripts/tree-diff.mjs BASE.jsonl HEAD.jsonl [--trees] [--check] [--inputs=INPUTS.jsonl]
+//   --trees includes tree values; --check requires nonempty, identical dumps (exit 1 on differences).
+//   --inputs checks each dump against the selected IDs (exit 1 on differences). Exit 2 on bad input.
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
@@ -41,7 +42,7 @@ export function classify(b, h) {
   if (!h) return 'only-base';
   if (!b) return 'only-head';
   if (b.sha256 !== h.sha256) throw new Error(`${b.id}: the source differs between the dumps`);
-  if (b.tree === h.tree) return 'same';
+  if (b.tree === h.tree && b.error === h.error && b.errors === h.errors && b.missing === h.missing) return 'same';
   if (bad(b)) return bad(h) ? 'error-changed' : 'error-to-clean';
   return bad(h) ? 'clean-to-error' : 'changed-clean';
 }
@@ -68,11 +69,48 @@ export function report(groups, base, head, trees) {
   return lines.join('\n');
 }
 
+function readInputIDs(file) {
+  const ids = new Set();
+  for (const line of readFileSync(file, 'utf8').split('\n')) {
+    if (!line.trim()) continue;
+    const id = JSON.parse(line)?.id;
+    if (typeof id !== 'string' || !id || ids.has(id)) {
+      throw new Error(`${file}: invalid or duplicate input ID ${JSON.stringify(id)}`);
+    }
+    ids.add(id);
+  }
+  if (!ids.size) throw new Error(`${file}: empty input list`);
+  return ids;
+}
+
+function checkInputs(file, dump, ids) {
+  const missing = [...ids].filter((id) => !dump.has(id));
+  const extra = [...dump.keys()].filter((id) => !ids.has(id));
+  if (!missing.length && !extra.length) return true;
+
+  const details = [`expected ${ids.size} inputs, got ${dump.size}`];
+  if (missing.length) details.push(`missing ${JSON.stringify(missing)}`);
+  if (extra.length) details.push(`unexpected ${JSON.stringify(extra)}`);
+  console.log(`${file}: ${details.join('; ')}`);
+  return false;
+}
+
 function main(argv) {
   const files = argv.filter((a) => !a.startsWith('--'));
-  if (files.length !== 2) throw new Error('usage: tree-diff.mjs BASE.jsonl HEAD.jsonl [--trees]');
+  if (files.length !== 2) throw new Error('usage: tree-diff.mjs BASE.jsonl HEAD.jsonl [--trees] [--check] [--inputs=INPUTS.jsonl]');
   const [base, head] = files.map((f) => readDump(readFileSync(f, 'utf8'), f));
-  console.log(report(diff(base, head), base, head, argv.includes('--trees')));
+  const inputs = argv.find((a) => a.startsWith('--inputs='));
+  if (inputs !== undefined) {
+    const ids = readInputIDs(inputs.slice('--inputs='.length));
+    const baseMatches = checkInputs(files[0], base, ids);
+    const headMatches = checkInputs(files[1], head, ids);
+    if (!baseMatches || !headMatches) return 1;
+  }
+  const check = argv.includes('--check');
+  if (check && (!base.size || !head.size)) throw new Error('cannot check an empty dump');
+  const groups = diff(base, head);
+  console.log(report(groups, base, head, argv.includes('--trees')));
+  if (check && CLASSES.slice(1).some((c) => groups[c].length)) return 1;
   return 0;
 }
 

@@ -1,5 +1,10 @@
 {
   "format": 1,
+  "xplat_valid_counts": {
+    "test262": 43781,
+    "babel-jsx": 62,
+    "npm": 10753
+  },
   "test262": {
     "repo": "https://github.com/tc39/test262",
     "commit": "2e58f87d8350ad51224617a041c6e041d52f8444",
