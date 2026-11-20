@@ -168,6 +168,7 @@ typedef struct {
     bool can_defer_binding;
     bool line_comment;
     bool ends_at_block_comment;
+    bool yield_operand;
 } ASITrivia;
 
 static bool is_line_terminator(int32_t c) {
@@ -224,14 +225,15 @@ static ASILookahead scan_asi_trivia(TSLexer *lexer, ASITrivia *trivia, bool anne
                 space(lexer);
             }
         } else if (c == '-' && (block_terminator || line_prefix ||
-                                (annex_comments && trivia->line_comment && trivia->break_after_comment))) {
+                                (annex_comments && trivia->break_after_comment &&
+                                 (trivia->line_comment || trivia->yield_operand)))) {
             advance(lexer);
             if (lexer->lookahead != '-') return ASI_MINUS;
             advance(lexer);
             if (lexer->lookahead != '>') return ASI_DOUBLE_MINUS;
-            // Lex a preceding line comment separately before taking the Annex B token.
+            // Lex a preceding ordinary comment separately before taking the Annex B token.
             return block_terminator || line_prefix ? ASI_HTML_CLOSE : ASI_HTML_AFTER_COMMENT;
-        } else if (c == '<' && annex_comments && trivia->newline) {
+        } else if (c == '<' && annex_comments && (trivia->newline || trivia->yield_operand)) {
             if (!scan_html_open(lexer)) return ASI_LESS_THAN;
             return trivia->comment ? ASI_HTML_OPEN_AFTER_COMMENT : ASI_HTML_OPEN;
         } else if (c != '/') {
@@ -443,8 +445,16 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
 // A line break before an operand or '*' cannot be skipped, even where ASI is unavailable.
 static bool scan_yield_operand(TSLexer *lexer, const bool *valid_symbols) {
     lexer->mark_end(lexer);
-    ASITrivia trivia = {0};
+    ASITrivia trivia = {.yield_operand = true};
     ASILookahead next = scan_asi_trivia(lexer, &trivia, valid_symbols[HTML_COMMENT], false, false);
+    if (next == ASI_HTML_CLOSE || next == ASI_HTML_OPEN) return finish_html_comment(lexer);
+    // Leave ordinary comments to the regular lexer, but check the delimiter beyond the Annex B comments.
+    while (next == ASI_HTML_OPEN_AFTER_COMMENT || next == ASI_HTML_AFTER_COMMENT ||
+           next == ASI_HTML_OPEN || next == ASI_HTML_CLOSE) {
+        scan_html_comment_body(lexer);
+        trivia = (ASITrivia){.yield_operand = true};
+        next = scan_asi_trivia(lexer, &trivia, true, false, false);
+    }
     if (next == ASI_NEXT_TOKEN) {
         int32_t c = lexer->lookahead;
         if (c == ';' || c == ',' || c == ':' || c == ')' || c == ']') return false;
