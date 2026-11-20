@@ -2558,7 +2558,7 @@ e = <Foo bar/>
 f = <Foo bar="string" baz={2} data-i8n="dialogs.welcome.heading" bam />
 g = <Avatar userId={foo.creatorId} />
 h = <input checked={this.state.selectedNewStreetType === 'new-street-default' || !this.state.selectedNewStreetType}> </input>
-i = <Foo:Bar bar={}>{...children}</Foo:Bar>
+i = <Foo:Bar bar={value}>{...children}</Foo:Bar>
 
 ---
 
@@ -2679,7 +2679,8 @@ i = <Foo:Bar bar={}>{...children}</Foo:Bar>
             (identifier))
           attribute: (jsx_attribute
             (property_identifier)
-            (jsx_expression)))
+            (jsx_expression
+              (identifier))))
         (jsx_expression
           (spread_element
             (identifier)))

@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Known limitations
+
+- JSX opening and closing tag names are parsed independently, so pairs such as `<a></b>` and `<const></span>`,
+  as well as mixed fragment and named tags, can parse without an error (#20).
+
 ## [3.0.0] - 2026-11-20
 
 This major release changes trees for inputs that already parsed cleanly in v2.2.0 and are accepted by the pinned
