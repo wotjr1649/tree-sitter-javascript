@@ -225,6 +225,20 @@ func loadInputs(root string, patterns []string) ([]input, error) {
 	return out, nil
 }
 
+// writeInputIDs records the selected inputs before the parser writes the dump.
+func writeInputIDs(path string, inputs []input) error {
+	var buf bytes.Buffer
+	enc := json.NewEncoder(&buf)
+	for _, in := range inputs {
+		if err := enc.Encode(struct {
+			ID string `json:"id"`
+		}{ID: in.ID}); err != nil {
+			return err
+		}
+	}
+	return os.WriteFile(path, buf.Bytes(), 0o644)
+}
+
 // treeString writes the tree as an s-expression of every node, named and anonymous: `(field:kind@start:end ...)`,
 // anonymous kinds quoted, MISSING nodes prefixed with `MISSING `, UTF-8 byte offsets.
 func treeString(root *tree_sitter.Node) (tree string, errors, missing int) {

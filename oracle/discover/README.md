@@ -12,6 +12,9 @@ Inputs (pinned in `manifest.json`):
 | `npm` | JS/JSX/MJS/CJS files of the packages in `manifest.json`, pinned by version and tarball sha256/sha512 (`.mjs` module, `.cjs` script, `.js` tried as script and as module; a package may limit itself with `include`) | The tools: a file is valid when both accept it for some source type |
 | `babel-jsx` | `input.*` files of `packages/babel-parser/test/fixtures/jsx` of `babel/babel` at the pinned commit (JSX has no test262) | The tools (Babel is one of them, so only agreement counts). The fixtures' `options.json` is not read: each input is tried as module and as script and the first type both tools accept decides, so this set finds inputs on which the tools agree in some context, not the fixture's own verdict (`errors/html-comment-module` is a valid script and an invalid module) |
 
+The cross-platform comparison checks the selected valid counts in `xplat_valid_counts`. Recount the valid inputs
+when changing the input or reference-parser pins.
+
 Babel 8.1.2 and oxc 0.159.0 answer with the exact options of `../run.mjs` (JSX on, `errorRecovery`, `showSemanticErrors`).
 Their classes are `accept` (no error), `early` (Babel: recovered errors only; oxc: errors only with `showSemanticErrors`) and
 `syntax` (a parse error). This grammar is run through the Go binding of the repository by `tsparse`, with the faithfulness

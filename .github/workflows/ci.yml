@@ -210,7 +210,8 @@ jobs:
           work=build/xplat
           node oracle/discover/fetch.mjs --data "$work/data"
           RAYON_NUM_THREADS=3 node oracle/discover/collect.mjs --data "$work/data" --out "$work/oracle.jsonl"
-          node scripts/xplat-inputs.mjs "$work/data" "$work/oracle.jsonl" "$work/discovery.jsonl"
+          mkdir -p "$work/dumps"
+          node scripts/xplat-inputs.mjs "$work/data" "$work/oracle.jsonl" "$work/discovery.jsonl" "$work/dumps/discovery-inputs.jsonl"
       - name: Build replay and hash CSTs
         shell: bash
         run: |
@@ -222,7 +223,7 @@ jobs:
           cp -R oracle/replay "$target/oracle/xplat-replay"
           (cd "$target/oracle/xplat-replay" && go build -p 2 -o "$replay" .)
           git -C "$target" rev-parse HEAD > "$work/dumps/commit.txt"
-          "$replay" -root "$target" -hash -dump "$work/dumps/default.jsonl"
+          "$replay" -root "$target" -hash -dump "$work/dumps/default.jsonl" -input-list "$work/dumps/default-inputs.jsonl"
           "$replay" -root "$target" -hash -dump "$work/dumps/n-of-m.jsonl" "$PWD/oracle/n-of-m/inputs.jsonl"
           "$replay" -root "$target" -hash -dump "$work/dumps/discovery.jsonl" "$work/discovery.jsonl"
       - name: Upload CST hashes
@@ -272,7 +273,11 @@ jobs:
               fi
               for set in default n-of-m discovery; do
                 printf '\n## Ubuntu vs %s (%s)\n\n' "$os" "$set"
-                node scripts/tree-diff.mjs "$base/$set.jsonl" "$head/$set.jsonl" --check --trees || status=1
+                expected="$base/$set-inputs.jsonl"
+                if [ "$set" = n-of-m ]; then
+                  expected=oracle/n-of-m/inputs.jsonl
+                fi
+                node scripts/tree-diff.mjs "$base/$set.jsonl" "$head/$set.jsonl" --check --trees --inputs="$expected" || status=1
               done
             done
           } > "$work/diff.md" 2>&1
