@@ -360,6 +360,404 @@ export { "string import" as "string export" } from 'foo';
       (string_fragment))))
 
 ============================================
+Anonymous export default declarations end without a semicolon
+============================================
+
+export default function () {};
+export default class {};
+export default function* () {}
+export default async function () {}
+export default function () {}{}
+export default class extends A {}if (x) {}
+export default function () {}
+(1);
+export default class {}
+[1];
+export default class {} class B {}
+
+---
+
+(program
+  (export_statement
+    value: (function_expression
+      parameters: (formal_parameters)
+      body: (statement_block)))
+  (empty_statement)
+  (export_statement
+    value: (class
+      body: (class_body)))
+  (empty_statement)
+  (export_statement
+    value: (generator_function
+      parameters: (formal_parameters)
+      body: (statement_block)))
+  (export_statement
+    value: (function_expression
+      parameters: (formal_parameters)
+      body: (statement_block)))
+  (export_statement
+    value: (function_expression
+      parameters: (formal_parameters)
+      body: (statement_block)))
+  (statement_block)
+  (export_statement
+    value: (class
+      (class_heritage
+        (identifier))
+      body: (class_body)))
+  (if_statement
+    condition: (parenthesized_expression
+      (identifier))
+    consequence: (statement_block))
+  (export_statement
+    value: (function_expression
+      parameters: (formal_parameters)
+      body: (statement_block)))
+  (expression_statement
+    (parenthesized_expression
+      (number)))
+  (export_statement
+    value: (class
+      body: (class_body)))
+  (expression_statement
+    (array
+      (number)))
+  (export_statement
+    value: (class
+      body: (class_body)))
+  (class_declaration
+    name: (identifier)
+    body: (class_body)))
+
+============================================
+Export default expressions keep the semicolon
+============================================
+
+export default (function () {});
+export default async () => {};
+export default (class {}).x;
+
+---
+
+(program
+  (export_statement
+    value: (parenthesized_expression
+      (function_expression
+        parameters: (formal_parameters)
+        body: (statement_block))))
+  (export_statement
+    value: (arrow_function
+      parameters: (formal_parameters)
+      body: (statement_block)))
+  (export_statement
+    value: (member_expression
+      object: (parenthesized_expression
+        (class
+          body: (class_body)))
+      property: (property_identifier))))
+
+============================================
+Export followed by a line break
+============================================
+
+export
+{ a };
+export
+var b;
+export
+default 1;
+export
+{} from 'x';
+export
+{}
+{}
+
+---
+
+(program
+  (export_statement
+    (export_clause
+      (export_specifier
+        name: (identifier))))
+  (export_statement
+    declaration: (variable_declaration
+      (variable_declarator
+        name: (identifier))))
+  (export_statement
+    value: (number))
+  (export_statement
+    (export_clause)
+    source: (string
+      (string_fragment)))
+  (export_statement
+    (export_clause))
+  (statement_block))
+
+============================================
+Import attributes on exports from another module
+============================================
+
+export * from "a" with { type: "json" };
+export * as ns from "a" with { type: "json" };
+export { a } from "a" with { type: "json" };
+export { a as b, } from "a" with {};
+
+---
+
+(program
+  (export_statement
+    (string
+      (string_fragment))
+    (import_attribute
+      (object
+        (pair
+          (property_identifier)
+          (string
+            (string_fragment))))))
+  (export_statement
+    (namespace_export
+      (identifier))
+    (string
+      (string_fragment))
+    (import_attribute
+      (object
+        (pair
+          (property_identifier)
+          (string
+            (string_fragment))))))
+  (export_statement
+    (export_clause
+      (export_specifier
+        (identifier)))
+    (string
+      (string_fragment))
+    (import_attribute
+      (object
+        (pair
+          (property_identifier)
+          (string
+            (string_fragment))))))
+  (export_statement
+    (export_clause
+      (export_specifier
+        (identifier)
+        (identifier)))
+    (string
+      (string_fragment))
+    (import_attribute
+      (object))))
+
+============================================
+Line break before import attributes
+============================================
+
+import a from "a"
+with { type: "json" }
+import "b"
+with { type: "json" };
+export * from "c"
+with { type: "json" }
+export { d } from "d"
+with { type: "json" }
+import e from "e"
+f()
+
+---
+
+(program
+  (import_statement
+    (import_clause
+      (identifier))
+    (string
+      (string_fragment))
+    (import_attribute
+      (object
+        (pair
+          (property_identifier)
+          (string
+            (string_fragment))))))
+  (import_statement
+    (string
+      (string_fragment))
+    (import_attribute
+      (object
+        (pair
+          (property_identifier)
+          (string
+            (string_fragment))))))
+  (export_statement
+    (string
+      (string_fragment))
+    (import_attribute
+      (object
+        (pair
+          (property_identifier)
+          (string
+            (string_fragment))))))
+  (export_statement
+    (export_clause
+      (export_specifier
+        (identifier)))
+    (string
+      (string_fragment))
+    (import_attribute
+      (object
+        (pair
+          (property_identifier)
+          (string
+            (string_fragment))))))
+  (import_statement
+    (import_clause
+      (identifier))
+    (string
+      (string_fragment)))
+  (expression_statement
+    (call_expression
+      (identifier)
+      (arguments))))
+
+============================================
+Import attributes need a source
+:error
+============================================
+
+export { a } with { type: "json" };
+
+---
+
+============================================
+Import attribute keys and values
+============================================
+
+import a from "a" with { if: "b", "c": "d", };
+
+---
+
+(program
+  (import_statement
+    (import_clause
+      (identifier))
+    (string
+      (string_fragment))
+    (import_attribute
+      (object
+        (pair
+          (property_identifier)
+          (string
+            (string_fragment)))
+        (pair
+          (string
+            (string_fragment))
+          (string
+            (string_fragment)))))))
+
+============================================
+Import attribute values are strings
+:error
+============================================
+
+export * from "a" with { type: 1 };
+
+---
+
+============================================
+Import attributes are not an object literal
+:error
+============================================
+
+import a from "a"
+with { type, ...b };
+
+---
+
+============================================
+Reserved words as module export and import names
+============================================
+
+export { a as if, b as class, c as default, d as await } from "a";
+export { if, new as in } from "b";
+export * as typeof from "c";
+import { if as a, class as b, default as c, "d" as e } from "d";
+var f;
+export { f as import };
+
+---
+
+(program
+  (export_statement
+    (export_clause
+      (export_specifier
+        (identifier)
+        (identifier))
+      (export_specifier
+        (identifier)
+        (identifier))
+      (export_specifier
+        (identifier))
+      (export_specifier
+        (identifier)
+        (identifier)))
+    (string
+      (string_fragment)))
+  (export_statement
+    (export_clause
+      (export_specifier
+        (identifier))
+      (export_specifier
+        (identifier)
+        (identifier)))
+    (string
+      (string_fragment)))
+  (export_statement
+    (namespace_export
+      (identifier))
+    (string
+      (string_fragment)))
+  (import_statement
+    (import_clause
+      (named_imports
+        (import_specifier
+          (identifier)
+          (identifier))
+        (import_specifier
+          (identifier)
+          (identifier))
+        (import_specifier
+          (identifier))
+        (import_specifier
+          (string
+            (string_fragment))
+          (identifier))))
+    (string
+      (string_fragment)))
+  (variable_declaration
+    (variable_declarator
+      (identifier)))
+  (export_statement
+    (export_clause
+      (export_specifier
+        (identifier)
+        (identifier)))))
+
+============================================
+Reserved word as an import binding
+:error
+============================================
+
+import { a as if } from "a";
+
+---
+
+============================================
+Reserved word as a namespace import binding
+:error
+============================================
+
+import * as class from "a";
+
+---
+
+============================================
 Decorators before exports
 ============================================
 
@@ -1031,6 +1429,59 @@ of y);
     body: (empty_statement)))
 
 ============================================
+Using in a for…of head is an identifier before 'of'
+============================================
+
+for (using of of[0]) {}
+for (using of of [1, 2]);
+for (await using of of y);
+for (let of of y);
+
+---
+
+(program
+  (for_in_statement
+    left: (identifier)
+    right: (subscript_expression
+      object: (identifier)
+      index: (number))
+    body: (statement_block))
+  (for_in_statement
+    left: (identifier)
+    right: (subscript_expression
+      object: (identifier)
+      index: (sequence_expression
+        (number)
+        (number)))
+    body: (empty_statement))
+  (for_in_statement
+    left: (identifier)
+    right: (identifier)
+    body: (empty_statement))
+  (for_in_statement
+    left: (identifier)
+    right: (identifier)
+    body: (empty_statement)))
+
+============================================
+A using declaration cannot bind 'of' in a for…of head
+:error
+============================================
+
+for (using of of y);
+
+---
+
+============================================
+A using declaration cannot bind 'of' in a for…in head
+:error
+============================================
+
+for (using of in y);
+
+---
+
+============================================
 Line break after using in a plain for loop
 :error
 ============================================
@@ -1049,6 +1500,86 @@ for (using x = f()
 y;) {}
 
 ---
+
+============================================
+Using declaration in a for-in head
+:error
+============================================
+
+for (using x in o);
+
+---
+
+============================================
+Await using declaration in a for-in head
+:error
+============================================
+
+async function g() {
+  for (await using x in o);
+}
+
+---
+
+============================================
+'using' as an expression in for-in heads
+============================================
+
+for (using in o);
+for (using.x in o);
+
+---
+
+(program
+  (for_in_statement
+    (identifier)
+    (identifier)
+    (empty_statement))
+  (for_in_statement
+    (member_expression
+      (identifier)
+      (property_identifier))
+    (identifier)
+    (empty_statement)))
+
+============================================
+'async of' arrow function in a for initializer
+============================================
+
+for (async of => {};;) {}
+for (async of => x;;);
+for (async of x);
+for ((async) of x);
+for (async in x);
+
+---
+
+(program
+  (for_statement
+    (arrow_function
+      (identifier)
+      (statement_block))
+    (empty_statement)
+    (statement_block))
+  (for_statement
+    (arrow_function
+      (identifier)
+      (identifier))
+    (empty_statement)
+    (empty_statement))
+  (for_in_statement
+    (identifier)
+    (identifier)
+    (empty_statement))
+  (for_in_statement
+    (parenthesized_expression
+      (identifier))
+    (identifier)
+    (empty_statement))
+  (for_in_statement
+    (identifier)
+    (identifier)
+    (empty_statement)))
 
 ============================================
 'using' as identifier
@@ -1678,6 +2209,99 @@ let x = { a: //  3
           (property_identifier)
           (comment)
           (number))))))
+
+==========================================
+A statement that starts with a brace is a block
+==========================================
+
+{a:0}
+function b() {}{c: 1}
+if (foo) { bar: 'baz' }
+{d: {e: 1}}
+
+---
+
+(program
+  (statement_block
+    (labeled_statement
+      (statement_identifier)
+      (expression_statement
+        (number))))
+  (function_declaration
+    (identifier)
+    (formal_parameters)
+    (statement_block))
+  (statement_block
+    (labeled_statement
+      (statement_identifier)
+      (expression_statement
+        (number))))
+  (if_statement
+    (parenthesized_expression
+      (identifier))
+    (statement_block
+      (labeled_statement
+        (statement_identifier)
+        (expression_statement
+          (string
+            (string_fragment))))))
+  (statement_block
+    (labeled_statement
+      (statement_identifier)
+      (statement_block
+        (labeled_statement
+          (statement_identifier)
+          (expression_statement
+            (number)))))))
+
+==========================================
+A brace after a parenthesis or an arrow is an object or a function body
+==========================================
+
+({a: 0});
+x = {a: 0};
+y = () => {a: 0};
+
+---
+
+(program
+  (expression_statement
+    (parenthesized_expression
+      (object
+        (pair
+          (property_identifier)
+          (number)))))
+  (expression_statement
+    (assignment_expression
+      (identifier)
+      (object
+        (pair
+          (property_identifier)
+          (number)))))
+  (expression_statement
+    (assignment_expression
+      (identifier)
+      (arrow_function
+        (formal_parameters)
+        (statement_block
+          (labeled_statement
+            (statement_identifier)
+            (expression_statement
+              (number))))))))
+
+============================================
+Hash bang lines end at any line terminator
+============================================
+#!/usr/bin/env node a b
+
+---
+
+(program
+  (hash_bang_line)
+  (expression_statement
+    (identifier))
+  (expression_statement
+    (identifier)))
 
 ============================================
 For-await-of statements with let and const patterns

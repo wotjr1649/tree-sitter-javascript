@@ -519,3 +519,13 @@ JSX character reference ASCII classes: ASCII references
       (html_character_reference)
       (jsx_closing_element
         (identifier)))))
+
+============================================================
+Line break before the closing quote of a string
+:error
+============================================================
+
+'a
+'
+
+---
