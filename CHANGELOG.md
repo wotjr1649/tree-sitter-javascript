@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Known limitations
+
+- JSX opening and closing tag names are parsed independently, so pairs such as `<a></b>` and `<const></span>`,
+  as well as mixed fragment and named tags, can parse without an error (#20).
+
 ## [3.0.0] - 2026-11-20
 
 This major release changes trees for inputs that already parsed cleanly in v2.2.0 and are accepted by the pinned
@@ -61,9 +68,9 @@ changed their recovery tree.
   semicolon insertion in `let x\n/**/[y]` and `let x\n\uFEFF/**/[y]`, which now parse as declarations followed by
   separate array expressions. The ASCII form previously recovered with an error.
 - Insert an automatic semicolon after an uninitialized identifier declaration before a next-line `(`, `+`, `-`,
-  regular expression or template literal (#44, #43). All 2,417 inputs in #42's 28,628-input family that had parsed
-  only on Windows before #42 parse again with the same scanner rules on every platform. The #44 comparison
-  verified these inputs on Windows UCRT and under C-locale and glibc-like emulation.
+  regular expression or template literal (#44, #43). The 2,417 inputs of #42's 28,628-input family that regressed in
+  the #42 comparison parse again. The #44 checks covered Windows UCRT, C-locale emulation and glibc-like
+  emulation.
 - Require an explicit semicolon after a declaration initializer in a plain `for (;;)` header, preserving the
   public declaration kind in the `initializer` field. Ordinary array and object binding patterns require an
   initializer. For example, `var [z]\n/pattern/;` reports an error, while `for (var [x] of y) {}` still uses the
@@ -139,8 +146,9 @@ changed their recovery tree.
   method or field that should continue, and missed breaks before a standalone prefix update.
 - Some tokens containing U+0000 still give an error, including string literals, comments and regular expressions.
   #45 tracks strings, templates, comments, regular expressions, hashbangs and HTML-like comments for v3.1.
-- JSX tag names are parsed independently of their matching opening or closing name (#20). TSX still has
-  conflicts with reserved names such as `<const />`, `extends`, `<svg:true />` and `<super.Foo />`.
+- JSX tag names are parsed independently of their matching opening or closing name (#20), so `<a></b>` parses
+  without an error. JavaScript still rejects valid JSX names such as `<const />`, `<a extends="y" />`,
+  `<extends />`, `<svg:true />` and `<super.Foo />`, because changing these rules conflicts with TSX.
 - Line-break cases involving `using` and `await using` remain in #18. In an async block, `await\nusing x = g();`
   parses as two statements despite the reference parsers rejecting this form. In a non-async function in a Script,
   the same split is valid. A block comment with a line terminator in `{ using /*\n*/ x = f(); }` or after
@@ -153,8 +161,9 @@ changed their recovery tree.
   of `??` with `||` or `&&`, and some class heritage expressions.
 - The pinned Discovery run still reports 22 test262 A1 inputs. They include 11 sloppy `yield` cases, four
   block-comment ASI cases, four NUL cases, two class fields named `get` or `set` before a generator, and one
-  Annex B HTML-comment case. The structure tool reports 75 test262 differences, including 63 `yield` and
-  two `await` context cases. The Script interpretation of Annex B HTML-like comments can differ from Babel.
+  Annex B HTML-comment case. The structure tool reports 75 test262 differences: 63 `yield` and two `await`
+  context cases, nine static import attribute object and pair ranges, and one Annex B HTML-like comment. The
+  Script interpretation of Annex B HTML-like comments can differ from Babel.
   The downstream pin and vendoring criteria remain open in #41.
 - The TypeScript `import x = a.class;` family is still accepted by the TS grammar (TS1359). The separate J8
   TypeScript overrides and inherited build template limitations (#22) continue to apply.
