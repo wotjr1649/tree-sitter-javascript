@@ -47,6 +47,9 @@ module.exports = grammar({
     $._restricted_keyword,
     // A declaration without an initializer can end before an opening parenthesis on the next line.
     $._declaration_end,
+    // Only the validity of this marker is used, to tell a modifier from a field before '*'.
+    $._generator_method_continues,
+    $._static_before_get_field,
   ],
 
   extras: $ => [
@@ -1371,7 +1374,7 @@ module.exports = grammar({
 
     field_definition: $ => seq(
       repeat(field('decorator', $.decorator)),
-      optional('static'),
+      optional(choice('static', alias($._static_before_get_field, 'static'))),
       field('property', $._property_name),
       optional(choice($._initializer, $._binding_end)),
     ),
@@ -1408,10 +1411,11 @@ module.exports = grammar({
       repeat(field('decorator', $.decorator)),
       optional(choice(
         'static',
+        alias($._static_before_get_field, 'static'),
         alias(token(seq('static', /\s+/, 'get', /\s*\n/)), 'static get'),
       )),
-      optional('async'),
-      optional(choice('get', 'set', '*')),
+      optional(seq('async', optional($._restricted_keyword))),
+      optional(choice('get', 'set', seq(optional($._generator_method_continues), '*'))),
       field('name', $._property_name),
       field('parameters', $.formal_parameters),
       field('body', $.statement_block),
