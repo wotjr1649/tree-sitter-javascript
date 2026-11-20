@@ -29,7 +29,7 @@
     },
     "hash_bang_line": {
       "type": "PATTERN",
-      "value": "#![^\\r\\n\\u2028\\u2029]*"
+      "value": "#!([^\\r\\n\\u2028\\u2029\\x00]|\\x00+)*"
     },
     "export_statement": {
       "type": "CHOICE",
@@ -4014,6 +4014,26 @@
               }
             },
             {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "ALIAS",
+                  "content": {
+                    "type": "IMMEDIATE_TOKEN",
+                    "content": {
+                      "type": "STRING",
+                      "value": "&"
+                    }
+                  },
+                  "named": true,
+                  "value": "string_fragment"
+                },
+                {
+                  "type": "BLANK"
+                }
+              ]
+            },
+            {
               "type": "STRING",
               "value": "\""
             }
@@ -4048,6 +4068,26 @@
               }
             },
             {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "ALIAS",
+                  "content": {
+                    "type": "IMMEDIATE_TOKEN",
+                    "content": {
+                      "type": "STRING",
+                      "value": "&"
+                    }
+                  },
+                  "named": true,
+                  "value": "string_fragment"
+                },
+                {
+                  "type": "BLANK"
+                }
+              ]
+            },
+            {
               "type": "STRING",
               "value": "'"
             }
@@ -4062,7 +4102,7 @@
         "value": 1,
         "content": {
           "type": "PATTERN",
-          "value": "([^\"&]|&[^#A-Za-z])+"
+          "value": "([^\"&\\x00]|\\x00+|&([^\"#A-Za-z\\x00]|([A-Za-z]+|#([xX][0-9a-fA-F]*|[0-9]*))?\\x00+))+"
         }
       }
     },
@@ -4073,7 +4113,7 @@
         "value": 1,
         "content": {
           "type": "PATTERN",
-          "value": "([^'&]|&[^#A-Za-z])+"
+          "value": "([^'&\\x00]|\\x00+|&([^'#A-Za-z\\x00]|([A-Za-z]+|#([xX][0-9a-fA-F]*|[0-9]*))?\\x00+))+"
         }
       }
     },
@@ -6369,6 +6409,15 @@
                   {
                     "type": "SYMBOL",
                     "name": "escape_sequence"
+                  },
+                  {
+                    "type": "ALIAS",
+                    "content": {
+                      "type": "SYMBOL",
+                      "name": "_nul_escape_sequence"
+                    },
+                    "named": true,
+                    "value": "escape_sequence"
                   }
                 ]
               }
@@ -6406,6 +6455,15 @@
                   {
                     "type": "SYMBOL",
                     "name": "escape_sequence"
+                  },
+                  {
+                    "type": "ALIAS",
+                    "content": {
+                      "type": "SYMBOL",
+                      "name": "_nul_escape_sequence"
+                    },
+                    "named": true,
+                    "value": "escape_sequence"
                   }
                 ]
               }
@@ -6428,7 +6486,7 @@
         "value": 1,
         "content": {
           "type": "PATTERN",
-          "value": "[^\"\\\\\\r\\n]+"
+          "value": "([^\"\\\\\\r\\n\\x00]|\\x00+)+"
         }
       }
     },
@@ -6439,7 +6497,7 @@
         "value": 1,
         "content": {
           "type": "PATTERN",
-          "value": "[^'\\\\\\r\\n]+"
+          "value": "([^'\\\\\\r\\n\\x00]|\\x00+)+"
         }
       }
     },
@@ -6484,6 +6542,22 @@
         ]
       }
     },
+    "_nul_escape_sequence": {
+      "type": "IMMEDIATE_TOKEN",
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "STRING",
+            "value": "\\"
+          },
+          {
+            "type": "PATTERN",
+            "value": "\\x00"
+          }
+        ]
+      }
+    },
     "comment": {
       "type": "TOKEN",
       "content": {
@@ -6498,7 +6572,7 @@
               },
               {
                 "type": "PATTERN",
-                "value": "[^\\r\\n\\u2028\\u2029]*"
+                "value": "([^\\r\\n\\u2028\\u2029\\x00]|\\x00+)*"
               }
             ]
           },
@@ -6511,7 +6585,7 @@
               },
               {
                 "type": "PATTERN",
-                "value": "[^*]*\\*+([^/*][^*]*\\*+)*"
+                "value": "([^*\\x00]|\\x00+)*\\*+(([^/*\\x00]|\\x00+)([^*\\x00]|\\x00+)*\\*+)*"
               },
               {
                 "type": "STRING",
@@ -6546,6 +6620,15 @@
               {
                 "type": "SYMBOL",
                 "name": "escape_sequence"
+              },
+              {
+                "type": "ALIAS",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_nul_escape_sequence"
+                },
+                "named": true,
+                "value": "escape_sequence"
               },
               {
                 "type": "SYMBOL",
@@ -6584,6 +6667,15 @@
               {
                 "type": "SYMBOL",
                 "name": "escape_sequence"
+              },
+              {
+                "type": "ALIAS",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_nul_escape_sequence"
+                },
+                "named": true,
+                "value": "escape_sequence"
               },
               {
                 "type": "ALIAS",
@@ -6724,13 +6816,17 @@
                             },
                             {
                               "type": "PATTERN",
-                              "value": "[^\\n\\r\\u2028\\u2029]"
+                              "value": "([^\\n\\r\\u2028\\u2029\\x00]|\\x00+)"
                             }
                           ]
                         },
                         {
                           "type": "PATTERN",
-                          "value": "[^\\]\\n\\r\\u2028\\u2029\\\\]"
+                          "value": "[^\\]\\n\\r\\u2028\\u2029\\\\\\x00]"
+                        },
+                        {
+                          "type": "PATTERN",
+                          "value": "\\x00+"
                         }
                       ]
                     }
@@ -6750,13 +6846,17 @@
                   },
                   {
                     "type": "PATTERN",
-                    "value": "[^\\n\\r\\u2028\\u2029]"
+                    "value": "([^\\n\\r\\u2028\\u2029\\x00]|\\x00+)"
                   }
                 ]
               },
               {
                 "type": "PATTERN",
-                "value": "[^/\\\\\\[\\n\\r\\u2028\\u2029]"
+                "value": "[^/\\\\\\[\\n\\r\\u2028\\u2029\\x00]"
+              },
+              {
+                "type": "PATTERN",
+                "value": "\\x00+"
               }
             ]
           }

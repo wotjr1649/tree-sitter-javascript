@@ -157,7 +157,9 @@ module.exports = grammar({
       repeat($.statement),
     ),
 
-    hash_bang_line: _ => /#![^\r\n\u2028\u2029]*/,
+    // U+0000 in a repeated character class: `\x00+` gives it a transition of its own. Merged into a negated class
+    // (`[^x]|\x00`) the generated lexer drops it, as `lookahead != 0` also means the end of the input.
+    hash_bang_line: _ => /#!([^\r\n\u2028\u2029\x00]|\x00+)*/,
 
     //
     // Export declarations
@@ -843,6 +845,7 @@ module.exports = grammar({
           alias($.unescaped_double_jsx_string_fragment, $.string_fragment),
           $.html_character_reference,
         )),
+        optional(alias(token.immediate('&'), $.string_fragment)),
         '"',
       ),
       seq(
@@ -851,6 +854,7 @@ module.exports = grammar({
           alias($.unescaped_single_jsx_string_fragment, $.string_fragment),
           $.html_character_reference,
         )),
+        optional(alias(token.immediate('&'), $.string_fragment)),
         '\'',
       ),
     ),
@@ -858,11 +862,11 @@ module.exports = grammar({
     // Workaround to https://github.com/tree-sitter/tree-sitter/issues/1156
     // We give names to the token() constructs containing a regexp
     // so as to obtain a node in the CST.
-    //
-    unescaped_double_jsx_string_fragment: _ => token.immediate(prec(1, /([^"&]|&[^#A-Za-z])+/)),
+    // An entity prefix interrupted by NUL is text, as is a bare ampersand before the closing quote.
+    unescaped_double_jsx_string_fragment: _ => token.immediate(prec(1, /([^"&\x00]|\x00+|&([^"#A-Za-z\x00]|([A-Za-z]+|#([xX][0-9a-fA-F]*|[0-9]*))?\x00+))+/)),
 
     // same here
-    unescaped_single_jsx_string_fragment: _ => token.immediate(prec(1, /([^'&]|&[^#A-Za-z])+/)),
+    unescaped_single_jsx_string_fragment: _ => token.immediate(prec(1, /([^'&\x00]|\x00+|&([^'#A-Za-z\x00]|([A-Za-z]+|#([xX][0-9a-fA-F]*|[0-9]*))?\x00+))+/)),
 
     _jsx_attribute_value: $ => choice(
       alias($._jsx_string, $.string),
@@ -1135,6 +1139,7 @@ module.exports = grammar({
         repeat(choice(
           alias($.unescaped_double_string_fragment, $.string_fragment),
           $.escape_sequence,
+          alias($._nul_escape_sequence, $.escape_sequence),
         )),
         // Immediate: a line terminator before the closing quote is not white space but an unterminated string.
         token.immediate('"'),
@@ -1144,6 +1149,7 @@ module.exports = grammar({
         repeat(choice(
           alias($.unescaped_single_string_fragment, $.string_fragment),
           $.escape_sequence,
+          alias($._nul_escape_sequence, $.escape_sequence),
         )),
         token.immediate('\''),
       ),
@@ -1153,10 +1159,10 @@ module.exports = grammar({
     // We give names to the token() constructs containing a regexp
     // so as to obtain a node in the CST.
     //
-    unescaped_double_string_fragment: _ => token.immediate(prec(1, /[^"\\\r\n]+/)),
+    unescaped_double_string_fragment: _ => token.immediate(prec(1, /([^"\\\r\n\x00]|\x00+)+/)),
 
     // same here
-    unescaped_single_string_fragment: _ => token.immediate(prec(1, /[^'\\\r\n]+/)),
+    unescaped_single_string_fragment: _ => token.immediate(prec(1, /([^'\\\r\n\x00]|\x00+)+/)),
 
     escape_sequence: _ => token.immediate(seq(
       '\\',
@@ -1170,12 +1176,16 @@ module.exports = grammar({
       ),
     )),
 
+    // `\` and U+0000: a branch of escape_sequence would merge with `[^xu0-7]` and lose the NUL, so it is a token of its
+    // own, aliased to escape_sequence where it is used.
+    _nul_escape_sequence: _ => token.immediate(seq('\\', /\x00/)),
+
     // http://stackoverflow.com/questions/13014947/regex-to-match-a-c-style-multiline-comment/36328890#36328890
     comment: _ => token(choice(
-      seq('//', /[^\r\n\u2028\u2029]*/),
+      seq('//', /([^\r\n\u2028\u2029\x00]|\x00+)*/),
       seq(
         '/*',
-        /[^*]*\*+([^/*][^*]*\*+)*/,
+        /([^*\x00]|\x00+)*\*+(([^/*\x00]|\x00+)([^*\x00]|\x00+)*\*+)*/,
         '/',
       ),
     )),
@@ -1185,6 +1195,7 @@ module.exports = grammar({
       repeat(choice(
         alias($._template_chars, $.string_fragment),
         $.escape_sequence,
+        alias($._nul_escape_sequence, $.escape_sequence),
         $.template_substitution,
       )),
       '`',
@@ -1196,6 +1207,7 @@ module.exports = grammar({
       repeat(choice(
         alias($._template_chars, $.string_fragment),
         $.escape_sequence,
+        alias($._nul_escape_sequence, $.escape_sequence),
         alias($._invalid_escape_sequence, $.escape_sequence),
         $.template_substitution,
       )),
@@ -1228,13 +1240,15 @@ module.exports = grammar({
         seq(
           '[',
           repeat(choice(
-            seq('\\', /[^\n\r\u2028\u2029]/), // escaped character
-            /[^\]\n\r\u2028\u2029\\]/, // any character besides ']', '\' or a line terminator
+            seq('\\', /([^\n\r\u2028\u2029\x00]|\x00+)/), // escaped character
+            /[^\]\n\r\u2028\u2029\\\x00]/, // any character besides ']', '\' or a line terminator
+            /\x00+/,
           )),
           ']',
         ), // square-bracket-delimited character class
-        seq('\\', /[^\n\r\u2028\u2029]/), // escaped character
-        /[^/\\\[\n\r\u2028\u2029]/, // any character besides '[', '\', '/' or a line terminator
+        seq('\\', /([^\n\r\u2028\u2029\x00]|\x00+)/), // escaped character
+        /[^/\\\[\n\r\u2028\u2029\x00]/, // any character besides '[', '\', '/' or a line terminator
+        /\x00+/,
       )),
     )),
 

@@ -104,14 +104,14 @@ static WhitespaceResult scan_whitespace_and_comments(TSLexer *lexer, bool *scann
 
             if (lexer->lookahead == '/') {
                 skip(lexer);
-                while (lexer->lookahead != 0 && !is_asi_line_terminator(lexer->lookahead, declaration_newline != NULL)) {
+                while (!lexer->eof(lexer) && !is_asi_line_terminator(lexer->lookahead, declaration_newline != NULL)) {
                     skip(lexer);
                 }
                 *scanned_comment = true;
                 seen_comment = true;
             } else if (lexer->lookahead == '*') {
                 skip(lexer);
-                while (lexer->lookahead != 0) {
+                while (!lexer->eof(lexer)) {
                     if (lexer->lookahead == '*') {
                         skip(lexer);
                         if (lexer->lookahead == '/') {
@@ -245,7 +245,7 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
     lexer->mark_end(lexer);
 
     for (;;) {
-        if (lexer->lookahead == 0) {
+        if (lexer->eof(lexer)) {
             return true;
         }
 
@@ -317,7 +317,7 @@ static bool scan_restricted_semicolon(TSLexer *lexer) {
     bool newline = false;
     for (;;) {
         int32_t c = lexer->lookahead;
-        if (c == 0 || c == '}' || lexer->is_at_included_range_start(lexer)) {
+        if (lexer->eof(lexer) || c == '}' || lexer->is_at_included_range_start(lexer)) {
             return true;
         }
 
@@ -331,13 +331,13 @@ static bool scan_restricted_semicolon(TSLexer *lexer) {
         } else {
             skip(lexer);
             if (lexer->lookahead == '/') {
-                while (lexer->lookahead != 0 && lexer->lookahead != '\n' && lexer->lookahead != '\r' &&
+                while (!lexer->eof(lexer) && lexer->lookahead != '\n' && lexer->lookahead != '\r' &&
                        lexer->lookahead != 0x2028 && lexer->lookahead != 0x2029) {
                     skip(lexer);
                 }
             } else if (lexer->lookahead == '*') {
                 skip(lexer);
-                while (lexer->lookahead != 0) {
+                while (!lexer->eof(lexer)) {
                     c = lexer->lookahead;
                     skip(lexer);
                     if (c == '*' && lexer->lookahead == '/') {
@@ -464,7 +464,7 @@ static bool scan_jsx_text(TSLexer *lexer) {
 
     lexer->result_symbol = JSX_TEXT;
 
-    while (lexer->lookahead != 0 && lexer->lookahead != '<' && lexer->lookahead != '>' && lexer->lookahead != '{' &&
+    while (!lexer->eof(lexer) && lexer->lookahead != '<' && lexer->lookahead != '>' && lexer->lookahead != '{' &&
            lexer->lookahead != '}') {
         if (lexer->lookahead == '&') {
             // A character reference is its own token: the text ends before it.
