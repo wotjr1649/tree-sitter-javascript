@@ -32,7 +32,7 @@
    }
   },
   "cases_file": "cases.jsonl",
-  "cases_sha256": "39813f4005fb5571b1e0394b04c8479d2b4c5f81cadbefeecdc63361a1506cce",
+  "cases_sha256": "70f77cc5824b00f3a60be32b41aa65f24004210425b932ebb1f7f25998a8f52e",
   "runner": "run.mjs",
   "runner_sha256": "06cfe49cd56d0bac9b5c672b1f62fc0f44b37de02c0a2bf04c557e5354c5c24d"
  },
@@ -18469,66 +18469,6 @@
    }
   },
   {
-   "id": "nul/html-open",
-   "sha256": "20bb9163879b22e63994c233faba86aa681f1062dba93d884e1d6b8d33ecf735",
-   "sourceType": "script",
-   "verdict": "accept",
-   "babel": {
-    "class": "accept",
-    "errors": []
-   },
-   "oxc": {
-    "class": "accept",
-    "errors": [],
-    "errorsWithSemantic": []
-   }
-  },
-  {
-   "id": "nul/html-open-nl",
-   "sha256": "232ad33186631c4bc79988a71cb7dff75582f3f4a52cef42c35ff48f8e8d02ac",
-   "sourceType": "script",
-   "verdict": "accept",
-   "babel": {
-    "class": "accept",
-    "errors": []
-   },
-   "oxc": {
-    "class": "accept",
-    "errors": [],
-    "errorsWithSemantic": []
-   }
-  },
-  {
-   "id": "nul/html-close",
-   "sha256": "7c516a45f51829d8b171d6bbcf7fc41a5b823ae65c9d26f4b044ab65003b1651",
-   "sourceType": "script",
-   "verdict": "accept",
-   "babel": {
-    "class": "accept",
-    "errors": []
-   },
-   "oxc": {
-    "class": "accept",
-    "errors": [],
-    "errorsWithSemantic": []
-   }
-  },
-  {
-   "id": "nul/html-close-nl",
-   "sha256": "c2d18a3a00a976795d0575d513539ed2db9582da16173121454432c1bda5437e",
-   "sourceType": "script",
-   "verdict": "accept",
-   "babel": {
-    "class": "accept",
-    "errors": []
-   },
-   "oxc": {
-    "class": "accept",
-    "errors": [],
-    "errorsWithSemantic": []
-   }
-  },
-  {
    "id": "nul/hashbang",
    "sha256": "0226f130691db4a59336c9f1c491c002c83e6a01680ee5430eeaff53221e3edc",
    "sourceType": "module",
@@ -18636,6 +18576,456 @@
   {
    "id": "nul/jsx-comment",
    "sha256": "230903dbffe976292f5ede06f688e5fa9e4be758c6d5b7f66dd736c1e6472a6b",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "nul/annex-b-open-nul-cr-outside-nul",
+   "sha256": "c006b2f269be93b29e0fae59fbfa45b79e89c55362c58af4137c59718b3e8a4f",
+   "sourceType": "script",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected character '\u0000'. (2:0)",
+      "at": 6
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Invalid Character `\u0000`",
+      "at": 6
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Invalid Character `\u0000`",
+      "at": 6
+     }
+    ]
+   }
+  },
+  {
+   "id": "nul/annex-b-open-ascii-cr-outside-nul",
+   "sha256": "314749dc3a6b39254d3dbf79c6a12adb545e70c1108df75b76fbed6edd6369cb",
+   "sourceType": "script",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected character '\u0000'. (2:0)",
+      "at": 6
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Invalid Character `\u0000`",
+      "at": 6
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Invalid Character `\u0000`",
+      "at": 6
+     }
+    ]
+   }
+  },
+  {
+   "id": "nul/annex-b-open-nul-lf-outside-nul",
+   "sha256": "d555256e05b5f1087dff24f2d98c0a20abe4a5340b0790a1dfec986e1e30e95c",
+   "sourceType": "script",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected character '\u0000'. (2:0)",
+      "at": 6
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Invalid Character `\u0000`",
+      "at": 6
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Invalid Character `\u0000`",
+      "at": 6
+     }
+    ]
+   }
+  },
+  {
+   "id": "nul/annex-b-open-nul-crlf-outside-nul",
+   "sha256": "46e3c911f0dd583414185c335b790fdddeaeb43683d1ef46a11371574f1d6ebc",
+   "sourceType": "script",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected character '\u0000'. (2:0)",
+      "at": 7
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Invalid Character `\u0000`",
+      "at": 7
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Invalid Character `\u0000`",
+      "at": 7
+     }
+    ]
+   }
+  },
+  {
+   "id": "nul/annex-b-close-nul-cr-outside-nul",
+   "sha256": "1a3ad5ca3fcd0e57349cb23c2c39bbbf2142addba047eec897d0379e5b0535b0",
+   "sourceType": "script",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected character '\u0000'. (2:0)",
+      "at": 5
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Invalid Character `\u0000`",
+      "at": 5
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Invalid Character `\u0000`",
+      "at": 5
+     }
+    ]
+   }
+  },
+  {
+   "id": "nul/annex-b-close-ascii-cr-outside-nul",
+   "sha256": "fd02cf913b5f3ea5b9699fad8c44f92ee88be0d71584cecb8bb195d3d44403ac",
+   "sourceType": "script",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected character '\u0000'. (2:0)",
+      "at": 5
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Invalid Character `\u0000`",
+      "at": 5
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Invalid Character `\u0000`",
+      "at": 5
+     }
+    ]
+   }
+  },
+  {
+   "id": "nul/annex-b-close-nul-lf-outside-nul",
+   "sha256": "673424e46610c6a5314ce530fc3459d7f18985066599b7dcea6b03721b3a7106",
+   "sourceType": "script",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected character '\u0000'. (2:0)",
+      "at": 5
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Invalid Character `\u0000`",
+      "at": 5
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Invalid Character `\u0000`",
+      "at": 5
+     }
+    ]
+   }
+  },
+  {
+   "id": "nul/annex-b-close-nul-crlf-outside-nul",
+   "sha256": "671e519f853ee42561b885172e8f4af4d0e558ea0ee786bb183c42bebf72e33f",
+   "sourceType": "script",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected character '\u0000'. (2:0)",
+      "at": 6
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Invalid Character `\u0000`",
+      "at": 6
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Invalid Character `\u0000`",
+      "at": 6
+     }
+    ]
+   }
+  },
+  {
+   "id": "nul/jsx-attr-dq-split-named",
+   "sha256": "1f0f2c509874aac9b98e746534fb3ed039d8c916102c9550821554d8bf839d33",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "nul/jsx-attr-dq-split-decimal",
+   "sha256": "6f0b31a464ff4cff1b60c3a4bd59764fe3679038943d9d154074765378db8adf",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "nul/jsx-attr-dq-split-hex",
+   "sha256": "336a1fd58e279e351aa233e154de27ae42286439cc8a804cec357b4ea401bd81",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "nul/jsx-attr-dq-split-decimal-prefix",
+   "sha256": "837af40fd90348cab2610743c305692181ac5c5821bd4b0858cfff26b5d6762e",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "nul/jsx-attr-dq-split-hex-prefix",
+   "sha256": "ccbdf477b3accce1fbd5aa6e1d5e16aa4e9ea95dba6778b74806bfdbd736913d",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "nul/jsx-attr-dq-amp-nul-after",
+   "sha256": "26d2524f0b78f5d2b0c5091e77516a9f3d1ba77e77d686b28d4cbd800e7a65cd",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "nul/jsx-attr-dq-complete-entities",
+   "sha256": "be47635387c4cf54fef4e8696717ec7a86460709f412165c5e45e8b88510d1c0",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "nul/jsx-attr-sq-split-named",
+   "sha256": "f6d2b38bb946561dd6942d537b0889206b9e27347f81abc3c148c619cdb1045d",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "nul/jsx-attr-sq-split-decimal",
+   "sha256": "e83138e9d88303f71110f52613e574b142e313222548951176060f2deb2b5180",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "nul/jsx-attr-sq-split-hex",
+   "sha256": "a2046ec0096b39d4a142b8b3a2552950089f1e7082fe7362b657f81459cfb99b",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "nul/jsx-attr-sq-split-decimal-prefix",
+   "sha256": "bd2d149beb6232e19e9021cf1c7bdc5417fdd9b4b52ef7e8f565130b226e265e",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "nul/jsx-attr-sq-split-hex-prefix",
+   "sha256": "7b358747eccf3edc49cfce24fe9860be4b013f2856738ebe4d546cf35099763a",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "nul/jsx-attr-sq-amp-nul-after",
+   "sha256": "9bee1cf6d1c4617b4412fe5f42bbe55d065f2e9cf761dd519a75b564acfb62c7",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "nul/jsx-attr-sq-complete-entities",
+   "sha256": "584d1074d0b45fdc223123dff1ad5a4c9b7a90b7bd22f8f811a1f6873b6752fb",
    "sourceType": "module",
    "verdict": "accept",
    "babel": {
