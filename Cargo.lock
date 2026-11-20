@@ -196,7 +196,7 @@ dependencies = [
 
 [[package]]
 name = "tree-sitter-javascript"
-version = "2.2.0"
+version = "3.0.0"
 dependencies = [
  "cc",
  "tree-sitter",
