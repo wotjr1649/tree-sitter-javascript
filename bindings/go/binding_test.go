@@ -67,3 +67,40 @@ func TestRestrictedStatementEndsAtIncludedRange(t *testing.T) {
 		parser.Close()
 	}
 }
+
+func TestConciseArrowContinuesAcrossIncludedRanges(t *testing.T) {
+	language := tree_sitter.NewLanguage(tree_sitter_javascript.Language())
+	cases := []struct{ left, right string }{
+		{"function f(){ g(async()=>x", " + await y, await / 2); }"},
+		{"function f(){ g(async()=>x", " (await y), await / 2); }"},
+		{"function f(){ g(async()=>x", " ? await y : await z, await / 2); }"},
+		{"async function f(){ g(()=>x", " + await(y), await y); }"},
+	}
+	for _, c := range cases {
+		t.Run(c.right, func(t *testing.T) {
+			parser := tree_sitter.NewParser()
+			defer parser.Close()
+			if err := parser.SetLanguage(language); err != nil {
+				t.Fatal(err)
+			}
+			joined := parser.Parse([]byte(c.left+c.right), nil)
+			defer joined.Close()
+			gap := "<excluded>\n"
+			start := uint(len(c.left) + len(gap))
+			source := c.left + gap + c.right
+			if err := parser.SetIncludedRanges([]tree_sitter.Range{
+				{EndByte: uint(len(c.left)), EndPoint: tree_sitter.Point{Column: uint(len(c.left))}},
+				{StartByte: start, EndByte: uint(len(source)), StartPoint: tree_sitter.Point{Row: 1},
+					EndPoint: tree_sitter.Point{Row: 1, Column: uint(len(c.right))}},
+			}); err != nil {
+				t.Fatal(err)
+			}
+			ranged := parser.Parse([]byte(source), nil)
+			defer ranged.Close()
+			want, got := joined.RootNode(), ranged.RootNode()
+			if want.HasError() || got.HasError() || got.ToSexp() != want.ToSexp() {
+				t.Errorf("ranged: %s\njoined: %s", got.ToSexp(), want.ToSexp())
+			}
+		})
+	}
+}
