@@ -61,6 +61,8 @@ unsigned tree_sitter_javascript_external_scanner_serialize(void *payload, char *
     memcpy(buffer, &scanner->overflow, sizeof(scanner->overflow));
     memcpy(buffer + sizeof(scanner->overflow), &scanner->depth, sizeof(scanner->depth));
     memcpy(buffer + SCOPE_HEADER_SIZE, scanner->flags, length);
+    unsigned used_bits = (scanner->depth % 4) * 2;
+    if (used_bits) buffer[SCOPE_HEADER_SIZE + length - 1] &= (1u << used_bits) - 1;
     return SCOPE_HEADER_SIZE + length;
 }
 
@@ -153,7 +155,7 @@ static bool is_asi_line_terminator(int32_t c, bool declaration_end) {
  * @param consume If false, only consume enough to check if comment indicates semicolon-legality
  * @param break_after_comment If not NULL: set when a line terminator follows a comment of this scan, in white space or
  *        inside a later block comment (the next call then sees it and decides)
- * @param declaration_newline If not NULL: record line terminators, including CR, for a bare declaration.
+ * @param declaration_newline If not NULL: record line terminators, including CR.
  */
 static WhitespaceResult scan_whitespace_and_comments(TSLexer *lexer, bool *scanned_comment, bool consume,
                                                      bool *break_after_comment, bool *declaration_newline) {
@@ -655,17 +657,27 @@ bool tree_sitter_javascript_external_scanner_scan(void *payload, TSLexer *lexer,
         return true;
     }
 
-    bool at_next_token = true;
-    if (valid_symbols[AUTOMATIC_SEMICOLON] || valid_symbols[LEAVE_CONCISE_BODY]) {
+    if (valid_symbols[LEAVE_CONCISE_BODY]) {
+        // Look through trivia without extending the body or treating a new included range as a line break.
+        lexer->mark_end(lexer);
         bool scanned_comment = false;
-        at_next_token = false;
+        bool newline = false;
+        if (scan_whitespace_and_comments(lexer, &scanned_comment, true, NULL, &newline) == REJECT) return false;
+        bool ternary = lexer->lookahead == '?';
+        if (at_concise_body_end(lexer) ||
+            (newline && semicolon_before_next_token(lexer, valid_symbols, false, false))) {
+            return leave_context(scanner, lexer, LEAVE_CONCISE_BODY);
+        }
+        if (scanned_comment) return false;
+        if (ternary && valid_symbols[TERNARY_QMARK]) return scan_ternary_qmark(lexer);
+        if (newline) return false;
+    } else if (valid_symbols[AUTOMATIC_SEMICOLON]) {
+        bool scanned_comment = false;
+        bool at_next_token = false;
         bool ret = valid_symbols[RESTRICTED_KEYWORD]
                        ? scan_restricted_semicolon(lexer, &at_next_token)
                        : scan_automatic_semicolon(lexer, valid_symbols, &scanned_comment, &at_next_token);
-        if (valid_symbols[LEAVE_CONCISE_BODY] && (ret || (at_next_token && at_concise_body_end(lexer)))) {
-            return leave_context(scanner, lexer, LEAVE_CONCISE_BODY);
-        }
-        if (ret && valid_symbols[AUTOMATIC_SEMICOLON]) return true;
+        if (ret) return true;
         if (!scanned_comment && valid_symbols[TERNARY_QMARK] && lexer->lookahead == '?') {
             return scan_ternary_qmark(lexer);
         }
