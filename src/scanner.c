@@ -825,7 +825,7 @@ bool tree_sitter_javascript_external_scanner_scan(void *payload, TSLexer *lexer,
             if (next == ASI_HTML_CLOSE) return finish_html_comment(lexer);
             if (!trivia.html_open_needs_prefix || !valid_symbols[LOGICAL_OR]) return false;
             next = scan_after_html_open(lexer, true);
-            return next != ASI_END && (next != ASI_NEXT_TOKEN || !at_concise_body_end(lexer)) &&
+            return next != ASI_END && (next != ASI_NEXT_TOKEN || lexer->lookahead == ',' || !at_concise_body_end(lexer)) &&
                    !semicolon_before_lookahead(lexer, valid_symbols, next, false, false) &&
                    remember_html_open(scanner, lexer, valid_symbols);
         }
