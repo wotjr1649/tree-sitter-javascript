@@ -28,6 +28,66 @@ func TestCanLoadGrammar(t *testing.T) {
 	}
 }
 
+func TestIncompleteMethodNameAfterEdit(t *testing.T) {
+	language := tree_sitter.NewLanguage(tree_sitter_javascript.Language())
+	const prefix = "class C {"
+	const comment = "/* comment\n*/"
+	for _, head := range []string{"*m", "async m", "async *m"} {
+		t.Run(head, func(t *testing.T) {
+			parser := tree_sitter.NewParser()
+			defer parser.Close()
+			if err := parser.SetLanguage(language); err != nil {
+				t.Fatal(err)
+			}
+			suffix := "\n" + head + "(\n}"
+			plain := []byte(prefix + suffix)
+			withComment := []byte(prefix + comment + suffix)
+			start := tree_sitter.Point{Column: uint(len(prefix))}
+			end := tree_sitter.Point{Row: 1, Column: 2}
+			insert := tree_sitter.InputEdit{
+				StartByte: uint(len(prefix)), OldEndByte: uint(len(prefix)), NewEndByte: uint(len(prefix + comment)),
+				StartPosition: start, OldEndPosition: start, NewEndPosition: end,
+			}
+			remove := tree_sitter.InputEdit{
+				StartByte: insert.StartByte, OldEndByte: insert.NewEndByte, NewEndByte: insert.OldEndByte,
+				StartPosition: start, OldEndPosition: end, NewEndPosition: start,
+			}
+
+			initial := parser.Parse(plain, nil)
+			defer initial.Close()
+			initial.Edit(&insert)
+			edited := parser.Parse(withComment, initial)
+			defer edited.Close()
+
+			check := func(tree *tree_sitter.Tree, source []byte, nameStart uint) {
+				t.Helper()
+				root := tree.RootNode()
+				node := root.NamedDescendantForByteRange(nameStart, nameStart+1)
+				if node == nil || node.Kind() != "property_identifier" || node.StartByte() != nameStart ||
+					node.EndByte() != nameStart+1 || node.Parent() == nil || !node.Parent().IsError() {
+					t.Fatalf("missing ERROR property identifier for %q: %s", source, root.ToSexp())
+				}
+				cursor := node.Parent().Walk()
+				defer cursor.Close()
+				if cursor.GotoFirstChildForByte(uint32(nameStart)) == nil || cursor.FieldName() != "name" {
+					t.Fatalf("missing ERROR name field for %q: %s", source, root.ToSexp())
+				}
+				fresh := parser.Parse(source, nil)
+				defer fresh.Close()
+				if got, want := root.ToSexp(), fresh.RootNode().ToSexp(); got != want {
+					t.Errorf("incremental tree: %s\nfresh tree: %s", got, want)
+				}
+			}
+			check(edited, withComment, uint(len(prefix+comment+"\n"+head)-1))
+
+			edited.Edit(&remove)
+			restored := parser.Parse(plain, edited)
+			defer restored.Close()
+			check(restored, plain, uint(len(prefix+"\n"+head)-1))
+		})
+	}
+}
+
 // After `return`, `break`, `continue` and a label a line terminator ends the statement, and so does the start of the
 // next included range (host code, such as a template's markup, between two ranges): the second range then starts a
 // statement of its own, whatever its first token is.

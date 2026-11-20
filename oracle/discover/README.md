@@ -1,8 +1,8 @@
 # Defect discovery
 
-Finds the places where this grammar fails on valid JavaScript/JSX, at scale. It is a tool, not a gate: nothing here runs in
-CI, and every output goes under `build/discovery/` (git-ignored). The committed oracle (`../README.md`) guards fixes; this
-looks for new ones. Early errors are out of scope: they are counted only to be set apart.
+Finds the places where this grammar fails on valid JavaScript/JSX, at scale. Local outputs default to `build/discovery/`
+(git-ignored). The on-demand cross-platform CST comparison uses the fetch and collect steps. The committed oracle
+(`../README.md`) guards fixes. Early errors are counted separately.
 
 Inputs (pinned in `manifest.json`):
 
@@ -11,6 +11,9 @@ Inputs (pinned in `manifest.json`):
 | `test262` | `test/language`, `test/built-ins`, `test/annexB` of `tc39/test262` at the pinned commit. `staging/` and `intl402/` are skipped, and so is every test whose `features:` lists a feature that `features.txt` keeps above `## Standard language features` (stage 3 and earlier), and every fixture that uses `import defer`/`import source` | The metadata: `negative: {phase: parse}` must be rejected, anything else must parse. `flags: [module]` gives the source type, `onlyStrict` prepends `"use strict";\n`, `*_FIXTURE.js` are modules judged by the tools. A plain script test is judged **in sloppy mode only**: test262's runner also runs it in strict mode (INTERPRETING.md), this tool does not, so a script that is valid only sloppy (or only strict) is read as the metadata says for the one mode tried |
 | `npm` | JS/JSX/MJS/CJS files of the packages in `manifest.json`, pinned by version and tarball sha256/sha512 (`.mjs` module, `.cjs` script, `.js` tried as script and as module; a package may limit itself with `include`) | The tools: a file is valid when both accept it for some source type |
 | `babel-jsx` | `input.*` files of `packages/babel-parser/test/fixtures/jsx` of `babel/babel` at the pinned commit (JSX has no test262) | The tools (Babel is one of them, so only agreement counts). The fixtures' `options.json` is not read: each input is tried as module and as script and the first type both tools accept decides, so this set finds inputs on which the tools agree in some context, not the fixture's own verdict (`errors/html-comment-module` is a valid script and an invalid module) |
+
+The cross-platform comparison checks the selected valid counts in `xplat_valid_counts`. Recount the valid inputs
+when changing the input or reference-parser pins.
 
 Babel 8.1.2 and oxc 0.159.0 answer with the exact options of `../run.mjs` (JSX on, `errorRecovery`, `showSemanticErrors`).
 Their classes are `accept` (no error), `early` (Babel: recovered errors only; oxc: errors only with `showSemanticErrors`) and

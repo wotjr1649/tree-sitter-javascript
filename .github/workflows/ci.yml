@@ -5,13 +5,18 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+    inputs:
+      tree_ref:
+        description: Git ref to compare across OSes (empty runs regular CI)
+        type: string
 
 concurrency:
-  group: ${{github.workflow}}-${{github.ref}}
+  group: ${{github.workflow}}-${{github.ref}}-${{ inputs.tree_ref && 'xplat' || 'ci' }}
   cancel-in-progress: true
 
 jobs:
   test:
+    if: ${{ !inputs.tree_ref }}
     name: Test parser
     runs-on: ${{matrix.os}}
     strategy:
@@ -62,6 +67,7 @@ jobs:
             examples/*.jsx
 
   swift:
+    if: ${{ !inputs.tree_ref }}
     name: Test Swift (${{matrix.os}})
     runs-on: ${{matrix.os}}
     strategy:
@@ -85,6 +91,7 @@ jobs:
         run: cmp Package.resolved "$RUNNER_TEMP/Package.resolved"
 
   swift-min:
+    if: ${{ !inputs.tree_ref }}
     name: Test Swift (tools 5.9)
     runs-on: ubuntu-24.04
     container: swift:5.9
@@ -101,6 +108,7 @@ jobs:
         run: cmp Package.resolved "$RUNNER_TEMP/Package.resolved"
 
   gates:
+    if: ${{ !inputs.tree_ref }}
     name: Node kinds and parser cost
     runs-on: ubuntu-24.04
     steps:
@@ -120,6 +128,7 @@ jobs:
         run: node scripts/parser-cost.mjs
 
   oracle:
+    if: ${{ !inputs.tree_ref }}
     name: Oracle replay
     runs-on: ubuntu-24.04
     steps:
@@ -150,3 +159,134 @@ jobs:
       - name: Replay verdicts against the grammar
         working-directory: oracle/replay
         run: go run . -oracle ..
+
+  xplat-dump:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.tree_ref != '' }}
+    name: Dump CSTs (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    env:
+      GIT_CONFIG_COUNT: "1"
+      GIT_CONFIG_KEY_0: core.autocrlf
+      GIT_CONFIG_VALUE_0: "false"
+      GOMAXPROCS: "3"
+      CGO_ENABLED: "1"
+    steps:
+      - name: Checkout comparison tools
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Checkout grammar and default inputs
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tree_ref }}
+          path: build/xplat/target
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          package-manager-cache: false
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version: "1.23"
+          # The cgo cache does not track the #included grammar sources.
+          cache: false
+      - name: Install the reference parsers
+        working-directory: oracle
+        run: npm ci --ignore-scripts
+      - name: Fetch and select discovery inputs
+        shell: bash
+        env:
+          npm_config_loglevel: error
+        run: |
+          work=build/xplat
+          node oracle/discover/fetch.mjs --data "$work/data"
+          RAYON_NUM_THREADS=3 node oracle/discover/collect.mjs --data "$work/data" --out "$work/oracle.jsonl"
+          mkdir -p "$work/dumps"
+          node scripts/xplat-inputs.mjs "$work/data" "$work/oracle.jsonl" "$work/discovery.jsonl" "$work/dumps/discovery-inputs.jsonl"
+      - name: Build replay and hash CSTs
+        shell: bash
+        run: |
+          work="$PWD/build/xplat"
+          target="$work/target"
+          replay="$work/replay$(go env GOEXE)"
+          mkdir -p "$work/dumps" "$target/oracle"
+          # Build the comparison tools against the selected checkout via replay's ../.. module replacement.
+          cp -R oracle/replay "$target/oracle/xplat-replay"
+          (cd "$target/oracle/xplat-replay" && go build -p 2 -o "$replay" .)
+          git -C "$target" rev-parse HEAD > "$work/dumps/commit.txt"
+          "$replay" -root "$target" -hash -dump "$work/dumps/default.jsonl" -input-list "$work/dumps/default-inputs.jsonl"
+          "$replay" -root "$target" -hash -dump "$work/dumps/n-of-m.jsonl" "$PWD/oracle/n-of-m/inputs.jsonl"
+          "$replay" -root "$target" -hash -dump "$work/dumps/discovery.jsonl" "$work/discovery.jsonl"
+      - name: Upload CST hashes
+        uses: actions/upload-artifact@v7
+        with:
+          name: cst-${{ matrix.os }}
+          path: build/xplat/dumps/
+          if-no-files-found: error
+          retention-days: 7
+
+  xplat-compare:
+    name: Compare CSTs across OSes
+    needs: xplat-dump
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout comparison tools
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          package-manager-cache: false
+      - name: Download CST hashes
+        uses: actions/download-artifact@v8
+        with:
+          pattern: cst-*
+          path: build/xplat
+      - name: Compare commits, inputs and CSTs
+        shell: bash
+        run: |
+          work=build/xplat
+          base="$work/cst-ubuntu-latest"
+          status=0
+          {
+            printf 'Ubuntu commit: %s\n' "$(cat "$base/commit.txt")"
+            for os in windows-latest macos-latest; do
+              head="$work/cst-$os"
+              printf '\n%s commit: %s\n' "$os" "$(cat "$head/commit.txt")"
+              if ! cmp -s "$base/commit.txt" "$head/commit.txt"; then
+                echo "Checked-out commits differ"
+                status=1
+              fi
+              for set in default n-of-m discovery; do
+                printf '\n## Ubuntu vs %s (%s)\n\n' "$os" "$set"
+                expected="$base/$set-inputs.jsonl"
+                if [ "$set" = n-of-m ]; then
+                  expected=oracle/n-of-m/inputs.jsonl
+                fi
+                node scripts/tree-diff.mjs "$base/$set.jsonl" "$head/$set.jsonl" --check --trees --inputs="$expected" || status=1
+              done
+            done
+          } > "$work/diff.md" 2>&1
+          exit "$status"
+      - name: Upload CST diff
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: cst-diff
+          path: build/xplat/diff.md
+          if-no-files-found: error
+          retention-days: 7

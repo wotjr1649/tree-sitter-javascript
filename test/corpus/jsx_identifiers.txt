@@ -256,3 +256,84 @@ class Example { render() { return <this.props.Component />; } }
                   object: (this)
                   property: (property_identifier))
                 property: (property_identifier)))))))))
+
+==============================================
+JSX bare attribute expression
+:error
+==============================================
+
+<const {x} />
+
+---
+
+==============================================
+JSX bare attribute sequence
+:error
+==============================================
+
+<const {x,y} />
+
+---
+
+==============================================
+JSX empty bare attribute
+:error
+==============================================
+
+<extends {} />
+
+---
+
+==============================================
+JSX comment-only bare attribute
+:error
+==============================================
+
+<const {/*c*/} />
+
+---
+
+==============================================
+JSX empty attribute value
+:error
+==============================================
+
+<a extends={} />
+
+---
+
+==============================================
+JSX comment-only attribute value
+:error
+==============================================
+
+<a extends={/*c*/} />
+
+---
+
+==============================================
+JSX unparenthesized sequence attribute value
+:error
+==============================================
+
+<const x={x,y} />
+
+---
+
+==============================================
+JSX spread used as an attribute value
+:error
+==============================================
+
+<a extends={...props} />
+
+---
+
+==============================================
+JSX empty attribute value on a namespaced opening tag
+:error
+==============================================
+
+i = <Foo:Bar bar={}>{...children}</Foo:Bar>
+
+---
