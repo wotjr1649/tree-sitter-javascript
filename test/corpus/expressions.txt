@@ -2505,22 +2505,28 @@ Non-breaking spaces as whitespace
 Yield expressions
 ==============================================
 
-yield db.users.where('[endpoint+email]')
+function* f() {
+  yield db.users.where('[endpoint+email]');
+}
 
 ---
 
 (program
-  (expression_statement
-    (yield_expression
-      (call_expression
-        (member_expression
-          (member_expression
-            (identifier)
-            (property_identifier))
-          (property_identifier))
-        (arguments
-          (string
-            (string_fragment)))))))
+  (generator_function_declaration
+    (identifier)
+    (formal_parameters)
+    (statement_block
+      (expression_statement
+        (yield_expression
+          (call_expression
+            (member_expression
+              (member_expression
+                (identifier)
+                (property_identifier))
+              (property_identifier))
+            (arguments
+              (string
+                (string_fragment)))))))))
 
 ============================================
 Reserved words as identifiers
@@ -2538,13 +2544,14 @@ function await(await) { await: await (await + await (0)); }
       (labeled_statement
         (statement_identifier)
         (expression_statement
-          (await_expression
-            (parenthesized_expression
-              (await_expression
-                (unary_expression
-                  (await_expression
-                    (parenthesized_expression
-                      (number))))))))))))
+          (call_expression
+            (identifier)
+            (arguments
+              (binary_expression
+                (identifier)
+                (call_expression
+                  (identifier)
+                  (arguments (number)))))))))))
 
 ============================================
 JSX
