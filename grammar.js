@@ -37,7 +37,7 @@ module.exports = grammar({
     $.regex_pattern,
     $.jsx_text,
     // Never produced: the scanner only reads whether they are valid, to tell apart parse states that look the same to
-    // it when it decides on an automatic semicolon. Valid after a class field name or a binding without initializer...
+    // it when it decides on an automatic semicolon. Valid after a class field name without an initializer...
     $._binding_end,
     // ...and after a keyword that may still go on: before a declarator (`let`, `using`) or a property name (`get`,
     // `set`, `static`, `async` in a class), after `await` and `yield`.
@@ -45,6 +45,8 @@ module.exports = grammar({
     // Never produced: the scanner only reads whether it is valid, after `return`, `break`, `continue` and a label, where a
     // lone CR ends the statement like any other line terminator (ECMA-262 12.9.1: no LineTerminator here).
     $._restricted_keyword,
+    // A declaration without an initializer can end before an opening parenthesis on the next line.
+    $._declaration_end,
   ],
 
   extras: $ => [
@@ -116,6 +118,7 @@ module.exports = grammar({
     [$.import_statement, $.import],
     [$.export_statement, $.primary_expression],
     [$.lexical_declaration, $.primary_expression],
+    [$._for_lexical_declaration, $.primary_expression],
     // Unlike `let [`, `using [` starts an expression: a using declaration binds identifiers only.
     [$.primary_expression, $.using_declaration],
     [$.primary_expression, $._for_using_declaration],
@@ -131,7 +134,6 @@ module.exports = grammar({
     [$.primary_expression, $.rest_pattern],
     [$.primary_expression, $.pattern],
     [$.primary_expression, $._for_header],
-    [$.variable_declarator, $._for_header],
     [$.array, $.array_pattern],
     [$.object, $.object_pattern],
     [$.assignment_expression, $.pattern],
@@ -347,20 +349,22 @@ module.exports = grammar({
 
     using_declaration: $ => usingDeclaration($, $._semicolon),
 
-    // A plain `for` initializer ends at a real `;`: the automatic semicolon is never inserted in a `for` header.
+    _for_variable_declaration: $ => seq('var', commaSep1($.variable_declarator), ';'),
+
+    _for_lexical_declaration: $ => seq(field('kind', choice('let', 'const')), commaSep1($.variable_declarator), ';'),
+
     _for_using_declaration: $ => usingDeclaration($, ';'),
 
-    // One symbol for the declaration initializers of a plain `for`: the parse states of the rest of the header and
-    // the body are built once for all three, not once per declaration rule.
+    // A plain `for` initializer ends at a real `;`. Share the states after the declaration across all three forms.
     _for_declaration: $ => choice(
-      $.lexical_declaration,
-      $.variable_declaration,
+      alias($._for_lexical_declaration, $.lexical_declaration),
+      alias($._for_variable_declaration, $.variable_declaration),
       alias($._for_using_declaration, $.using_declaration),
     ),
 
     _using_keyword_declarator: $ => seq(
       field('name', alias(choice('as', 'satisfies'), $.identifier)),
-      optional($._initializer),
+      optional(choice($._initializer, $._declaration_end)),
     ),
 
     variable_declarator: $ => seq(
@@ -370,7 +374,7 @@ module.exports = grammar({
         alias('of', $.identifier),
         $._destructuring_pattern,
       )),
-      optional(choice($._initializer, $._binding_end)),
+      optional(choice($._initializer, $._declaration_end)),
     ),
 
     // A statement that starts with `{` is a block, never an object (ECMA-262: an ExpressionStatement cannot start with

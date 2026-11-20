@@ -486,3 +486,74 @@ async /*
       (comment)
       parameter: (identifier)
       body: (identifier))))
+
+============================================================
+Bare declarations before a parenthesis, unary sign, or regular expression
+============================================================
+
+let first
+(f)
+var second
++value
+let third
+-value
+var fourth = initial, last
+/pattern/
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator name: (identifier)))
+  (expression_statement
+    (parenthesized_expression (identifier)))
+  (variable_declaration
+    (variable_declarator name: (identifier)))
+  (expression_statement
+    (unary_expression argument: (identifier)))
+  (lexical_declaration
+    (variable_declarator name: (identifier)))
+  (expression_statement
+    (unary_expression argument: (identifier)))
+  (variable_declaration
+    (variable_declarator name: (identifier) value: (identifier))
+    (variable_declarator name: (identifier)))
+  (expression_statement
+    (regex pattern: (regex_pattern))))
+
+============================================================
+Bare declarations with initializer requirements checked as early errors
+============================================================
+
+const x
++y;
+using resource
+(work);
+var [z]
+/pattern/;
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator name: (identifier)))
+  (expression_statement
+    (unary_expression argument: (identifier)))
+  (using_declaration
+    (variable_declarator name: (identifier)))
+  (expression_statement
+    (parenthesized_expression (identifier)))
+  (variable_declaration
+    (variable_declarator name: (array_pattern (identifier))))
+  (expression_statement
+    (regex pattern: (regex_pattern))))
+
+============================================================
+The initializer of a for statement needs an explicit semicolon
+:error
+============================================================
+
+for (var x
+  (y););
+
+---
