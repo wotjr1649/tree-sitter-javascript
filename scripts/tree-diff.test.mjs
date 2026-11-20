@@ -68,3 +68,25 @@ test('the command exits 2 on records without a sha256', () => {
   assert.equal(r.status, 2);
   assert.match(r.stderr, /line 1: not a tree dump record/);
 });
+
+test('--check requires nonempty dumps with the same inputs, trees and error flags', (t) => {
+  const dir = mkdtempSync(join(tmpdir(), 'tree-diff-'));
+  t.after(() => rmSync(dir, { recursive: true }));
+  const left = join(dir, 'left.jsonl');
+  const right = join(dir, 'right.jsonl');
+  const original = rec('a', hash('(program)'));
+  writeFileSync(left, original + '\n');
+  for (const [content, status, message] of [
+    [original, 0, /\| same \| 1 \|/],
+    [rec('a', hash('(ERROR)'), 1), 1, /### clean-to-error/],
+    [rec('a', hash('(program)'), 1), 1, /### clean-to-error/],
+    [rec('b', hash('(program)')), 1, /### only-base/],
+    [rec('a', hash('(program)'), 0, hash('other bytes')), 2, /source differs/],
+    ['', 2, /empty dump/],
+  ]) {
+    writeFileSync(right, content + '\n');
+    const r = spawnSync(process.execPath, [fileURLToPath(new URL('tree-diff.mjs', import.meta.url)), left, right, '--check'], { encoding: 'utf8' });
+    assert.equal(r.status, status, r.stderr);
+    assert.match(r.stdout + r.stderr, message);
+  }
+});

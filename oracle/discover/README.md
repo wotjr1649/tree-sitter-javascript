@@ -1,8 +1,8 @@
 # Defect discovery
 
-Finds the places where this grammar fails on valid JavaScript/JSX, at scale. It is a tool, not a gate: nothing here runs in
-CI, and every output goes under `build/discovery/` (git-ignored). The committed oracle (`../README.md`) guards fixes; this
-looks for new ones. Early errors are out of scope: they are counted only to be set apart.
+Finds the places where this grammar fails on valid JavaScript/JSX, at scale. Local outputs default to `build/discovery/`
+(git-ignored). The on-demand cross-platform CST comparison uses the fetch and collect steps. The committed oracle
+(`../README.md`) guards fixes. Early errors are counted separately.
 
 Inputs (pinned in `manifest.json`):
 

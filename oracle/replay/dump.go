@@ -29,7 +29,7 @@ type dumpRecord struct {
 	Error   bool   `json:"error"` // the root has_error
 	Errors  int    `json:"errors"`
 	Missing int    `json:"missing"`
-	Tree    string `json:"tree"`
+	Tree    string `json:"tree"` // the full CST, or its SHA-256 with -hash
 }
 
 // defaultInputs are the dump's input sets, relative to the repository root.
@@ -267,7 +267,7 @@ func treeString(root *tree_sitter.Node) (tree string, errors, missing int) {
 }
 
 // dump parses every input and writes one dumpRecord per line.
-func dump(parser *tree_sitter.Parser, inputs []input, w io.Writer) error {
+func dump(parser *tree_sitter.Parser, inputs []input, w io.Writer, hashTrees bool) error {
 	bw := bufio.NewWriter(w)
 	enc := json.NewEncoder(bw)
 	enc.SetEscapeHTML(false)
@@ -280,6 +280,9 @@ func dump(parser *tree_sitter.Parser, inputs []input, w io.Writer) error {
 		r := dumpRecord{ID: in.ID, SHA256: sum(src), Error: t.RootNode().HasError()}
 		r.Tree, r.Errors, r.Missing = treeString(t.RootNode())
 		t.Close()
+		if hashTrees {
+			r.Tree = sum([]byte(r.Tree))
+		}
 		if err := enc.Encode(r); err != nil {
 			return err
 		}

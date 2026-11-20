@@ -1,11 +1,11 @@
 // Compares two tree dumps of `oracle/replay -dump` (base, then head) input by input, matched by id.
 //
-// Classes: same (equal tree), changed-clean (both without ERROR/MISSING, tree differs), clean-to-error, error-to-clean,
+// Classes: same (equal tree and flags), changed-clean (both without ERROR/MISSING, tree differs), clean-to-error, error-to-clean,
 // error-changed (both with errors, tree differs), and only-base / only-head for ids in one dump. An input whose source
 // differs between the dumps (sha256) is refused: the dumps must come from the same inputs.
 //
-// Usage: node scripts/tree-diff.mjs BASE.jsonl HEAD.jsonl [--trees]
-//   prints a markdown summary and the ids of every class but `same`; --trees adds both trees. Exit 0; 2 bad input.
+// Usage: node scripts/tree-diff.mjs BASE.jsonl HEAD.jsonl [--trees] [--check]
+//   --trees includes tree values; --check requires nonempty, identical dumps (exit 1 on differences). Exit 2 on bad input.
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
@@ -41,7 +41,7 @@ export function classify(b, h) {
   if (!h) return 'only-base';
   if (!b) return 'only-head';
   if (b.sha256 !== h.sha256) throw new Error(`${b.id}: the source differs between the dumps`);
-  if (b.tree === h.tree) return 'same';
+  if (b.tree === h.tree && b.error === h.error && b.errors === h.errors && b.missing === h.missing) return 'same';
   if (bad(b)) return bad(h) ? 'error-changed' : 'error-to-clean';
   return bad(h) ? 'clean-to-error' : 'changed-clean';
 }
@@ -70,9 +70,13 @@ export function report(groups, base, head, trees) {
 
 function main(argv) {
   const files = argv.filter((a) => !a.startsWith('--'));
-  if (files.length !== 2) throw new Error('usage: tree-diff.mjs BASE.jsonl HEAD.jsonl [--trees]');
+  if (files.length !== 2) throw new Error('usage: tree-diff.mjs BASE.jsonl HEAD.jsonl [--trees] [--check]');
   const [base, head] = files.map((f) => readDump(readFileSync(f, 'utf8'), f));
-  console.log(report(diff(base, head), base, head, argv.includes('--trees')));
+  const check = argv.includes('--check');
+  if (check && (!base.size || !head.size)) throw new Error('cannot check an empty dump');
+  const groups = diff(base, head);
+  console.log(report(groups, base, head, argv.includes('--trees')));
+  if (check && CLASSES.slice(1).some((c) => groups[c].length)) return 1;
   return 0;
 }
 

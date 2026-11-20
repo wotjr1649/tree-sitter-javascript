@@ -65,7 +65,7 @@ func TestSplitCorpusSource(t *testing.T) {
 	}
 }
 
-func dumpOne(t *testing.T, src string) dumpRecord {
+func dumpOne(t *testing.T, src string, hashTrees bool) dumpRecord {
 	t.Helper()
 	parser := tree_sitter.NewParser()
 	defer parser.Close()
@@ -73,7 +73,7 @@ func dumpOne(t *testing.T, src string) dumpRecord {
 		t.Fatal(err)
 	}
 	var out bytes.Buffer
-	if err := dump(parser, []input{{"x", src}}, &out); err != nil {
+	if err := dump(parser, []input{{"x", src}}, &out, hashTrees); err != nil {
 		t.Fatal(err)
 	}
 	var r dumpRecord
@@ -84,7 +84,7 @@ func dumpOne(t *testing.T, src string) dumpRecord {
 }
 
 func TestDumpTree(t *testing.T) {
-	r := dumpOne(t, "a = 1")
+	r := dumpOne(t, "a = 1", false)
 	want := `(program@0:5(expression_statement@0:5(assignment_expression@0:5(left:identifier@0:1)("="@2:3)(right:number@4:5))))`
 	if r.Tree != want || r.Error || r.Errors != 0 || r.Missing != 0 {
 		t.Errorf("got %+v, want tree %s", r, want)
@@ -92,9 +92,13 @@ func TestDumpTree(t *testing.T) {
 	if r.SHA256 != sum([]byte("a = 1")) {
 		t.Errorf("sha256 %s", r.SHA256)
 	}
-	bad := dumpOne(t, "if (a) {")
+	bad := dumpOne(t, "if (a) {", false)
 	if !bad.Error || bad.Missing == 0 || !strings.Contains(bad.Tree, `(MISSING "}"@8:8)`) {
 		t.Errorf("want a MISSING node, got %+v", bad)
+	}
+	bad.Tree = sum([]byte(bad.Tree))
+	if got := dumpOne(t, "if (a) {", true); got != bad {
+		t.Errorf("hashed dump: got %+v, want %+v", got, bad)
 	}
 }
 
