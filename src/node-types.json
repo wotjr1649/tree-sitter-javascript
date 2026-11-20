@@ -591,7 +591,31 @@
       "required": true,
       "types": [
         {
-          "type": "expression",
+          "type": "await_expression",
+          "named": true
+        },
+        {
+          "type": "jsx_element",
+          "named": true
+        },
+        {
+          "type": "jsx_self_closing_element",
+          "named": true
+        },
+        {
+          "type": "new_expression",
+          "named": true
+        },
+        {
+          "type": "primary_expression",
+          "named": true
+        },
+        {
+          "type": "unary_expression",
+          "named": true
+        },
+        {
+          "type": "update_expression",
           "named": true
         }
       ]

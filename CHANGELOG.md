@@ -5,6 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+Planned for v3.0.0.
+
+### Fixed
+
+- Parse ambiguous calls, member accesses and subscripts as await operands in forms such as `await (x)(y)`.
+  Keep `await(a).x=b` and `await[a].x ??= b` as assignments to an expression involving the identifier `await`.
+- Parse `let [a]` in `for await (let [a] of b)` as an array binding pattern.
+
+### Changed
+
+- `await++\n(a)(b);` and `await/*\n*/++(a).x;` still form one statement and now parse as await expressions.
+- `await(a)(b;` still has a missing closing parenthesis, now in a call inside the await operand.
+- `for await(let [a] of) {}` still has a missing right-hand identifier and now has an array pattern on the left.
+- `for await (let[0] of b)` now has a syntax error because `0` cannot bind a declaration.
+- `for await (let[a] in b)` still parses without an error and now has an array pattern on the left.
+- In async code, `await a=b` and `await a+=b` now produce a syntax error.
+- Recovery for `new f() = 1;` places the call under the constructor. Recovery for `a?.delete(;` places an
+  `ERROR` at the opening parenthesis.
+- Invalid `await using [] = null;` recovers as an assignment with an `ERROR` over `using []`. An invalid
+  initializer in `for await (let [x] = 0 of [])` puts the array pattern inside the `ERROR` node.
+
+### Known limitations
+
+- Await disambiguation does not yet track whether the enclosing context allows the keyword (#35).
+  In a non-async script or function body, `await (x)(y)`, `await (a).b()`, and `await [0].x` can parse as await
+  expressions even when `await` is an identifier. `await[a]++` can parse as an await of an update to the
+  array literal `[a]`. This also affects nested non-async functions and arrows, for example
+  `async function f(){return ()=>await(a)(b);}`.
+
 ## [2.2.0] - 2026-11-20
 
 A minor release: the scanner inserts automatic semicolons it missed in class bodies and after declarations, reads

@@ -4460,6 +4460,10 @@
                     },
                     {
                       "type": "SYMBOL",
+                      "name": "_postfix_expression"
+                    },
+                    {
+                      "type": "SYMBOL",
                       "name": "import"
                     }
                   ]
@@ -4627,11 +4631,57 @@
             },
             {
               "type": "SYMBOL",
-              "name": "expression"
+              "name": "_await_operand"
             }
           ]
         }
       }
+    },
+    "_await_operand": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "primary_expression"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_jsx_element"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "await_expression"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "unary_expression"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "update_expression"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "new_expression"
+        }
+      ]
+    },
+    "_postfix_expression": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "primary_expression"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "new_expression"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_jsx_element"
+        }
+      ]
     },
     "member_expression": {
       "type": "PREC",
@@ -4651,7 +4701,7 @@
                 },
                 {
                   "type": "SYMBOL",
-                  "name": "primary_expression"
+                  "name": "_postfix_expression"
                 },
                 {
                   "type": "SYMBOL",
@@ -4733,7 +4783,7 @@
                 },
                 {
                   "type": "SYMBOL",
-                  "name": "primary_expression"
+                  "name": "_postfix_expression"
                 }
               ]
             }
@@ -6047,8 +6097,17 @@
                 "type": "FIELD",
                 "name": "argument",
                 "content": {
-                  "type": "SYMBOL",
-                  "name": "expression"
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "SYMBOL",
+                      "name": "expression"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "primary_expression"
+                    }
+                  ]
                 }
               },
               {
@@ -8308,6 +8367,14 @@
       },
       {
         "type": "SYMBOL",
+        "name": "update_expression"
+      },
+      {
+        "type": "STRING",
+        "value": "unary_void"
+      },
+      {
+        "type": "SYMBOL",
         "name": "expression"
       }
     ],
@@ -8468,7 +8535,9 @@
     "_jsx_identifier",
     "_lhs_expression",
     "_keyword_identifier",
-    "_jsx_keyword_identifier"
+    "_jsx_keyword_identifier",
+    "_await_operand",
+    "_postfix_expression"
   ],
   "supertypes": [
     "statement",

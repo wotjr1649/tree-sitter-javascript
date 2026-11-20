@@ -1,7 +1,6 @@
 #include "tree_sitter/parser.h"
 
 #include <stdio.h>
-#include <wctype.h>
 
 enum TokenType {
     AUTOMATIC_SEMICOLON,
@@ -55,6 +54,20 @@ static bool scan_template_chars(TSLexer *lexer) {
     }
 }
 
+// White space and line terminators as the grammar's `extras` regex has them (extras_character_set_1 in parser.c).
+// Explicit, not iswspace: that differs between C runtimes (C locale, glibc, Windows UCRT).
+static bool is_extra_space(int32_t c) {
+    return (c >= '\t' && c <= '\r') || c == ' ' || c == 0xa0 || c == 0x1680 || (c >= 0x2000 && c <= 0x200b) ||
+           c == 0x2028 || c == 0x2029 || c == 0x202f || c == 0x205f || c == 0x2060 || c == 0x3000 || c == 0xfeff;
+}
+
+// Blank in a JSX text line: ASCII white space only (the C locale's iswspace). Any other character is text, as in Babel,
+// which trims only spaces and tabs: U+00A0, U+3000, U+200B, U+FEFF and the others are content, not layout.
+static bool is_jsx_space(int32_t c) { return (c >= '\t' && c <= '\r') || c == ' '; }
+
+// ASCII, not iswdigit: that matches non-ASCII digits on some C runtimes.
+static bool is_digit(int32_t c) { return c >= '0' && c <= '9'; }
+
 typedef enum {
     REJECT,     // Semicolon is illegal, ie a syntax error occurred
     NO_NEWLINE, // Unclear if semicolon will be legal, continue
@@ -63,12 +76,20 @@ typedef enum {
 
 /**
  * @param consume If false, only consume enough to check if comment indicates semicolon-legality
+ * @param break_after_comment If not NULL: set when a line terminator follows a comment of this scan, in white space or
+ *        inside a later block comment (the next call then sees it and decides)
  */
-static WhitespaceResult scan_whitespace_and_comments(TSLexer *lexer, bool *scanned_comment, bool consume) {
+static WhitespaceResult scan_whitespace_and_comments(TSLexer *lexer, bool *scanned_comment, bool consume,
+                                                     bool *break_after_comment) {
     bool saw_block_newline = false;
+    bool seen_comment = false;
 
     for (;;) {
-        while (iswspace(lexer->lookahead)) {
+        while (is_extra_space(lexer->lookahead)) {
+            if (seen_comment && break_after_comment &&
+                (lexer->lookahead == '\n' || lexer->lookahead == 0x2028 || lexer->lookahead == 0x2029)) {
+                *break_after_comment = true;
+            }
             skip(lexer);
         }
 
@@ -82,6 +103,7 @@ static WhitespaceResult scan_whitespace_and_comments(TSLexer *lexer, bool *scann
                     skip(lexer);
                 }
                 *scanned_comment = true;
+                seen_comment = true;
             } else if (lexer->lookahead == '*') {
                 skip(lexer);
                 while (lexer->lookahead != 0) {
@@ -90,6 +112,7 @@ static WhitespaceResult scan_whitespace_and_comments(TSLexer *lexer, bool *scann
                         if (lexer->lookahead == '/') {
                             skip(lexer);
                             *scanned_comment = true;
+                            seen_comment = true;
 
                             if (lexer->lookahead != '/' && !consume) {
                                 return saw_block_newline ? ACCEPT : NO_NEWLINE;
@@ -99,6 +122,9 @@ static WhitespaceResult scan_whitespace_and_comments(TSLexer *lexer, bool *scann
                         }
                     } else if (lexer->lookahead == '\n' || lexer->lookahead == 0x2028 || lexer->lookahead == 0x2029) {
                         saw_block_newline = true;
+                        if (seen_comment && break_after_comment) {
+                            *break_after_comment = true;
+                        }
                         skip(lexer);
                     } else {
                         skip(lexer);
@@ -111,13 +137,6 @@ static WhitespaceResult scan_whitespace_and_comments(TSLexer *lexer, bool *scann
             return ACCEPT;
         }
     }
-}
-
-// White space and line terminators as the grammar's `extras` regex has them (extras_character_set_1 in parser.c).
-// Explicit, not iswspace: that differs between C runtimes.
-static bool is_extra_space(int32_t c) {
-    return (c >= '\t' && c <= '\r') || c == ' ' || c == 0xa0 || c == 0x1680 || (c >= 0x2000 && c <= 0x200b) ||
-           c == 0x2028 || c == 0x2029 || c == 0x202f || c == 0x205f || c == 0x2060 || c == 0x3000 || c == 0xfeff;
 }
 
 // The next character of an identifier name: ASCII letters and digits, `_`, `$`, `\` (an escape), and any other
@@ -158,7 +177,7 @@ static bool semicolon_before_next_token(TSLexer *lexer, const bool *valid_symbol
         // Insert a semicolon before decimals literals but not otherwise.
         case '.':
             skip(lexer);
-            return iswdigit(lexer->lookahead);
+            return is_digit(lexer->lookahead);
 
         // Insert a semicolon before `--` and `++`, but not before binary `+` or `-`.
         case '+':
@@ -217,7 +236,7 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
         }
 
         if (lexer->lookahead == '/') {
-            WhitespaceResult result = scan_whitespace_and_comments(lexer, scanned_comment, false);
+            WhitespaceResult result = scan_whitespace_and_comments(lexer, scanned_comment, false, NULL);
             if (result == REJECT) {
                 return false;
             }
@@ -239,7 +258,7 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
             break;
         }
 
-        if (!iswspace(lexer->lookahead)) {
+        if (!is_extra_space(lexer->lookahead)) {
             return false;
         }
 
@@ -248,13 +267,18 @@ static bool scan_automatic_semicolon(TSLexer *lexer, const bool *valid_symbols, 
 
     skip(lexer);
 
-    if (scan_whitespace_and_comments(lexer, scanned_comment, true) == REJECT) {
+    bool comment_before_break = *scanned_comment;
+    bool break_after_comment = false;
+    if (scan_whitespace_and_comments(lexer, scanned_comment, true, &break_after_comment) == REJECT) {
         return false;
     }
 
     // After a comment the next call decides, as before: where the comment holds a line break the base scanner
-    // takes the semicolon after it (`let x<LF>/*<LF>*//*<LF>*/[b]`), so the declaration keeps its comment.
-    if (*scanned_comment && (lexer->lookahead == '*' || lexer->lookahead == '[' || lexer->lookahead == '<')) {
+    // takes the semicolon after it (`let x<LF>/*<LF>*//*<LF>*/[b]`), so the declaration keeps its comment. Only where
+    // that call will still see a line terminator (a comment came before the break, or one follows the first comment).
+    // Otherwise the break scanned here is the only one and decides now (`let x<LF>/**/[y]`, `let x<LF>U+FEFF/**/[y]`).
+    if (*scanned_comment && (comment_before_break || break_after_comment) &&
+        (lexer->lookahead == '*' || lexer->lookahead == '[' || lexer->lookahead == '<')) {
         return false;
     }
 
@@ -311,7 +335,7 @@ static bool scan_restricted_semicolon(TSLexer *lexer) {
 
 static bool scan_ternary_qmark(TSLexer *lexer) {
     for (;;) {
-        if (!iswspace(lexer->lookahead)) {
+        if (!is_extra_space(lexer->lookahead)) {
             break;
         }
         skip(lexer);
@@ -329,7 +353,7 @@ static bool scan_ternary_qmark(TSLexer *lexer) {
 
         if (lexer->lookahead == '.') {
             advance(lexer);
-            if (iswdigit(lexer->lookahead)) {
+            if (is_digit(lexer->lookahead)) {
                 return true;
             }
             return false;
@@ -340,7 +364,7 @@ static bool scan_ternary_qmark(TSLexer *lexer) {
 }
 
 static bool scan_html_comment(TSLexer *lexer) {
-    while (iswspace(lexer->lookahead) || lexer->lookahead == 0x2028 || lexer->lookahead == 0x2029) {
+    while (is_extra_space(lexer->lookahead)) {
         skip(lexer);
     }
 
@@ -432,7 +456,7 @@ static bool scan_jsx_text(TSLexer *lexer) {
             at_newline = false;
             continue;
         }
-        bool is_wspace = iswspace(lexer->lookahead);
+        bool is_wspace = is_jsx_space(lexer->lookahead);
         if (lexer->lookahead == '\n') {
             at_newline = true;
         } else {
