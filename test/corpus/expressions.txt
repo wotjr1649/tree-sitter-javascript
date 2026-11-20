@@ -2687,3 +2687,92 @@ i = <Foo:Bar bar={}>{...children}</Foo:Bar>
           name: (jsx_namespace_name
             (identifier)
             (identifier)))))))
+
+============================================
+Await operand followed by a call, member or subscript
+============================================
+
+async function f() {
+  await (x)(y);
+  await (a).b();
+  await (0, f)(u);
+  await[0];
+  await[0]?.[0];
+  z = await (y)(w);
+}
+
+---
+
+(program
+  (function_declaration
+    (identifier)
+    (formal_parameters)
+    (statement_block
+      (expression_statement
+        (await_expression
+          (call_expression
+            (parenthesized_expression
+              (identifier))
+            (arguments
+              (identifier)))))
+      (expression_statement
+        (await_expression
+          (call_expression
+            (member_expression
+              (parenthesized_expression
+                (identifier))
+              (property_identifier))
+            (arguments))))
+      (expression_statement
+        (await_expression
+          (call_expression
+            (parenthesized_expression
+              (sequence_expression
+                (number)
+                (identifier)))
+            (arguments
+              (identifier)))))
+      (expression_statement
+        (await_expression
+          (array
+            (number))))
+      (expression_statement
+        (await_expression
+          (subscript_expression
+            (array
+              (number))
+            (optional_chain)
+            (number))))
+      (expression_statement
+        (assignment_expression
+          (identifier)
+          (await_expression
+            (call_expression
+              (parenthesized_expression
+                (identifier))
+              (arguments
+                (identifier)))))))))
+
+============================================
+Identifier await before an operator
+============================================
+
+await / 2;
+await.x;
+await = 1;
+
+---
+
+(program
+  (expression_statement
+    (binary_expression
+      (identifier)
+      (number)))
+  (expression_statement
+    (member_expression
+      (identifier)
+      (property_identifier)))
+  (expression_statement
+    (assignment_expression
+      (identifier)
+      (number))))

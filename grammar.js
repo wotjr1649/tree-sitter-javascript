@@ -85,6 +85,8 @@ module.exports = grammar({
     $._lhs_expression,
     $._keyword_identifier,
     $._jsx_keyword_identifier,
+    $._await_operand,
+    $._postfix_expression,
   ],
 
   precedences: $ => [
@@ -111,7 +113,8 @@ module.exports = grammar({
       $.arrow_function,
     ],
     ['assign', $.primary_expression],
-    ['member', 'template_call', 'new', 'call', $.expression],
+    // Postfix operators can extend the operand before await reduces.
+    ['member', 'template_call', 'new', 'call', $.update_expression, 'unary_void', $.expression],
     ['declaration', 'literal'],
     [$.primary_expression, $.statement_block, 'object'],
     [$.meta_property, $.import],
@@ -119,6 +122,8 @@ module.exports = grammar({
     [$.export_statement, $.primary_expression],
     [$.lexical_declaration, $.primary_expression],
     [$._for_lexical_declaration, $.primary_expression],
+    // `for await (let [a] of b)` has no lexical_declaration item to outrank `let` as an identifier: the declaration wins.
+    ['for_let', $.primary_expression],
     // Unlike `let [`, `using [` starts an expression: a using declaration binds identifiers only.
     [$.primary_expression, $.using_declaration],
     [$.primary_expression, $._for_using_declaration],
@@ -450,7 +455,7 @@ module.exports = grammar({
               )),
               optional($._initializer),
             ),
-            seq(
+            prec('for_let', seq(
               field('kind', choice('let', 'const')),
               field('left', choice(
                 $.identifier,
@@ -458,7 +463,7 @@ module.exports = grammar({
                 $._destructuring_pattern,
               )),
               optional($._automatic_semicolon),
-            ),
+            )),
           ),
           field('operator', choice('in', 'of')),
         ),
@@ -951,7 +956,7 @@ module.exports = grammar({
 
     call_expression: $ => choice(
       prec('call', seq(
-        field('function', choice($.expression, $.import)),
+        field('function', choice($.expression, $._postfix_expression, $.import)),
         field('arguments', $.arguments),
       )),
       prec('template_call', seq(
@@ -971,14 +976,27 @@ module.exports = grammar({
       field('arguments', optional(prec.dynamic(1, $.arguments))),
     )),
 
-    await_expression: $ => prec('unary_void', seq(
+    // Prefer the keyword interpretation when await has a unary operand.
+    // A direct assignment is outside that operand, so `await(a).x=b` retains its identifier interpretation.
+    await_expression: $ => prec.dynamic(1, prec('unary_void', seq(
       'await',
       optional($._keyword_continues),
-      $.expression,
-    )),
+      $._await_operand,
+    ))),
+
+    _await_operand: $ => choice(
+      $.primary_expression,
+      $._jsx_element,
+      $.await_expression,
+      $.unary_expression,
+      $.update_expression,
+      $.new_expression,
+    ),
+
+    _postfix_expression: $ => choice($.primary_expression, $.new_expression, $._jsx_element),
 
     member_expression: $ => prec('member', seq(
-      field('object', choice($.expression, $.primary_expression, $.import)),
+      field('object', choice($.expression, $._postfix_expression, $.import)),
       choice('.', field('optional_chain', $.optional_chain)),
       field('property', choice(
         $.private_property_identifier,
@@ -990,7 +1008,7 @@ module.exports = grammar({
     )),
 
     subscript_expression: $ => prec.right('member', seq(
-      field('object', choice($.expression, $.primary_expression)),
+      field('object', choice($.expression, $._postfix_expression)),
       optional(field('optional_chain', $.optional_chain)),
       '[', field('index', $._expressions), ']',
     )),
@@ -1096,7 +1114,7 @@ module.exports = grammar({
 
     update_expression: $ => prec.left(choice(
       seq(
-        field('argument', $.expression),
+        field('argument', choice($.expression, $.primary_expression)),
         field('operator', choice('++', '--')),
       ),
       seq(
