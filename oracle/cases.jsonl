@@ -1199,3 +1199,9 @@
 {"id":"i20/class-member","sha256":"015dce225b9d6681a5f1b498b40d8fa680e95f39d94b788ea2b12bd12bf8b43f","source":"<class.Foo />","sourceType":"module","expect":["1-10:member_expression","1-6:identifier"]}
 {"id":"i20/const-member","sha256":"14c18ebaf2ab243893749ab0df35170c958685dd84645e13e6a5f24e9a14d372","source":"<const.Foo />","sourceType":"module","expect":["1-10:member_expression","1-6:identifier"]}
 {"id":"i20/true-member","sha256":"4c558f92c74e8e34acb8583d82a4a7464ccef8517ef2424f477aa3f419de529c","source":"<true.Foo />","sourceType":"module","expect":["1-9:member_expression","1-5:identifier"]}
+{"id":"i20/spread-attribute","sha256":"328e397dbe0ea9116ce3a3fef3851fd43dae9d8bce7089275d5bb94327279471","source":"<const {...props} />","sourceType":"module","expect":["7-17:jsx_expression","8-16:spread_element"]}
+{"id":"i20/expression-attribute","sha256":"ff56f760fc292d0619452caa21df820fae63644080ce4a54072720ed215dc7cd","source":"<a extends={value} />","sourceType":"module","expect":["3-10:property_identifier","11-18:jsx_expression","12-17:identifier"]}
+{"id":"i20/parenthesized-sequence-attribute","sha256":"72e60bc95c6e3716e3adf63ac46ced3d80bffb6484022b9cbc208ccc628eeeb6","source":"<a extends={(x,y)} />","sourceType":"module","expect":["11-18:jsx_expression","12-17:parenthesized_expression"]}
+{"id":"i20/expression-child","sha256":"1c742926a5e129ba7e60be05489d1227ef9b682cf917a801f90680a204367f6e","source":"<const>{value}</const>","sourceType":"module","expect":["7-14:jsx_expression","8-13:identifier"]}
+{"id":"i20/comment-child","sha256":"f169fdaa71f544210276cda1dd465f1a7fd5d0aaed7959f76f819a0eda251fd5","source":"<const>{/*c*/}</const>","sourceType":"module","expect":["7-14:jsx_expression","8-13:comment"]}
+{"id":"i20/empty-child","sha256":"faa84280a5279fdf59147e383bbf33c3294cc8adf8c0c0367a22e34ff96458d1","source":"<const>{}</const>","sourceType":"module","expect":["7-9:jsx_expression"]}

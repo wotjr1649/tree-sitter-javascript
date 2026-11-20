@@ -3914,8 +3914,30 @@
           "name": "jsx_attribute"
         },
         {
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_jsx_spread_attribute"
+          },
+          "named": true,
+          "value": "jsx_expression"
+        }
+      ]
+    },
+    "_jsx_spread_attribute": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "{"
+        },
+        {
           "type": "SYMBOL",
-          "name": "jsx_expression"
+          "name": "spread_element"
+        },
+        {
+          "type": "STRING",
+          "value": "}"
         }
       ]
     },
@@ -4075,12 +4097,34 @@
           "value": "string"
         },
         {
-          "type": "SYMBOL",
-          "name": "jsx_expression"
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_jsx_expression_attribute_value"
+          },
+          "named": true,
+          "value": "jsx_expression"
         },
         {
           "type": "SYMBOL",
           "name": "_jsx_element"
+        }
+      ]
+    },
+    "_jsx_expression_attribute_value": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "{"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "expression"
+        },
+        {
+          "type": "STRING",
+          "value": "}"
         }
       ]
     },

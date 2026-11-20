@@ -818,7 +818,12 @@ module.exports = grammar({
       '/>',
     ),
 
-    _jsx_attribute: $ => choice($.jsx_attribute, $.jsx_expression),
+    _jsx_attribute: $ => choice(
+      $.jsx_attribute,
+      alias($._jsx_spread_attribute, $.jsx_expression),
+    ),
+
+    _jsx_spread_attribute: $ => seq('{', $.spread_element, '}'),
 
     _jsx_attribute_name: $ => choice(
       alias($._jsx_identifier, $.property_identifier),
@@ -863,9 +868,11 @@ module.exports = grammar({
 
     _jsx_attribute_value: $ => choice(
       alias($._jsx_string, $.string),
-      $.jsx_expression,
+      alias($._jsx_expression_attribute_value, $.jsx_expression),
       $._jsx_element,
     ),
+
+    _jsx_expression_attribute_value: $ => seq('{', $.expression, '}'),
 
     class: $ => prec('literal', seq(
       repeat(field('decorator', $.decorator)),

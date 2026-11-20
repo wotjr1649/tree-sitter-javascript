@@ -32,7 +32,7 @@
    }
   },
   "cases_file": "cases.jsonl",
-  "cases_sha256": "1aecc18a8a4a366a87fdc73778f2450d82cba4415e15376697bbcde7200c535a",
+  "cases_sha256": "39813f4005fb5571b1e0394b04c8479d2b4c5f81cadbefeecdc63361a1506cce",
   "runner": "run.mjs",
   "runner_sha256": "06cfe49cd56d0bac9b5c672b1f62fc0f44b37de02c0a2bf04c557e5354c5c24d"
  },
@@ -18876,6 +18876,96 @@
   {
    "id": "i20/true-member",
    "sha256": "4c558f92c74e8e34acb8583d82a4a7464ccef8517ef2424f477aa3f419de529c",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i20/spread-attribute",
+   "sha256": "328e397dbe0ea9116ce3a3fef3851fd43dae9d8bce7089275d5bb94327279471",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i20/expression-attribute",
+   "sha256": "ff56f760fc292d0619452caa21df820fae63644080ce4a54072720ed215dc7cd",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i20/parenthesized-sequence-attribute",
+   "sha256": "72e60bc95c6e3716e3adf63ac46ced3d80bffb6484022b9cbc208ccc628eeeb6",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i20/expression-child",
+   "sha256": "1c742926a5e129ba7e60be05489d1227ef9b682cf917a801f90680a204367f6e",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i20/comment-child",
+   "sha256": "f169fdaa71f544210276cda1dd465f1a7fd5d0aaed7959f76f819a0eda251fd5",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i20/empty-child",
+   "sha256": "faa84280a5279fdf59147e383bbf33c3294cc8adf8c0c0367a22e34ff96458d1",
    "sourceType": "module",
    "verdict": "accept",
    "babel": {
