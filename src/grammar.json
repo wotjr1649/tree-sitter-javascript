@@ -963,8 +963,8 @@
                     "type": "SEQ",
                     "members": [
                       {
-                        "type": "STRING",
-                        "value": "await"
+                        "type": "SYMBOL",
+                        "name": "_await_keyword"
                       },
                       {
                         "type": "SYMBOL",
@@ -1030,8 +1030,8 @@
                       "type": "SEQ",
                       "members": [
                         {
-                          "type": "STRING",
-                          "value": "await"
+                          "type": "SYMBOL",
+                          "name": "_await_keyword"
                         },
                         {
                           "type": "SYMBOL",
@@ -1189,8 +1189,8 @@
                     "type": "SEQ",
                     "members": [
                       {
-                        "type": "STRING",
-                        "value": "await"
+                        "type": "SYMBOL",
+                        "name": "_await_keyword"
                       },
                       {
                         "type": "SYMBOL",
@@ -1256,8 +1256,8 @@
                       "type": "SEQ",
                       "members": [
                         {
-                          "type": "STRING",
-                          "value": "await"
+                          "type": "SYMBOL",
+                          "name": "_await_keyword"
                         },
                         {
                           "type": "SYMBOL",
@@ -2027,8 +2027,8 @@
                     "type": "SEQ",
                     "members": [
                       {
-                        "type": "STRING",
-                        "value": "await"
+                        "type": "SYMBOL",
+                        "name": "_await_keyword"
                       },
                       {
                         "type": "SYMBOL",
@@ -4987,6 +4987,24 @@
         ]
       }
     },
+    "_await_keyword": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "await"
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_context_await"
+          },
+          "named": false,
+          "value": "await"
+        }
+      ]
+    },
     "await_expression": {
       "type": "PREC_DYNAMIC",
       "value": 1,
@@ -4997,8 +5015,8 @@
           "type": "SEQ",
           "members": [
             {
-              "type": "STRING",
-              "value": "await"
+              "type": "SYMBOL",
+              "name": "_await_keyword"
             },
             {
               "type": "CHOICE",
@@ -8060,6 +8078,18 @@
         {
           "type": "SYMBOL",
           "name": "_leave_concise_body"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "_binding_end"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
         }
       ]
     },
@@ -9366,6 +9396,10 @@
     {
       "type": "SYMBOL",
       "name": "_await_using_asi"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_context_await"
     }
   ],
   "inline": [
@@ -9385,6 +9419,7 @@
     "_lhs_expression",
     "_keyword_identifier",
     "_jsx_keyword_identifier",
+    "_await_keyword",
     "_await_operand",
     "_postfix_expression"
   ],

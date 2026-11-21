@@ -1,0 +1,76 @@
+==========================
+Await in async arrow bodies
+==========================
+
+async x => await
+using;
+
+async x => await
+f();
+
+async () => await
+(x);
+
+async x => y => await;
+
+class C { f = async x => await
+using; }
+
+function f(g = async x => await
+using) {}
+
+x => await
+using;
+
+---
+
+(program
+  (expression_statement
+    (arrow_function
+      (identifier)
+      (await_expression
+        (identifier))))
+  (expression_statement
+    (arrow_function
+      (identifier)
+      (await_expression
+        (call_expression
+          (identifier)
+          (arguments)))))
+  (expression_statement
+    (arrow_function
+      (formal_parameters)
+      (await_expression
+        (parenthesized_expression
+          (identifier)))))
+  (expression_statement
+    (arrow_function
+      (identifier)
+      (arrow_function
+        (identifier)
+        (identifier))))
+  (class_declaration
+    (identifier)
+    (class_body
+      (field_definition
+        (property_identifier)
+        (arrow_function
+          (identifier)
+          (await_expression
+            (identifier))))))
+  (function_declaration
+    (identifier)
+    (formal_parameters
+      (assignment_pattern
+        (identifier)
+        (arrow_function
+          (identifier)
+          (await_expression
+            (identifier)))))
+    (statement_block))
+  (expression_statement
+    (arrow_function
+      (identifier)
+      (identifier)))
+  (expression_statement
+    (identifier)))
