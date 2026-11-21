@@ -253,7 +253,9 @@ static ASILookahead scan_annex_marker(TSLexer *lexer, bool stop_at_range) {
 }
 
 static void scan_line_comment_body(TSLexer *lexer, bool stop_at_range, bool skip_body) {
-    while (!lexer->eof(lexer) && !at_range_start(lexer, stop_at_range) && !is_line_terminator(lexer->lookahead)) {
+    for (;;) {
+        int32_t c = lexer->lookahead;
+        if ((c == 0 && lexer->eof(lexer)) || at_range_start(lexer, stop_at_range) || is_line_terminator(c)) return;
         lexer->advance(lexer, skip_body);
     }
 }
@@ -275,7 +277,7 @@ static ASILookahead scan_asi_trivia(TSLexer *lexer, ASITrivia *trivia, bool anne
     bool separated_close = false;
     for (;;) {
         int32_t c = lexer->lookahead;
-        if (lexer->eof(lexer) || at_range_start(lexer, range != RANGE_IGNORE)) {
+        if ((c == 0 && lexer->eof(lexer)) || at_range_start(lexer, range != RANGE_IGNORE)) {
             return ASI_END;
         }
         if (is_extra_space(c)) {
