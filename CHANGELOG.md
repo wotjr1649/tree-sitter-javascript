@@ -48,6 +48,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <a x='&' y="' /> //" />
 ~~~
 
+- In quoted JSX attributes, whitespace before a complete character reference can become a separate
+  `string_fragment`. In `<a b='&&amp;'/>`, the first `&` is a `string_fragment` and `&amp;` is an
+  `html_character_reference`. In `<a b="&&"/>`, two `string_fragment` nodes replace one. Comment-like
+  text in quoted attributes can become string content, changing comment nodes and fragment boundaries
+  in valid input.
+
 ### Fixed
 
 - Count lone CR and line terminators in block comments for ASI. `a\rb`, `a/*\n*/b` and
@@ -69,6 +75,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Report a syntax error for `for (using\rx = f();;) {}` and `for (using /*\n*/ x = f();;) {}` (#17, #18,
   #46). The await/yield context fix also rejects `function f(){ await using x = y; }` and the tested
   `await using` loop forms in ordinary functions (#26, #35).
+
+- Treat `<!--`, `-->`, `//`, `/* ... */` and incomplete character references as string content inside
+  quoted JSX attributes, including when they occur alongside `U+0000`.
+
+### Changed
+
+- Adjust recovery ranges for character references, string fragments and error or missing nodes in
+  malformed JSX attributes. Report an error in some inputs with invalid text after the closing quote.
+
+### Performance
+
+- Move quoted JSX attribute lexing to the external scanner. The generated JavaScript main lexer has
+  264 states and can be optimised by the C compiler.
 
 ### Approved normalisations
 
