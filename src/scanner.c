@@ -183,7 +183,8 @@ static bool scan_template_chars(TSLexer *lexer) {
 // White space and line terminators as the grammar's `extras` regex has them (extras_character_set_1 in parser.c).
 // Explicit, not iswspace: that differs between C runtimes (C locale, glibc, Windows UCRT).
 static bool is_extra_space(int32_t c) {
-    return (c >= '\t' && c <= '\r') || c == ' ' || c == 0xa0 || c == 0x1680 || (c >= 0x2000 && c <= 0x200b) ||
+    if ((uint32_t)c < 0x80) return (c >= '\t' && c <= '\r') || c == ' ';
+    return c == 0xa0 || c == 0x1680 || (c >= 0x2000 && c <= 0x200b) ||
            c == 0x2028 || c == 0x2029 || c == 0x202f || c == 0x205f || c == 0x2060 || c == 0x3000 || c == 0xfeff;
 }
 
