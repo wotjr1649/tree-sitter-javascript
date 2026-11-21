@@ -398,7 +398,6 @@ static bool semicolon_before_next_token(TSLexer *lexer, const bool *valid_symbol
         case '^':
         case '|':
         case '&':
-        case '/':
             return false;
 
         // Insert a semicolon before decimals literals but not otherwise.
@@ -410,9 +409,6 @@ static bool semicolon_before_next_token(TSLexer *lexer, const bool *valid_symbol
         case '+':
             skip(lexer);
             return lexer->lookahead == '+' || (declaration_end && !defer_binding);
-        case '-':
-            skip(lexer);
-            return lexer->lookahead == '-' || (declaration_end && !defer_binding);
 
         // Don't insert a semicolon before `!=`, but do insert one before a unary `!`.
         case '!':
@@ -450,8 +446,7 @@ static bool semicolon_before_lookahead(TSLexer *lexer, const bool *valid_symbols
 }
 
 // Keep the decision at the preceding token. The next scan emits the already classified extra.
-static bool replay_annex(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
-    if (!valid_symbols[ANNEX_PREFIX]) return false;
+static bool replay_annex(Scanner *scanner, TSLexer *lexer) {
     scanner->annex_pending = true;
     lexer->result_symbol = ANNEX_PREFIX;
     return true;
@@ -522,8 +517,7 @@ static bool scan_automatic_semicolon(Scanner *scanner, TSLexer *lexer, const boo
         bool defer_asi = valid_symbols[LOGICAL_OR] && !trivia.leading_non_cr_break &&
                          (trivia.break_after_comment || valid_symbols[AWAIT_OPERAND_CONTINUES]);
         bool asi_for_identifier = trivia.newline && (annex || restricted || !defer_asi);
-        return scan_await_using(scanner, lexer, valid_symbols, trivia.newline, asi_for_identifier, annex) ||
-               (annex && replay_annex(scanner, lexer, valid_symbols));
+        return scan_await_using(scanner, lexer, valid_symbols, trivia.newline, asi_for_identifier, annex);
     }
     if (next == ASI_END) {
         if (!lexer->eof(lexer)) {
@@ -533,7 +527,7 @@ static bool scan_automatic_semicolon(Scanner *scanner, TSLexer *lexer, const boo
                 next = scan_asi_trivia(lexer, &after, true, false, RANGE_IGNORE, false);
                 if (next >= ASI_ANNEX && scan_past_annex(lexer, &after, RANGE_BETWEEN_TOKENS) == ASI_NEXT_TOKEN &&
                     lexer->lookahead == ',') {
-                    return replay_annex(scanner, lexer, valid_symbols);
+                    return replay_annex(scanner, lexer);
                 }
             }
             return true;
@@ -552,7 +546,7 @@ static bool scan_automatic_semicolon(Scanner *scanner, TSLexer *lexer, const boo
         bool declaration_end = valid_symbols[DECLARATION_END] && !valid_symbols[LOGICAL_OR];
         bool insert = restricted ? (next != ASI_NEXT_TOKEN || lexer->lookahead != ';') :
                       semicolon_before_lookahead(lexer, valid_symbols, next, declaration_end, false);
-        return (trivia.newline && insert) || replay_annex(scanner, lexer, valid_symbols);
+        return (trivia.newline && insert) || replay_annex(scanner, lexer);
     }
     if (!trivia.newline) {
         return false;
@@ -586,12 +580,12 @@ static bool scan_yield_operand(Scanner *scanner, TSLexer *lexer, const bool *val
     if (next == ASI_NEXT_TOKEN) {
         int32_t c = lexer->lookahead;
         if (c == ';' || c == ',' || c == ':' || c == ')' || c == ']') {
-            return annex && replay_annex(scanner, lexer, valid_symbols);
+            return annex && replay_annex(scanner, lexer);
         }
     }
     if (next == ASI_END || (next == ASI_NEXT_TOKEN && lexer->lookahead == '}')) {
         lexer->result_symbol = AUTOMATIC_SEMICOLON;
-        return valid_symbols[AUTOMATIC_SEMICOLON] || (annex && replay_annex(scanner, lexer, valid_symbols));
+        return valid_symbols[AUTOMATIC_SEMICOLON] || (annex && replay_annex(scanner, lexer));
     }
     if (trivia.newline) {
         if (valid_symbols[AUTOMATIC_SEMICOLON]) {
@@ -599,21 +593,13 @@ static bool scan_yield_operand(Scanner *scanner, TSLexer *lexer, const bool *val
             return true;
         }
         lexer->result_symbol = YIELD_LINE_TERMINATOR;
-        return valid_symbols[YIELD_LINE_TERMINATOR];
+        return true;
     }
-    if (annex) return replay_annex(scanner, lexer, valid_symbols);
     lexer->result_symbol = YIELD_OPERAND;
     return true;
 }
 
 static bool scan_ternary_qmark(TSLexer *lexer) {
-    for (;;) {
-        if (!is_extra_space(lexer->lookahead)) {
-            break;
-        }
-        skip(lexer);
-    }
-
     if (lexer->lookahead == '?') {
         advance(lexer);
 
@@ -874,7 +860,7 @@ bool tree_sitter_javascript_external_scanner_scan(void *payload, TSLexer *lexer,
                                 semicolon_before_lookahead(lexer, valid_symbols, next, false, false)))) {
             return leave_context(scanner, lexer, LEAVE_CONCISE_BODY);
         }
-        if (annex) return replay_annex(scanner, lexer, valid_symbols);
+        if (annex) return replay_annex(scanner, lexer);
         if (trivia.comment || next != ASI_NEXT_TOKEN) return false;
         if (lexer->lookahead == '?' && valid_symbols[TERNARY_QMARK]) return scan_ternary_qmark(lexer);
         if (trivia.newline) return false;
@@ -895,10 +881,10 @@ bool tree_sitter_javascript_external_scanner_scan(void *payload, TSLexer *lexer,
         if (annex) next = scan_past_annex(lexer, &trivia, RANGE_STOP);
         if (next == ASI_NEXT_TOKEN && lexer->lookahead == 'u') {
             return scan_await_using(scanner, lexer, valid_symbols, trivia.newline, false, annex) ||
-                   (annex && replay_annex(scanner, lexer, valid_symbols));
+                   (annex && replay_annex(scanner, lexer));
         }
         // With no using operand, leave the top-level identifier alternative to its ordinary lexer.
-        if (annex) return scanner->depth && replay_annex(scanner, lexer, valid_symbols);
+        if (annex) return scanner->depth && replay_annex(scanner, lexer);
         if (next == ASI_END && !lexer->eof(lexer)) {
             lexer->result_symbol = AWAIT_USING;
             return true;
@@ -958,7 +944,7 @@ bool tree_sitter_javascript_external_scanner_scan(void *payload, TSLexer *lexer,
             ASITrivia trivia = {.newline = html_line_start, .close_at_line_start = line_start || first_column};
             ASILookahead next = scan_asi_trivia(lexer, &trivia, true, false, RANGE_IGNORE, true);
             if (next == ASI_ANNEX) return finish_html_comment(lexer);
-            return next == ASI_ANNEX_OPEN_PREFIX && replay_annex(scanner, lexer, valid_symbols);
+            return next == ASI_ANNEX_OPEN_PREFIX && replay_annex(scanner, lexer);
         }
     }
 
