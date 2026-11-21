@@ -141,8 +141,8 @@ jobs:
           node-version: "22"
       - name: Test the gate scripts
         run: node --test scripts/*.test.mjs
-      - name: Check node kinds and fields against test/node-types-snapshot.txt
-        # Fails on a removed or renamed kind, field, field type or subtype (a major change); additions are notices.
+      - name: Check node types against test/node-types-snapshot.txt
+        # Fails on removed types, lost multiplicity or previously optional fields or children becoming required.
         run: node scripts/node-types-snapshot.mjs
       - name: Report the parser cost against the last release
         # Report only, into the job summary; there is no budget yet.
