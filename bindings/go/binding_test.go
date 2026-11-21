@@ -141,6 +141,15 @@ func TestConciseArrowContinuesAcrossIncludedRanges(t *testing.T) {
 		{"var f = () => a", excluded, "\n--> c\n+ b"},
 		{"x = x => a", "", "\n--> c\n,b"},
 		{"x = x => a\n", "", "--> c\n,b"},
+		{"x=>a\n-->x\n", "", "-->y\n,b"},
+		{"x=>a\n-->x\n-->y\n", "", "-->z\n,b"},
+		{"x=>a\n-->x\n--", "", ">y\n-->z\n,b"},
+		{"f(x=>a\n-->x\n", "", "-->y\n-->z\n)"},
+		{"f(x=>a\n-->x\n-->y\n", "", "-->z\n)"},
+		{"f(x=>a\n-->x\n-->y", "", "\n-->z\n)"},
+		{"x=>a\n-->x\n", "", "-->y\n-->z\n+b"},
+		{"x=>a\n-->x\n-->y\n", "", "-->z\n+b"},
+		{"x=>a\n-->x\n--", "", ">y\n-->z\n+b"},
 	}
 	for _, c := range cases {
 		t.Run(c.right, func(t *testing.T) {
