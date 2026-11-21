@@ -242,14 +242,14 @@ static ASILookahead scan_annex_marker(TSLexer *lexer, bool stop_at_range) {
     return ASI_ANNEX;
 }
 
-static void scan_html_comment_body(TSLexer *lexer, bool stop_at_range) {
+static void scan_line_comment_body(TSLexer *lexer, bool stop_at_range, bool skip_body) {
     while (!lexer->eof(lexer) && !at_range_start(lexer, stop_at_range) && !is_line_terminator(lexer->lookahead)) {
-        advance(lexer);
+        lexer->advance(lexer, skip_body);
     }
 }
 
 static bool finish_html_comment(TSLexer *lexer) {
-    scan_html_comment_body(lexer, false);
+    scan_line_comment_body(lexer, false, false);
     lexer->result_symbol = HTML_COMMENT;
     lexer->mark_end(lexer);
     return true;
@@ -301,10 +301,7 @@ static ASILookahead scan_asi_trivia(TSLexer *lexer, ASITrivia *trivia, bool anne
                 close_allowed = false;
                 trivia->line_comment = true;
                 lexer->advance(lexer, !preserve_start);
-                while (!lexer->eof(lexer) && !at_range_start(lexer, stop_at_range) &&
-                       !is_line_terminator(lexer->lookahead)) {
-                    lexer->advance(lexer, !preserve_start);
-                }
+                scan_line_comment_body(lexer, stop_at_range, !preserve_start);
             } else if (lexer->lookahead == '*') {
                 lexer->advance(lexer, skip_block);
                 bool block_newline = false;
@@ -345,7 +342,7 @@ static ASILookahead scan_asi_trivia(TSLexer *lexer, ASITrivia *trivia, bool anne
 static ASILookahead scan_past_annex(TSLexer *lexer, ASITrivia *trivia, RangePolicy range) {
     ASILookahead next;
     do {
-        scan_html_comment_body(lexer, range == RANGE_STOP);
+        scan_line_comment_body(lexer, range == RANGE_STOP, false);
         ASITrivia after = {0};
         next = scan_asi_trivia(lexer, &after, true, false, range, false);
         trivia->newline |= after.newline;
@@ -358,6 +355,20 @@ static ASILookahead scan_past_annex(TSLexer *lexer, ASITrivia *trivia, RangePoli
 static bool is_identifier_part(int32_t c) {
     return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_' || c == '$' ||
            c == '\\' || (c > 0x7f && !is_extra_space(c));
+}
+
+static bool consume_word(TSLexer *lexer, const char *word, bool skip_word) {
+    for (; *word; word++) {
+        if (lexer->lookahead != *word) return false;
+        lexer->advance(lexer, skip_word);
+    }
+    return true;
+}
+
+static bool starts_in_operator(TSLexer *lexer, bool skip_word) {
+    if (!consume_word(lexer, "in", skip_word)) return false;
+    return !is_identifier_part(lexer->lookahead) ||
+           (consume_word(lexer, "stanceof", skip_word) && !is_identifier_part(lexer->lookahead));
 }
 
 // After a line terminator: does the token that starts at the lookahead get a semicolon inserted before it?
@@ -411,28 +422,7 @@ static bool semicolon_before_next_token(TSLexer *lexer, const bool *valid_symbol
         // Don't insert a semicolon before `in` or `instanceof`, but do insert one
         // before an identifier.
         case 'i':
-            skip(lexer);
-
-            if (lexer->lookahead != 'n') {
-                return true;
-            }
-            skip(lexer);
-
-            if (!is_identifier_part(lexer->lookahead)) {
-                return false;
-            }
-
-            for (unsigned i = 0; i < 8; i++) {
-                if (lexer->lookahead != "stanceof"[i]) {
-                    return true;
-                }
-                skip(lexer);
-            }
-
-            if (!is_identifier_part(lexer->lookahead)) {
-                return false;
-            }
-            break;
+            return !starts_in_operator(lexer, true);
 
         default:
             break;
@@ -470,25 +460,13 @@ static bool replay_annex(Scanner *scanner, TSLexer *lexer, const bool *valid_sym
 // The only identifier-like tokens that can continue an await using expression here are binary operators.
 static bool starts_using_binding(TSLexer *lexer) {
     if (!is_identifier_part(lexer->lookahead) || is_digit(lexer->lookahead)) return false;
-    if (lexer->lookahead != 'i') return true;
-    advance(lexer);
-    if (lexer->lookahead != 'n') return true;
-    advance(lexer);
-    if (!is_identifier_part(lexer->lookahead)) return false;
-    for (const char *word = "stanceof"; *word; word++) {
-        if (lexer->lookahead != *word) return true;
-        advance(lexer);
-    }
-    return is_identifier_part(lexer->lookahead);
+    return !starts_in_operator(lexer, false);
 }
 
 // The end is marked before the trivia so the ordinary lexer still emits all extras.
 static bool scan_await_using(const Scanner *scanner, TSLexer *lexer, const bool *valid_symbols,
                              bool newline, bool asi_for_identifier, bool annex) {
-    for (const char *word = "using"; *word; word++) {
-        if (lexer->lookahead != *word) return asi_for_identifier;
-        advance(lexer);
-    }
+    if (!consume_word(lexer, "using", false)) return asi_for_identifier;
     if (is_identifier_part(lexer->lookahead)) return asi_for_identifier;
     if (newline && (scanner->depth || !valid_symbols[AUTOMATIC_SEMICOLON])) {
         lexer->result_symbol = AWAIT_OPERAND_CONTINUES;
@@ -776,10 +754,7 @@ static bool scan_jsx_text(TSLexer *lexer) {
 
 // End 'static' before a comment-separated member or the legacy 'static get' token before a generator.
 static bool scan_static_modifier(TSLexer *lexer) {
-    for (const char *c = "static"; *c; c++) {
-        if (lexer->lookahead != *c) return false;
-        advance(lexer);
-    }
+    if (!consume_word(lexer, "static", false)) return false;
     lexer->mark_end(lexer);
     if (!is_extra_space(lexer->lookahead) && lexer->lookahead != '/') return false;
     ASITrivia prefix = {0};
@@ -792,10 +767,7 @@ static bool scan_static_modifier(TSLexer *lexer) {
          next_char == '"' || next_char == '\'')) {
         return true;
     }
-    for (const char *c = "get"; *c; c++) {
-        if (lexer->lookahead != *c) return false;
-        advance(lexer);
-    }
+    if (!consume_word(lexer, "get", false)) return false;
     ASITrivia trivia = {0};
     ASILookahead next = scan_asi_trivia(lexer, &trivia, false, true, RANGE_BETWEEN_TOKENS, false);
     return next == ASI_NEXT_TOKEN && trivia.newline && lexer->lookahead == '*';
@@ -809,11 +781,7 @@ static bool scan_context_word(const Scanner *scanner, TSLexer *lexer, bool keywo
     } else if (lexer->lookahead == 'y' && !(flags & YIELD_CONTEXT)) {
         word = "yield";
     }
-    if (!word) return false;
-    for (; *word; word++) {
-        if (lexer->lookahead != *word) return false;
-        advance(lexer);
-    }
+    if (!word || !consume_word(lexer, word, false)) return false;
     if (is_identifier_part(lexer->lookahead)) return false;
     lexer->mark_end(lexer);
     lexer->result_symbol = keyword ? CONTEXT_AWAIT : CONTEXT_IDENTIFIER;
