@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Keep trailing comments attached to their declarations when incremental parsing reuses an initializer or declarator.
   Incremental parses now equal fresh parses of the edited input in these cases; fresh CSTs are unchanged.
+- Accept a hyphenated first segment in JSX member tag names, such as `<a-b.C />`.
 
 ## [4.3.0] - 2026-11-22
 

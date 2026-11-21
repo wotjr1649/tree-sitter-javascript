@@ -40,6 +40,7 @@ approval. go-treesitter regenerates `src/parser.c` with its own pinned CLI.
 - The grammar checks syntax, not early errors (static semantics, e.g. a `using` declaration without an initializer,
   `for (using x;;);`); those are a non-goal and stay accepted (owner decision, 2026-11-19). Grammar restrictions such
   as `for (using x in o);` or `await using` in a non-async function are defects, not early errors (#26).
+- Hyphens after a dot in JSX member tag names (e.g. `<A.b-c/>`) are a non-goal and remain syntax errors.
 - The generate command and CMake default read the ABI from `ci/tree-sitter-abi.txt`. Binding runtime lower bounds
   are in the binding manifests. Changing the ABI or a runtime lower bound requires owner approval and a major release.
   CI tests Python under `ci/python-constraints.txt` and Swift with `--force-resolved-versions`. Every binding test
