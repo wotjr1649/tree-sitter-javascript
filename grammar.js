@@ -192,6 +192,37 @@ module.exports = grammar({
       repeat($.statement),
     ),
 
+    arguments: $ => seq(
+      '(',
+      commaSep(optional(choice($.expression, $.spread_element))),
+      ')',
+    ),
+
+    parenthesized_expression: $ => seq(
+      '(',
+      $._expressions,
+      ')',
+    ),
+
+    // A statement that starts with `{` is a block, never an object (ECMA-262: an ExpressionStatement cannot start with
+    // `{`). `{a:0}` reads both ways; `labeled_statement` has dynamic precedence -1, so the block needs more than 1 to win.
+    statement_block: $ => prec.dynamic(2, prec.right(seq(
+      '{',
+      repeat($.statement),
+      '}',
+      optional($._automatic_semicolon),
+    ))),
+
+    // http://stackoverflow.com/questions/13014947/regex-to-match-a-c-style-multiline-comment/36328890#36328890
+    comment: _ => token(choice(
+      seq('//', /([^\r\n\u2028\u2029\x00]|\x00+)*/),
+      seq(
+        '/*',
+        /([^*\x00]|\x00+)*\*+(([^/*\x00]|\x00+)([^*\x00]|\x00+)*\*+)*/,
+        '/',
+      ),
+    )),
+
     // U+0000 in a repeated character class: `\x00+` gives it a transition of its own. Merged into a negated class
     // (`[^x]|\x00`) the generated lexer drops it, as `lookahead != 0` also means the end of the input.
     hash_bang_line: _ => /#!([^\r\n\u2028\u2029\x00]|\x00+)*/,
@@ -422,15 +453,6 @@ module.exports = grammar({
       seq(optional($._keyword_continues), field('name', $._destructuring_pattern), $._initializer),
     ),
 
-    // A statement that starts with `{` is a block, never an object (ECMA-262: an ExpressionStatement cannot start with
-    // `{`). `{a:0}` reads both ways; `labeled_statement` has dynamic precedence -1, so the block needs more than 1 to win.
-    statement_block: $ => prec.dynamic(2, prec.right(seq(
-      '{',
-      repeat($.statement),
-      '}',
-      optional($._automatic_semicolon),
-    ))),
-
     else_clause: $ => seq('else', $.statement),
 
     if_statement: $ => prec.right(seq(
@@ -632,12 +654,6 @@ module.exports = grammar({
     finally_clause: $ => seq(
       'finally',
       field('body', $.statement_block),
-    ),
-
-    parenthesized_expression: $ => seq(
-      '(',
-      $._expressions,
-      ')',
     ),
 
     //
@@ -1209,16 +1225,6 @@ module.exports = grammar({
     // own, aliased to escape_sequence where it is used.
     _nul_escape_sequence: _ => token.immediate(seq('\\', /\x00/)),
 
-    // http://stackoverflow.com/questions/13014947/regex-to-match-a-c-style-multiline-comment/36328890#36328890
-    comment: _ => token(choice(
-      seq('//', /([^\r\n\u2028\u2029\x00]|\x00+)*/),
-      seq(
-        '/*',
-        /([^*\x00]|\x00+)*\*+(([^/*\x00]|\x00+)([^*\x00]|\x00+)*\*+)*/,
-        '/',
-      ),
-    )),
-
     template_string: $ => seq(
       '`',
       repeat(choice(
@@ -1356,12 +1362,6 @@ module.exports = grammar({
     //
     // Expression components
     //
-
-    arguments: $ => seq(
-      '(',
-      commaSep(optional(choice($.expression, $.spread_element))),
-      ')',
-    ),
 
     decorator: $ => seq(
       '@',
