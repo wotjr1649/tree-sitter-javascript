@@ -874,22 +874,17 @@ module.exports = grammar({
     ),
 
     _jsx_string: $ => choice(
-      seq(
-        '"',
+      ...[
+        ['"', $._jsx_double_string_fragment],
+        ['\'', $._jsx_single_string_fragment],
+      ].map(([quote, fragment]) => seq(
+        quote,
         repeat(choice(
-          alias($._jsx_double_string_fragment, $.string_fragment),
+          alias(fragment, $.string_fragment),
           alias($._jsx_attribute_character_reference, $.html_character_reference),
         )),
-        '"',
-      ),
-      seq(
-        '\'',
-        repeat(choice(
-          alias($._jsx_single_string_fragment, $.string_fragment),
-          alias($._jsx_attribute_character_reference, $.html_character_reference),
-        )),
-        '\'',
-      ),
+        quote,
+      )),
     ),
 
     _jsx_attribute_value: $ => choice(
@@ -1106,38 +1101,27 @@ module.exports = grammar({
 
     binary_expression: $ => choice(
       ...[
-        ['&&', 'logical_and'],
-        ['||', 'logical_or'],
-        ['>>', 'binary_shift'],
-        ['>>>', 'binary_shift'],
-        ['<<', 'binary_shift'],
-        ['&', 'bitwise_and'],
-        ['^', 'bitwise_xor'],
-        ['|', 'bitwise_or'],
-        ['+', 'binary_plus'],
-        ['-', 'binary_plus'],
-        ['*', 'binary_times'],
-        ['/', 'binary_times'],
-        ['%', 'binary_times'],
-        ['**', 'binary_exp', 'right'],
-        ['<', 'binary_relation'],
-        ['<=', 'binary_relation'],
-        ['==', 'binary_equality'],
-        ['===', 'binary_equality'],
-        ['!=', 'binary_equality'],
-        ['!==', 'binary_equality'],
-        ['>=', 'binary_relation'],
-        ['>', 'binary_relation'],
-        ['??', 'ternary'],
-        ['instanceof', 'binary_relation'],
-        ['in', 'binary_relation'],
-      ].map(([operator, precedence, associativity]) =>
+        [['&&'], 'logical_and'],
+        [['||'], 'logical_or'],
+        [['>>', '>>>', '<<'], 'binary_shift'],
+        [['&'], 'bitwise_and'],
+        [['^'], 'bitwise_xor'],
+        [['|'], 'bitwise_or'],
+        [['+', '-'], 'binary_plus'],
+        [['*', '/', '%'], 'binary_times'],
+        [['**'], 'binary_exp', 'right'],
+        [['<', '<='], 'binary_relation'],
+        [['==', '===', '!=', '!=='], 'binary_equality'],
+        [['>=', '>'], 'binary_relation'],
+        [['??'], 'ternary'],
+        [['instanceof', 'in'], 'binary_relation'],
+      ].flatMap(([operators, precedence, associativity]) => operators.map(operator =>
         (associativity === 'right' ? prec.right : prec.left)(precedence, seq(
           field('left', operator === 'in' ? choice($.expression, $.private_property_identifier) : $.expression),
           field('operator', operator),
           field('right', $.expression),
         )),
-      ),
+      )),
     ),
 
     unary_expression: $ => prec.left('unary_void', seq(

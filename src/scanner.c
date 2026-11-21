@@ -172,6 +172,7 @@ static bool scan_template_chars(TSLexer *lexer) {
         }
         switch (lexer->lookahead) {
             case '`':
+            case '\\':
                 return has_content;
             case '$':
                 advance(lexer);
@@ -179,8 +180,6 @@ static bool scan_template_chars(TSLexer *lexer) {
                     return has_content;
                 }
                 break;
-            case '\\':
-                return has_content;
             default:
                 advance(lexer);
         }
@@ -571,20 +570,15 @@ static bool scan_automatic_semicolon(Scanner *scanner, TSLexer *lexer, const boo
         return true;
     }
     if (trivia.newline && ends_before_next_token(lexer, valid_symbols, next, false)) return true;
-    if (annex) {
-        // ASI only classifies an Annex B marker after a line break.
-        bool declaration_end = valid_symbols[DECLARATION_END];
-        bool insert = restricted ? (next != ASI_NEXT_TOKEN || lexer->lookahead != ';') :
-                      semicolon_before_lookahead(lexer, valid_symbols, next, declaration_end, false);
-        return insert || replay_annex(scanner, lexer);
-    }
-    if (!trivia.newline) {
-        return false;
-    }
+    if (!annex && !trivia.newline) return false;
 
     // After return, break and continue, a line terminator ends the statement unless a ';' follows.
     if (restricted) {
-        return next != ASI_NEXT_TOKEN || lexer->lookahead != ';';
+        return next != ASI_NEXT_TOKEN || lexer->lookahead != ';' || (annex && replay_annex(scanner, lexer));
+    }
+    if (annex) {
+        return semicolon_before_lookahead(lexer, valid_symbols, next, valid_symbols[DECLARATION_END], false) ||
+               replay_annex(scanner, lexer);
     }
 
     // Leave room for the await operand or for extras to consume a comment before the next scan.
@@ -635,26 +629,15 @@ static bool scan_yield_operand(Scanner *scanner, TSLexer *lexer, const bool *val
 }
 
 static bool scan_ternary_qmark(TSLexer *lexer) {
-    if (lexer->lookahead == '?') {
-        advance(lexer);
+    if (lexer->lookahead != '?') return false;
+    advance(lexer);
+    if (lexer->lookahead == '?') return false;
 
-        if (lexer->lookahead == '?') {
-            return false;
-        }
-
-        lexer->mark_end(lexer);
-        lexer->result_symbol = TERNARY_QMARK;
-
-        if (lexer->lookahead == '.') {
-            advance(lexer);
-            if (is_digit(lexer->lookahead)) {
-                return true;
-            }
-            return false;
-        }
-        return true;
-    }
-    return false;
+    lexer->mark_end(lexer);
+    lexer->result_symbol = TERNARY_QMARK;
+    if (lexer->lookahead != '.') return true;
+    advance(lexer);
+    return is_digit(lexer->lookahead);
 }
 
 // After an `&`: is what follows the rest of an HTML character reference
@@ -719,11 +702,7 @@ static bool scan_jsx_attribute_string(TSLexer *lexer, bool double_quote) {
 }
 
 static bool scan_jsx_text(TSLexer *lexer) {
-    // saw_text will be true if we see any non-whitespace content, or any whitespace content that is not a newline and
-    // does not immediately follow a newline.
     bool saw_text = false;
-    // at_newline will be true if we are currently at a newline, or if we are at whitespace that is not a newline but
-    // immediately follows a newline.
     bool at_newline = false;
 
     lexer->result_symbol = JSX_TEXT;
@@ -742,28 +721,11 @@ static bool scan_jsx_text(TSLexer *lexer) {
             at_newline = false;
             continue;
         }
-        bool is_wspace = is_jsx_space(lexer->lookahead);
         if (lexer->lookahead == '\n') {
             at_newline = true;
-        } else {
-            // If at_newline is already true, and we see some whitespace, then it must stay true.
-            // Otherwise, it should be false.
-            //
-            // See the table below to determine the logic for computing `saw_text`.
-            //
-            // |------------------------------------|
-            // | at_newline | is_wspace | saw_text  |
-            // |------------|-----------|-----------|
-            // | false (0)  | false (0) | true  (1) |
-            // | false (0)  | true  (1) | true  (1) |
-            // | true  (1)  | false (0) | true  (1) |
-            // | true  (1)  | true  (1) | false (0) |
-            // |------------------------------------|
-
-            at_newline &= is_wspace;
-            if (!at_newline) {
-                saw_text = true;
-            }
+        } else if (!at_newline || !is_jsx_space(lexer->lookahead)) {
+            saw_text = true;
+            at_newline = false;
         }
 
         advance(lexer);
