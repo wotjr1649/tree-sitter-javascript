@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.13)
 
 project(tree-sitter-javascript
-        VERSION "4.3.0"
+        VERSION "4.4.0"
         DESCRIPTION "JavaScript grammar for tree-sitter"
         HOMEPAGE_URL "https://github.com/wotjr1649/tree-sitter-javascript"
         LANGUAGES C)

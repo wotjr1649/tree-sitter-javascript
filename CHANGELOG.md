@@ -5,21 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [4.4.0] - 2026-11-22
 
 ### Added
 
-- Support parenthesized decorator expressions such as `@(decorator || fallback)`.
+- Support parenthesized decorator expressions such as `@(decorator || fallback)` in Stage 3 decorators syntax.
+  The `decorator` node gains `parenthesized_expression` as a possible child. The oracle now uses Babel's
+  `decorators` plugin, with identical verdicts on the fixed oracle and Discovery inputs. LR states increased
+  from 2,836 to 2,840. [#81](https://github.com/wotjr1649/tree-sitter-javascript/pull/81)
 
 ### Fixed
 
 - Keep trailing comments attached to their declarations when incremental parsing reuses an initializer or declarator.
-  Incremental parses now equal fresh parses of the edited input in these cases; fresh CSTs are unchanged.
-- Accept a hyphenated first segment in JSX member tag names, such as `<a-b.C />`.
+  Five incremental divergences now match fresh parses of the edited inputs. Fresh CSTs are unchanged.
+  [#79](https://github.com/wotjr1649/tree-sitter-javascript/pull/79)
+- Accept a hyphenated first segment in JSX member tag names, such as `<a-b.C />`, which Babel and oxc accept.
+  A hyphen after a dot, as in `<A.b-c />`, remains a syntax error per the owner decision recorded in `AGENTS.md`.
+  LR states decreased from 2,857 to 2,836. [#80](https://github.com/wotjr1649/tree-sitter-javascript/pull/80)
 
 ### Changed
 
-- Document when to parse from scratch after widening or adding included ranges (README, Known limitations).
+- Document when to parse from scratch after widening or adding included ranges in the README's Known limitations
+  section. Tree-sitter runtime reuse accounts for the nine remaining included-range incremental divergences.
+  [#82](https://github.com/wotjr1649/tree-sitter-javascript/pull/82)
+- Linux Callgrind instruction counts for #79 fell by 0.007% to 0.039% per workload compared with v4.3.0.
+  [#79 Callgrind CI run](https://github.com/wotjr1649/tree-sitter-javascript/actions/runs/44936102637)
+- Compared with #80, #81 reduced N-of-M instruction counts by about 0.39% for fresh parses and 3.06% for
+  incremental parses based on the normalized CI figures. N-of-M error inputs fell from 110 to 108 in both modes.
+  Other workloads increased by at most 0.02%.
+  [#81 Callgrind CI run](https://github.com/wotjr1649/tree-sitter-javascript/actions/runs/44938415473)
 
 ## [4.3.0] - 2026-11-22
 
@@ -1044,6 +1058,7 @@ Not fixed in 2.0.0; tracked as GitHub Issues where a number is given:
   build as `cp310-abi3`, and `make install` leaves the pkg-config description empty and prefixes absolute paths
   ([#22](https://github.com/wotjr1649/tree-sitter-javascript/issues/22)).
 
+[4.4.0]: https://github.com/wotjr1649/tree-sitter-javascript/compare/v4.3.0...v4.4.0
 [4.3.0]: https://github.com/wotjr1649/tree-sitter-javascript/compare/v4.2.0...v4.3.0
 [4.2.0]: https://github.com/wotjr1649/tree-sitter-javascript/compare/v4.1.0...v4.2.0
 [4.1.0]: https://github.com/wotjr1649/tree-sitter-javascript/compare/v4.0.1...v4.1.0
