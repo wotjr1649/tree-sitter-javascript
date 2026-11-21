@@ -4751,6 +4751,18 @@
               ]
             }
           ]
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "_arrow_function_end"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
         }
       ]
     },
@@ -5001,6 +5013,10 @@
                     {
                       "type": "SYMBOL",
                       "name": "_await_using"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "_await_using_asi"
                     }
                   ]
                 },
@@ -6506,6 +6522,18 @@
                     }
                   ]
                 }
+              },
+              {
+                "type": "CHOICE",
+                "members": [
+                  {
+                    "type": "SYMBOL",
+                    "name": "_postfix_update_end"
+                  },
+                  {
+                    "type": "BLANK"
+                  }
+                ]
               }
             ]
           },
@@ -8858,6 +8886,10 @@
           "name": "_automatic_semicolon"
         },
         {
+          "type": "SYMBOL",
+          "name": "_await_using_asi"
+        },
+        {
           "type": "STRING",
           "value": ";"
         }
@@ -9322,6 +9354,18 @@
     {
       "type": "SYMBOL",
       "name": "_jsx_single_string_fragment"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_arrow_function_end"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_postfix_update_end"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_await_using_asi"
     }
   ],
   "inline": [

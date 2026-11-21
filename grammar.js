@@ -73,6 +73,11 @@ module.exports = grammar({
     $._jsx_attribute_character_reference,
     $._jsx_double_string_fragment,
     $._jsx_single_string_fragment,
+    // ASI reads these markers after a completed arrow or postfix update.
+    $._arrow_function_end,
+    $._postfix_update_end,
+    // A line break before using can also end a Script statement.
+    $._await_using_asi,
   ],
 
   extras: $ => [
@@ -963,6 +968,7 @@ module.exports = grammar({
         seq(field('body', $.expression), $._leave_concise_body),
         seq(field('body', $.statement_block), $._leave_context),
       ),
+      optional($._arrow_function_end),
     ),
 
     _arrow_parameters: $ => choice(
@@ -1002,7 +1008,7 @@ module.exports = grammar({
     // A direct assignment is outside that operand, so `await(a).x=b` retains its identifier interpretation.
     await_expression: $ => prec.dynamic(1, prec('unary_void', seq(
       'await',
-      optional(choice($._await_operand_continues, $._await_using)),
+      optional(choice($._await_operand_continues, $._await_using, $._await_using_asi)),
       $._await_operand,
     ))),
 
@@ -1138,6 +1144,7 @@ module.exports = grammar({
       seq(
         field('argument', choice($.expression, $.primary_expression)),
         field('operator', choice('++', '--')),
+        optional($._postfix_update_end),
       ),
       seq(
         field('operator', choice('++', '--')),
@@ -1511,7 +1518,7 @@ module.exports = grammar({
       ...CONTEXTUAL_KEYWORDS,
     ),
 
-    _semicolon: $ => choice($._automatic_semicolon, ';'),
+    _semicolon: $ => choice($._automatic_semicolon, $._await_using_asi, ';'),
   },
 });
 

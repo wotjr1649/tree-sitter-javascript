@@ -39,6 +39,9 @@ enum TokenType {
     JSX_ATTRIBUTE_CHARACTER_REFERENCE,
     JSX_DOUBLE_STRING_FRAGMENT,
     JSX_SINGLE_STRING_FRAGMENT,
+    ARROW_FUNCTION_END,
+    POSTFIX_UPDATE_END,
+    AWAIT_USING_ASI,
 };
 
 enum Context {
@@ -414,6 +417,12 @@ static bool semicolon_before_next_token(TSLexer *lexer, const bool *valid_symbol
     return true;
 }
 
+static bool ends_before_next_token(TSLexer *lexer, const bool *valid_symbols, ASILookahead next) {
+    if (next == ASI_SLASH) return valid_symbols[ARROW_FUNCTION_END];
+    return next == ASI_NEXT_TOKEN && lexer->lookahead == '`' &&
+           (valid_symbols[ARROW_FUNCTION_END] || valid_symbols[POSTFIX_UPDATE_END]);
+}
+
 // The trivia scan can already have consumed the prefix of an operator.
 static bool semicolon_before_lookahead(TSLexer *lexer, const bool *valid_symbols, ASILookahead next,
                                       bool declaration_end, bool defer_binding) {
@@ -449,7 +458,7 @@ static bool starts_using_binding(TSLexer *lexer) {
 
 // The end is marked before the trivia so the ordinary lexer still emits all extras.
 static bool scan_await_using(const Scanner *scanner, TSLexer *lexer, const bool *valid_symbols,
-                             bool newline, bool asi_for_identifier) {
+                             bool newline, bool asi_for_identifier, bool annex) {
     for (const char *word = "using"; *word; word++) {
         if (lexer->lookahead != *word) return asi_for_identifier;
         advance(lexer);
@@ -464,8 +473,10 @@ static bool scan_await_using(const Scanner *scanner, TSLexer *lexer, const bool 
     ASILookahead next = scan_asi_trivia(lexer, &after_using, valid_symbols[HTML_COMMENT], false, RANGE_STOP, false);
     bool binding = next == ASI_NEXT_TOKEN && !after_using.newline && starts_using_binding(lexer);
     if (newline) {
-        // Keep the top-level expression alternatives unless the following binding needs a Script statement.
-        return binding || asi_for_identifier;
+        // Annex B needs the Script reading. Otherwise prefer await and let the parser try Script ASI.
+        if (binding || annex || next >= ASI_ANNEX) return binding || asi_for_identifier;
+        lexer->result_symbol = AWAIT_USING_ASI;
+        return valid_symbols[AWAIT_USING_ASI];
     }
     lexer->result_symbol = AWAIT_USING;
     if (binding || (next == ASI_END && !lexer->eof(lexer))) return true;
@@ -502,7 +513,7 @@ static bool scan_automatic_semicolon(Scanner *scanner, TSLexer *lexer, const boo
         bool defer_asi = valid_symbols[LOGICAL_OR] && !trivia.leading_non_cr_break &&
                          (trivia.break_after_comment || valid_symbols[AWAIT_OPERAND_CONTINUES]);
         bool asi_for_identifier = trivia.newline && (annex || restricted || !defer_asi);
-        return scan_await_using(scanner, lexer, valid_symbols, trivia.newline, asi_for_identifier) ||
+        return scan_await_using(scanner, lexer, valid_symbols, trivia.newline, asi_for_identifier, annex) ||
                (annex && replay_annex(scanner, lexer, valid_symbols));
     }
     if (next == ASI_END) {
@@ -527,6 +538,7 @@ static bool scan_automatic_semicolon(Scanner *scanner, TSLexer *lexer, const boo
     if (next == ASI_NEXT_TOKEN && lexer->lookahead == '}') {
         return true;
     }
+    if (trivia.newline && ends_before_next_token(lexer, valid_symbols, next)) return true;
     if (annex) {
         bool declaration_end = valid_symbols[DECLARATION_END] && !valid_symbols[LOGICAL_OR];
         bool insert = restricted ? (next != ASI_NEXT_TOKEN || lexer->lookahead != ';') :
@@ -851,7 +863,8 @@ bool tree_sitter_javascript_external_scanner_scan(void *payload, TSLexer *lexer,
         bool annex = next >= ASI_ANNEX;
         if (annex) next = scan_past_annex(lexer, &trivia, RANGE_IGNORE);
         if (next == ASI_END || (next == ASI_NEXT_TOKEN && at_concise_body_end(lexer)) ||
-            (trivia.newline && semicolon_before_lookahead(lexer, valid_symbols, next, false, false))) {
+            (trivia.newline && (ends_before_next_token(lexer, valid_symbols, next) ||
+                                semicolon_before_lookahead(lexer, valid_symbols, next, false, false)))) {
             return leave_context(scanner, lexer, LEAVE_CONCISE_BODY);
         }
         if (annex) return replay_annex(scanner, lexer, valid_symbols);
@@ -874,7 +887,7 @@ bool tree_sitter_javascript_external_scanner_scan(void *payload, TSLexer *lexer,
         bool annex = next >= ASI_ANNEX;
         if (annex) next = scan_past_annex(lexer, &trivia, RANGE_STOP);
         if (next == ASI_NEXT_TOKEN && lexer->lookahead == 'u') {
-            return scan_await_using(scanner, lexer, valid_symbols, trivia.newline, false) ||
+            return scan_await_using(scanner, lexer, valid_symbols, trivia.newline, false, annex) ||
                    (annex && replay_annex(scanner, lexer, valid_symbols));
         }
         // With no using operand, leave the top-level identifier alternative to its ordinary lexer.
