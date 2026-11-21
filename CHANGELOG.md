@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Incremental parses now equal fresh parses of the edited input in these cases; fresh CSTs are unchanged.
 - Accept a hyphenated first segment in JSX member tag names, such as `<a-b.C />`.
 
+### Changed
+
+- Document when to parse from scratch after widening or adding included ranges (README, Known limitations).
+
 ## [4.3.0] - 2026-11-22
 
 ### Fixed
