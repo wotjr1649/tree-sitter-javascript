@@ -66,14 +66,14 @@ module.exports = grammar({
     $._leave_concise_body,
     $._yield_operand,
     $._yield_line_terminator,
-    // Carry a line break across ordinary comments without adding a CST node.
-    $._html_open_prefix,
+    // Replay the next Annex B extra after deciding whether the preceding construct ends.
+    $._annex_prefix,
   ],
 
   extras: $ => [
     $.comment,
     $.html_comment,
-    $._html_open_prefix,
+    $._annex_prefix,
     /[\s\p{Zs}\uFEFF\u2028\u2029\u2060\u200B]/,
   ],
 

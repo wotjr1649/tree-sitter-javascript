@@ -8898,7 +8898,7 @@
     },
     {
       "type": "SYMBOL",
-      "name": "_html_open_prefix"
+      "name": "_annex_prefix"
     },
     {
       "type": "PATTERN",
@@ -9328,7 +9328,7 @@
     },
     {
       "type": "SYMBOL",
-      "name": "_html_open_prefix"
+      "name": "_annex_prefix"
     }
   ],
   "inline": [
