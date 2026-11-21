@@ -141,9 +141,12 @@ test("structure.mjs refuses a fractional or out-of-range --workers and a bad --m
 });
 
 test("tools.mjs gives the verdicts of oracle/run.mjs (the copy has not drifted)", () => {
+  assert.equal(babel("@(d || e) class C {}", "module").c, "accept");
+  assert.equal(babel("@(d) class C {} const broken = ;", "module").c, "syntax");
+  assert.equal(babel("@(d) class C {} let a; let a;", "module").c, "early");
   const d = tmp();
   try {
-    const cases = [["a;", "script"], ["let a; let a;", "script"], ["a b", "script"], ["<a/>", "module"], ["x = é😀 +", "script"], ["await 1;", "module"], ["with (a) b;", "module"], ["a /* é */ ) 2", "script"]];
+    const cases = [["a;", "script"], ["let a; let a;", "script"], ["a b", "script"], ["<a/>", "module"], ["x = é😀 +", "script"], ["await 1;", "module"], ["with (a) b;", "module"], ["a /* é */ ) 2", "script"], ["@(d || e) class C {}", "module"], ["@(d) class C {} const broken = ;", "module"]];
     const line = ([source, sourceType], i) => JSON.stringify({ id: `c${i}`, sha256: createHash("sha256").update(source, "utf8").digest("hex"), source, sourceType });
     writeFileSync(join(d, "cases.jsonl"), cases.map(line).join("\n") + "\n");
     execFileSync(process.execPath, [join(here, "../../run.mjs"), "--cases", join(d, "cases.jsonl"), "--out", join(d, "v.json")], { encoding: "utf8" });

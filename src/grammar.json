@@ -7815,6 +7815,10 @@
               "name": "identifier"
             },
             {
+              "type": "SYMBOL",
+              "name": "parenthesized_expression"
+            },
+            {
               "type": "ALIAS",
               "content": {
                 "type": "SYMBOL",

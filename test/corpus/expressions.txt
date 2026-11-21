@@ -930,6 +930,50 @@ class Foo {
           (string_fragment))))))
 
 ============================================
+Parenthesized Class Decorators
+============================================
+
+@(d)class C {
+  @(d || e) m() {}
+  @(d, e) field;
+}
+
+---
+
+(program
+  (class_declaration
+    (decorator
+      (parenthesized_expression
+        (identifier)))
+    (identifier)
+    (class_body
+      (method_definition
+        (decorator
+          (parenthesized_expression
+            (binary_expression
+              (identifier)
+              (identifier))))
+        (property_identifier)
+        (formal_parameters)
+        (statement_block))
+      (field_definition
+        (decorator
+          (parenthesized_expression
+            (sequence_expression
+              (identifier)
+              (identifier))))
+        (property_identifier)))))
+
+============================================
+Empty Parenthesized Decorator
+:error
+============================================
+
+@() class C {}
+
+---
+
+============================================
 Arrays
 ============================================
 

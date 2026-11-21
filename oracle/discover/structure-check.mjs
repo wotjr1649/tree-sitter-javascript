@@ -22,7 +22,7 @@ export async function makeChecker(bin) {
     async check(src, type) {
       let file;
       try {
-        file = parse(src, { sourceType: type, plugins: ["jsx"], createParenthesizedExpressions: true });
+        file = parse(src, { sourceType: type, plugins: ["jsx", "decorators"], createParenthesizedExpressions: true });
       } catch (e) {
         return { reject: String(e.message).slice(0, 120) };
       }
