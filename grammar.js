@@ -876,7 +876,7 @@ module.exports = grammar({
     _jsx_string: $ => choice(
       ...[
         ['"', $._jsx_double_string_fragment],
-        ["'", $._jsx_single_string_fragment],
+        ['\'', $._jsx_single_string_fragment],
       ].map(([quote, fragment]) => seq(
         quote,
         repeat(choice(
