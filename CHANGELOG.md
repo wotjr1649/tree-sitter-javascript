@@ -65,9 +65,8 @@ raw differences, the Module readings of top-level `await` and of inline `<!--`, 
   separate ranges and the expression is `a + b`. In `a/*\n*/<!--x\n;`, the explicit semicolon terminates
   the expression statement. In `f(() => a/*\n*/<!--x\n, c);`, the arrow body ends at `a`, the comments
   belong to the argument list and the comma separates the two arguments. In
-  `class C { x = a/*c*/\n-->x\n+b;\ny = 2; }`, the field value is `a + b` where v3.1.0 gives an `ERROR` at
-  the `+`. In `const f = () => a/*\n*/-->x\n;`, the arrow and the declarator end at `a` and the comment
-  follows them (#59, #61).
+  `const f = () => a/*\n*/-->x\n;`, the arrow and the declarator end at `a` and the comment follows
+  them (#59, #61).
 - A single-line block comment at the start of a line followed by `-->` is one `html_comment`. In
   `a\n/*c*/-->x\nb`, the `html_comment` spans `/*c*/-->x` where v3.1.0 has a `comment` followed by an
   `html_comment` (#61).
@@ -130,6 +129,8 @@ raw differences, the Module readings of top-level `await` and of inline `<!--`, 
 - Parse `get` and `set` fields before a next-line generator, including `class A { get\n*g() {} }`.
   Recognise Annex B close comments after line-start block comments and preserve the surrounding expression
   (#46, #49, #55).
+- In Script, `class C { x = a/*c*/\n-->x\n+b;\ny = 2; }` has a field with value `a + b` followed by
+  `y = 2`. v3.1.0 gives an `ERROR` at the `+` (#59, #61).
 - Accept U+0000 inside Annex B opening and closing comments, as in `<!--\0\rnext();` and
   `-->\0\rnext();`. The call starts after the CR. U+0000 outside the comment after the CR gives a
   syntax error. These CR and U+0000 changes were deferred from v3.1.0 (#45, #48, #55).
@@ -184,9 +185,9 @@ raw differences, the Module readings of top-level `await` and of inline `<!--`, 
   in static imports and re-exports. It still checks key and value ranges. The public CST keeps the
   wrappers in examples such as `export * from 'x' with {type: 'json'}` (#41, #55, #57).
 - In test262's `generator-function-expression.js`, the trailing `/* after */` comments (`[466,477)` and
-  `[606,617)`) attach to the `lexical_declaration`, which now ends at the comment end (477 and 617), where
-  v3.1.0 ends it at 606. The `generator_function` and `variable_declarator` end at 466 and 606 as in v3.1.0. The
-  structure agrees with Babel after normalising the `lexical_declaration` end and the comment placement. The EOF
+  `[606,617)`) attach to the two `lexical_declaration` nodes. Their end offsets are 466 and 606 in v3.1.0 and
+  477 and 617 in v4.0.0. The `generator_function` and `variable_declarator` still end at 466 and 606. The
+  structure agrees with Babel after normalising the `lexical_declaration` ends and the comment placement. The EOF
   function-body comment under Breaking changes is a separate change (#46, #52).
 - In `f(x/*\n*/--> z\n+ y);` and in `a\n/*c*/-->x\nb`, one `html_comment` spans the block comment and its
   close suffix, where Babel exposes two comment ranges. In the first, both parsers expose `x + y` as the
@@ -206,17 +207,16 @@ raw differences, the Module readings of top-level `await` and of inline `<!--`, 
   character references to the external scanner. The main lexer now has 264 states and `parser.c` carries no
   pragma. The Go binding compiles `src/scanner.c` as its own translation unit, because including it after
   `parser.c` extended the pragma to the scanner under cgo (#63, #64).
-- Linux CI instruction counts (callgrind, the 375-file npm sample, all clean, v1.0.0 = 100 %), run 44873992978
-  at `1864a60`, before #65 and #66 (#66 changes the grammar and the scanner and grows the generated
-  `src/parser.c` by 149,857 bytes and 56 states; the main lexer stays at 264 states and there is still no
-  pragma). No instruction count of the release content had been measured when this entry was written:
-  fresh parse 104.68 %, incremental parse 107.44 % at `1864a60`. For comparison, v3.1.0 measures 105.55 % and 103.84 %, and `dde79c0` before
-  #61 to #64 measured 109.71 % and 110.72 %. On the #63 branch (run 44863360925), a control with the pragma
-  removed by hand gave 104.15 % and 107.12 % against the branch's 104.23 % and 107.13 %, so the pragma
-  explains the difference. The default inputs measure 92.68 % fresh and 63.91 % incremental, and the N-of-M
-  inputs 98.78 % and 66.65 %. Both sets contain inputs for which v1.0.0 builds error trees, so they do not
-  measure parsing cost alone; error trees in N-of-M rise from 102 to 111 compared with `dde79c0`, from the
-  newly rejected `await using` line breaks. Peak RSS is +2 %.
+- Linux CI measured Callgrind instruction counts on `87a1b75` (v1.0.0 = 100 %). The 375-file npm sample
+  parses cleanly in both modes. Fresh and incremental counts are 106.07 % and 107.98 %, respectively
+  (105.55 % and 103.84 % for v3.1.0). The 1,449 default measurement files give 94.01 % and 64.96 %,
+  and the 1,068 N-of-M inputs give 100.17 % and 67.50 %. Both sets include files for which v1.0.0 builds
+  error trees. The CST comparison above covers 3,804 default inputs. Peak RSS for fresh npm parsing rises
+  2.3 % from v1.0.0.
+  [Linux CI run 44885418942](https://github.com/wotjr1649/tree-sitter-javascript/actions/runs/44885418942)
+- On the #63 branch, removing the pragma by hand gave 104.15 % fresh and 107.12 % incremental against
+  the branch's 104.23 % and 107.13 %, respectively.
+  [Linux CI control run 44863360925](https://github.com/wotjr1649/tree-sitter-javascript/actions/runs/44863360925)
 - Quoted JSX attributes that consist only of complete character references take about 1.35 times as long to
   parse as before #63. The cost stays linear in the attribute size (#63).
 - The #58 comparison between `19bb871` and the tree merged at `976c65b` found matching full CSTs
@@ -288,9 +288,9 @@ are kept as history; the release criterion is the Linux CI instruction count abo
   without error (#20).
 - `function f(){ for await (const x of xs) x; }` can still parse outside an async context. Beyond 4,072
   saved function contexts, the scanner can fall back to the default keyword reading until it returns
-  to a saved context. From about 2,700 nested contexts on, the marks that make `await` a keyword in the
-  concise body of the innermost async arrows no longer fit the serialization buffer and are dropped first, so
-  such a body can read `await` as an identifier (#35, #36, #66).
+  to a saved context. In a nested async-arrow probe on `87a1b75`, the innermost `await\nf();` is an
+  `await_expression` at depth 2,712. At depth 2,713 the serialization buffer drops the innermost async
+  marker, and the parser reads `await` as an identifier followed by a separate call (#35, #36, #66).
 - The early-error policy still allows cases such as duplicate import attribute keys and a `using`
   declaration without an initializer. TypeScript's `import x = a.class;` family (TS1359) remains a
   downstream limitation.
