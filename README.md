@@ -21,6 +21,12 @@ References
 - [The ESTree Spec](https://github.com/estree/estree)
 - [The ECMAScript 2025 Spec](https://tc39.es/ecma262/2025/)
 
+## Known limitations
+
+After widening an included range or adding a new one, parse from scratch with the updated ranges. In the C API,
+set the ranges with `ts_parser_set_included_ranges` and pass `NULL` as `old_tree`. Reusing the old tree can keep
+tokens that ended at a previous included-range boundary.
+
 [ci]: https://img.shields.io/github/actions/workflow/status/wotjr1649/tree-sitter-javascript/ci.yml?logo=github&label=CI
 [discord]: https://img.shields.io/discord/1063097320771698699?logo=discord&label=discord
 [matrix]: https://img.shields.io/matrix/tree-sitter-chat%3Amatrix.org?logo=matrix&label=matrix
