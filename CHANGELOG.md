@@ -13,6 +13,24 @@ JavaScript and JSX inputs that parsed cleanly in v3.1.0 and are accepted by both
 is `tree_sitter_javascript`, and the parser ABI is 15. In the examples below, `\n`, `\r`, `\r\n` and `\0`
 denote actual source characters.
 
+The Windows comparison with v3.1.0 covered 59,390 records: the 3,726 default inputs (corpus, examples,
+highlights, tags and oracle), the 1,068 fixed N-of-M inputs and the 54,596 pinned inputs labeled valid by
+Discovery. Records can appear in more than one set.
+
+| Input set | Total | Same | Changed clean | Clean to error | Error to clean | Changed recovery |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Default | 3,726 | 1,580 | 1,048 | 54 | 543 | 501 |
+| Fixed N-of-M | 1,068 | 1,045 | 6 | 15 | 0 | 2 |
+| Pinned Discovery valid | 54,596 | 54,368 | 210 | 0 | 18 | 0 |
+| **Total** | **59,390** | **56,993** | **1,264** | **69** | **561** | **503** |
+
+Both reference parsers accept all 1,264 changed clean records in their source goal, and the structure of
+each agrees with Babel after the approved normalisations below. Both references reject all 69 clean-to-error
+records in Script and in Module, so no input they accept moved from clean to error. The 561 error-to-clean
+records include 543 default inputs whose structure agrees with Babel. In the pinned Discovery set, all 54,596
+valid inputs are clean, and the classification has A1 0, A2 0 and B1 152. The structure comparison found two
+raw differences, the Module readings of top-level `await` and of inline `<!--`, and no unapproved difference.
+
 ### Breaking changes
 
 - In `function f() {} // x` at EOF without a final newline, the `comment` moves from the
@@ -27,7 +45,10 @@ denote actual source characters.
   the call is the default export's value. In `a\n//x\r/*z*//b/g`, the division chain is one statement.
   Comment attachment can also move, as in `a /* \0 */\nb` (#46, #55).
 - Class member boundaries can change. `class A{async\n*g(){}}` has an `async` field followed by a
-  synchronous generator. `class A{get/*\n*/[x](){}}` has one computed accessor (#46, #49, #55).
+  synchronous generator. `class A{get/*\n*/[x](){}}` has one computed accessor. `class A{static/*\n*/*g(){}}`
+  has one static generator method, where v3.1.0 has a `static` field followed by a generator.
+  `class A { static get\n*g() {} }` has a static field named `get` followed by a generator, where v3.1.0
+  has one static `get` generator method (#46, #49, #55).
 - Annex B comments can change the surrounding expression and comment range. In Script,
   `f(x\n/*c*/-->z\n+y);` has one argument, `x + y`. In `<!--x\rnext();`, the `html_comment` ends
   before the CR and `next()` is a separate call. With CRLF, the comment also ends before the CR.
@@ -35,11 +56,20 @@ denote actual source characters.
 - At statement boundaries in Script, `a/*\n*/<!--x\n<!--y\nb` has two `html_comment` nodes between
   separate expression statements. A single opener after line-terminating trivia also works, as in
   `a\n/**/<!--x\rb` and `a/*x\ny*/<!--x\rb` (#55, #56).
-- In Script, Annex B opening comments can appear where an expression continues or before an
-  explicit delimiter. In `a/*\n*/<!--x\n<!--y\n+b`, two `html_comment` nodes keep separate ranges
-  and the expression is `a + b`. In `a/*\n*/<!--x\n;`, the explicit semicolon terminates
+- In Script, a statement ends before a trailing Annex B opening comment. In `a\n<!--x\nb`, `a` and `b` are
+  separate expression statements with an `html_comment` between them. The comment is not part of the first
+  statement, and v3.1.0 reads `a < !--x` as a comparison (#59, #61).
+- In Script, Annex B comments can appear where an expression continues, in class fields and concise arrow
+  bodies, and before an explicit delimiter. In `a/*\n*/<!--x\n<!--y\n+b`, two `html_comment` nodes keep
+  separate ranges and the expression is `a + b`. In `a/*\n*/<!--x\n;`, the explicit semicolon terminates
   the expression statement. In `f(() => a/*\n*/<!--x\n, c);`, the arrow body ends at `a`, the comments
-  belong to the argument list and the comma separates the two arguments (#59).
+  belong to the argument list and the comma separates the two arguments. In
+  `class C { x = a/*c*/\n-->x\n+b;\ny = 2; }`, the field value is `a + b` where v3.1.0 gives an `ERROR` at
+  the `+`. In `const f = () => a/*\n*/-->x\n;`, the arrow and the declarator end at `a` and the comment
+  follows them (#59, #61).
+- A single-line block comment at the start of a line followed by `-->` is one `html_comment`. In
+  `a\n/*c*/-->x\nb`, the `html_comment` spans `/*c*/-->x` where v3.1.0 has a `comment` followed by an
+  `html_comment` (#61).
 - Function context changes the roles of `await` and `yield`. `function f(){ return await(x)(y); }` has
   two nested calls. In `function* f(){ return ()=>yield(x); }`, the ordinary arrow body has a call.
   In `function* f(){ function g(x = yield(1)){ return yield(x); } yield 2; }`, both uses in `g` are calls
@@ -47,6 +77,9 @@ denote actual source characters.
 - In `function* f(){ yield\n(x); }`, a bare `yield_expression` is followed by an expression statement
   for `(x)`. A line terminator inside a comment also separates the operand where ASI applies.
   `yield\n*x` gives a syntax error in a generator and `yield *\n x` still delegates (#56).
+- In an async function, `await\nusing;` is one `await_expression`, where v3.1.0 has two identifier
+  statements. In `async function f(){for(await /*c*/using\n<!--c\n;;);}`, the initializer is an
+  `await_expression` followed by an `html_comment`, where v3.1.0 reads a comparison (#18, #26, #62).
 - A bare `&` immediately before either JSX attribute closing quote is a `string_fragment`, including
   when U+0000 precedes it. Each example below has two attributes, `x` and `y`, with `/> //` inside
   the value of `y`. v3.1.0 produces one attribute followed by a JavaScript comment (#45, #48, #50,
@@ -56,6 +89,21 @@ denote actual source characters.
 <a x="&" y='" /> //' />
 <a x='&' y="' /> //" />
 ~~~
+
+- Quoted JSX attribute text and character references are scanned by the external scanner, which moves
+  some fragment boundaries (#63). Whitespace before a complete character reference is a separate
+  `string_fragment`: `<a b=" &amp;"/>` has a `string_fragment` and an `html_character_reference`, where
+  v3.1.0 has one `html_character_reference` that includes the space. After consecutive `&`, only the
+  complete reference is an `html_character_reference`: in `<a b='&&amp;'/>`, the first `&` is a
+  `string_fragment`, and `<a b="&&"/>` has two `string_fragment` nodes where v3.1.0 has one.
+  Comment-like text inside the value is string content and no longer produces comment nodes.
+- Some inputs that parsed cleanly in v3.1.0 now give errors. Both reference parsers reject all of them:
+  `yield` with an operand outside a generator, as in `yield db.users.where('x')` (#52); `a/*\r*/++`,
+  `class A{get/*\n*/[g]=1}` and `class A{set//c\n[g]=1}`, where a line terminator follows `get` or `set`
+  before a computed field name (#55); `function* f(){ yield\n*x; }` and `function* f(){ g(yield\n(x)); }`, where a line
+  terminator follows `yield` (#56); and a line terminator inside `await using` in a `for` head, as in
+  `async function f(){ for (await\nusing x = f();;) {} }` and
+  `async function f(){ for (await using\nx of y) {} }` (#18, #26, #62).
 
 ### Fixed
 
@@ -75,8 +123,24 @@ denote actual source characters.
 - Reject `for (using\rx = f();;) {}` and `for (using /*\n*/ x = f();;) {}`.
   Reject `function f(){ await using x = y; }` and the tested `await using` loop forms in ordinary
   functions (#17, #18, #26, #46, #52, #55).
+- Reject a line terminator, or a comment that contains one, between `await` and `using` and between
+  `await using` and its binding in `for` heads, as in `for (await using\nx of y);`. Statement forms
+  such as `await using\nx = f();` keep their ASI reading (#18, #26, #62).
 - Keep bare `yield` as the sole argument in the Script example `function* g(){f(yield/*\n*/-->x\n)}`.
   Report the stray semicolon in `function* g(){f(yield\n<!--x\n;)}` (#56).
+- Treat `<!--`, `-->`, `//`, `/* ... */` and incomplete character references as string content inside
+  quoted JSX attributes, including when they occur alongside U+0000. `<a b='<!--' c="d"/>` and
+  `<a b="-->" c="d"/>` give an `ERROR` in v3.1.0 and parse cleanly now (#63).
+
+### Changed
+
+- Error-recovery trees change for 503 inputs of the comparison above: the error corpus of #56 (351), incomplete
+  async and generator method heads (138, #58), one malformed JSX attribute with text after the closing quote
+  (#63), and 13 others, among them 8 NUL probes, a default-exported function with a call, a static class
+  head with a computed name, a `yield` probe and two N-of-M inputs. Recovery ranges for character references, string fragments and `ERROR` or
+  `MISSING` nodes in malformed JSX attributes change, and some inputs with invalid text after the closing
+  quote now report an error. Incomplete async and generator method heads keep a `name` field inside
+  `ERROR`, which can also enclose the leading `async` and intervening comments in object literals (#58).
 
 ### Approved normalisations
 
@@ -84,6 +148,9 @@ denote actual source characters.
   nested calls. In test262's `2nd-param-await-ident.js`, the binding is an `identifier` and the dynamic
   import's second argument is an `await_expression` where Babel's Script parse has a call (#35, #36,
   #41, #52, #57).
+- The same Module reading applies to top-level `await(y)` in Script-only Annex B inputs. In
+  `const fs=[async()=>x/*α\nβ*/<!--x\n,await(y)]`, both references accept the input in Script and the
+  parser returns an `await_expression` where Babel's Script parse has a call (#41, #61).
 - Inline `<!--` in `x = -1 <!--x;` follows Babel's Module expression structure. Babel's Script parse
   ends the assignment before an HTML-like comment. The parser API has no Script/Module selector
   (#41, #46, #49).
@@ -92,30 +159,49 @@ denote actual source characters.
   wrappers in examples such as `export * from 'x' with {type: 'json'}` (#41, #55, #57).
 - In test262's `generator-function-expression.js`, trailing `/* after */` comments attach inside the
   initializers and extend the `generator_function` and `variable_declarator` ranges. The executable
-  structure agrees with Babel after normalising those ranges and comment placement (#46).
-- In `f(x/*\n*/--> z\n+ y);`, one `html_comment` spans the line-terminating block comment and its close
-  suffix. Babel exposes two comment ranges. Both parsers expose `x + y` as the argument.
+  structure agrees with Babel after normalising those ranges and comment placement. The EOF comment
+  attachment under Breaking changes follows the same rule (#46, #52).
+- In `f(x/*\n*/--> z\n+ y);` and in `a\n/*c*/-->x\nb`, one `html_comment` spans the block comment and its
+  close suffix. Babel exposes two comment ranges. Both parsers expose `x + y` as the argument.
   [ECMA-262 B.1.1](https://tc39.es/ecma262/multipage/additional-ecmascript-features-for-web-browsers.html#sec-html-like-comments)
+  (#57, #61).
 
 ### Performance
 
 - Stop Annex B close-comment probes once a close comment can no longer match, share the async and
   generator method head, and use a fast path for ASI before visible ASCII tokens (#58).
+- tree-sitter CLI 0.27.2 wraps the whole generated `parser.c` in an optimize-off pragma
+  (`#pragma optimize("", off)`, `#pragma clang optimize off` and `#pragma GCC optimize ("O0", "jump-tables")`)
+  when the main lexer has more than 300 states. The JavaScript main lexer had 279 states in v1.0.0 and 396 in
+  v3.1.0, so every consumer compiled v3.1.0's lexer unoptimised. #63 moves quoted JSX attribute text and
+  character references to the external scanner. The main lexer now has 264 states and `parser.c` carries no
+  pragma. The Go binding compiles `src/scanner.c` as its own translation unit, because including it after
+  `parser.c` extended the pragma to the scanner under cgo (#63, #64).
+- Linux CI instruction counts (callgrind, the 375-file npm sample, all clean, v1.0.0 = 100 %), run 44873992978
+  at `1864a60`, which differs from the release head only in the `.metadata` version: fresh parse 104.68 %,
+  incremental parse 107.44 %. For comparison, v3.1.0 measures 105.55 % and 103.84 %, and `dde79c0` before
+  #61 to #64 measured 109.71 % and 110.72 %. On the #63 branch (run 44863360925), a control with the pragma
+  removed by hand gave 104.15 % and 107.12 % against the branch's 104.23 % and 107.13 %, so the pragma
+  explains the difference. The default inputs measure 92.68 % fresh and 63.91 % incremental, and the N-of-M
+  inputs 98.78 % and 66.65 %. Both sets contain inputs for which v1.0.0 builds error trees, so they do not
+  measure parsing cost alone; error trees in N-of-M rise from 102 to 111 compared with `dde79c0`, from the
+  newly rejected `await using` line breaks. Peak RSS is +2 %.
+- Quoted JSX attributes that consist only of complete character references take about 1.35 times as long to
+  parse as before #63. The cost stays linear in the attribute size (#63).
 - The #58 comparison between `19bb871` and the tree merged at `976c65b` found matching full CSTs
   in the default, N-of-M and pinned Discovery valid sets in fresh parses and after a one-space edit.
-  The targeted comparisons found differences in error recovery for incomplete method heads. Incomplete async and generator method heads now retain a `name` field inside `ERROR`, which can also enclose the leading `async` and intervening comments in object literals (#58).
-- With #58 merged at `976c65b`, generated `src/parser.c` fell from 3,971,999 to 3,704,797 bytes and
-  parser states from 3,412 to 2,797 compared with `19bb871`. The earlier comparison against `1fcdc7b`
-  went from 3,976,003 to 3,708,766 bytes (−6.72%) and from 3,392 to 2,777 states.
-- With #59 and the v4.0.0 metadata, generated `src/parser.c` is 3,799,933 bytes and has 2,797 parser
-  states. Compared with v3.1.0, that is 372,445 more bytes (+10.87%) and 534 more states (+23.60%).
+  Between those trees generated `src/parser.c` fell from 3,971,999 to 3,704,797 bytes and parser states
+  from 3,412 to 2,797 (#58).
+- Generated `src/parser.c` is 3,763,141 bytes and has 2,798 parser states with the v4.0.0 metadata.
+  Compared with v3.1.0 (3,427,488 bytes and 2,263 states), that is 335,653 more bytes (+9.79 %) and 535 more
+  states (+23.64 %). Compared with v1.0.0 (2,855,926 bytes and 1,870 states), it is larger by 31.77 % and
+  49.63 %.
 
 The Windows measurements below come from two runs of four paired rounds on the #58 changes before
 integration with `19bb871`. The cells give median parse-time changes and the observed ranges within
 each run. Negative values mean lower parse time. The v3.1.0 comparison includes 18 Discovery inputs
-that gave errors in v3.1.0 and parsed cleanly in the benchmarked #58 version. The release performance
-criterion is Linux CI instruction counts. The current CI reports generated parser size and table
-counts. Fresh and incremental parsing instruction counts against v3.1.0 are unavailable (#58).
+that gave errors in v3.1.0 and parsed cleanly in the benchmarked #58 version. They predate #61 to #64 and
+are kept as history; the release criterion is the Linux CI instruction count above (#58).
 
 | Windows run | Input | Base | Fresh parse | Incremental parse |
 | --- | --- | --- | ---: | ---: |
@@ -132,13 +218,14 @@ counts. Fresh and incremental parsing instruction counts against v3.1.0 are unav
   `{ using {a} = b; }` give syntax errors. Babel and oxc both reject these destructuring
   bindings in using declarations. The v3.1.0 baseline already reports the errors (#44).
 - Recheck queries that depend on sibling order, byte ranges or comment attachment around ASI, default
-  exports and class members. Check `comment` and `html_comment` captures, including the combined
-  block-comment and Annex B close-suffix range.
-- Recheck `await_expression` and `yield_expression` captures in nested functions, arrows and default
-  values. Check for bare `yield` at a line break in generators and for the `name` field inside `ERROR`
-  when editing an incomplete async or generator method.
-- Recheck JSX attribute, `string_fragment` and trailing-comment captures. Refresh cached numeric
-  symbol IDs against the new parser.
+  exports, class members and Annex B comments. Check `comment` and `html_comment` captures, including the
+  combined block-comment and Annex B close-suffix range and statements that now end before a trailing
+  `html_comment`.
+- Recheck `await_expression` and `yield_expression` captures in nested functions, arrows, default
+  values and `for` heads. Check for bare `yield` at a line break in generators and for the `name` field
+  inside `ERROR` when editing an incomplete async or generator method.
+- Recheck JSX attribute, `string_fragment`, `html_character_reference` and trailing-comment captures.
+  Refresh cached numeric symbol IDs against the new parser.
 - tree-sitter-typescript vendors this grammar. Its matching grammar and scanner changes for TypeScript
   and TSX, including the external-token ordering, and their validation are handled in a separate
   handoff. go-treesitter currently pins this repository's v1.0.0 (`d6501de`). Downstream adoption
@@ -146,21 +233,33 @@ counts. Fresh and incremental parsing instruction counts against v3.1.0 are unav
 
 ### Known limitations
 
-- JSX opening and closing names are parsed independently. `<a></b>` can still parse without error (#20).
-- Optional chains such as `a?.b = 1;` can still parse as assignment targets (#19). Some async
-  `await using` line-break cases still parse without error, including
-  `async function g() { for (await\nusing x = f();;) {} }` and
-  `async function g() { for (await using\nx of y); }` (#18).
-- `function f(){throw/*\r*/x}` can still parse despite the line terminator after `throw`. In Script,
-  the same-line close suffix in `x; -->z\n+y;` can still be accepted (#41, #46, #49, #55, #56).
-- For some `<!--` inputs that Babel alone accepts in Module, the parser follows the Script
-  interpretation shared by Babel and oxc. For example, in `a/*\n*/<!--x\n+b` it reads `<!--x` as a
-  comment. The parser API has no Script/Module selector (#59).
+- An inline `<!--` with no line terminator before it reads as the Module comparison: `a <!--x\nb` is
+  `a < !--x`, and `x = -1 <!--x;` continues the assignment (owner rule; the parser API has no
+  Script/Module selector). It is the remaining difference in the Annex B matrix of the release review, 260
+  of 2,045 Script inputs that both references accept (#41, #59, #61).
+- In Script, a same-line close suffix such as `x; -->z\n+y;` is still accepted, and
+  `function f(){throw/*\r*/x}` still parses despite the line terminator after `throw` (#41, #46, #49,
+  #55, #56).
+- Two Annex B matrix inputs still differ from the references. They contain no comment, and the defect exists
+  without Annex B: `async x => a++\n\`b\`` gives an `ERROR`, and `async x => {}\n/b/g` reads a division chain
+  (#61).
+- The Module-only `export {};\nawait\nusing;` keeps two identifier statements, because without a program
+  mode it cannot be told from the Script-only `var await;\nawait\nusing;`. Some invalid `using` forms are
+  still accepted: `for (using {a} of y);`, `label: using x = 1;` and a `using` declaration directly under
+  `case` (#18, #26, #62).
+- Optional chains such as `a?.b = 1;`, `a?.b++;` and `[a?.b] = c;` still parse as assignment, update and
+  destructuring targets (#19). `if (x) class A {}`, `a ?? b || c;` and `class A extends x + y {}` still
+  parse cleanly although both references reject them. The other invalid constructs documented under
+  v2.2.0 remain too: `import { if } from 'x';`, `f() = 1;`, a line break in `for (async\nof => {};;)` and
+  an arrow as an operand of a binary operator.
+- JSX opening and closing names are parsed independently. `<a></b>` and the mixed `<a></>` can still parse
+  without error (#20).
 - `function f(){ for await (const x of xs) x; }` can still parse outside an async context. Beyond 4,072
   saved function contexts, the scanner can fall back to the default keyword reading until it returns
   to a saved context (#35, #36).
-- The early-error policy still allows cases such as duplicate import attribute keys. TypeScript's
-  `import x = a.class;` family (TS1359) remains a downstream limitation.
+- The early-error policy still allows cases such as duplicate import attribute keys and a `using`
+  declaration without an initializer. TypeScript's `import x = a.class;` family (TS1359) remains a
+  downstream limitation.
 - The node-type snapshot still omits direct `children` types and `multiple` and `required` flags (#38).
   Inherited CMake, free-threaded CPython and pkg-config template defects remain tracked in #22.
   Downstream pin and vendoring criteria are tracked in #41.

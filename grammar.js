@@ -50,7 +50,7 @@ module.exports = grammar({
     // Only the validity of this marker is used, to tell a modifier from a field before '*'.
     $._generator_method_continues,
     $._static_before_get_field,
-    // Never produced. An await operand may follow a line terminator in trivia.
+    // A line break before using can select the await operand instead of the declaration.
     $._await_operand_continues,
     // The scanner returns the same identifier token for await and yield when their keyword is inactive.
     $.identifier,
@@ -66,14 +66,19 @@ module.exports = grammar({
     $._leave_concise_body,
     $._yield_operand,
     $._yield_line_terminator,
-    // Carry a line break across ordinary comments without adding a CST node.
-    $._html_open_prefix,
+    // Replay the next Annex B extra after deciding whether the preceding construct ends.
+    $._annex_prefix,
+    // A declaration requires both gaps in await using Binding to have no line terminator.
+    $._await_using,
+    $._jsx_attribute_character_reference,
+    $._jsx_double_string_fragment,
+    $._jsx_single_string_fragment,
   ],
 
   extras: $ => [
     $.comment,
     $.html_comment,
-    $._html_open_prefix,
+    $._annex_prefix,
     /[\s\p{Zs}\uFEFF\u2028\u2029\u2060\u200B]/,
   ],
 
@@ -507,7 +512,7 @@ module.exports = grammar({
           field('operator', 'of'),
         ),
         seq(
-          field('kind', seq('await', 'using')),
+          field('kind', seq('await', $._await_using, 'using')),
           field('left', choice(
             $.identifier,
             alias('of', $.identifier),
@@ -865,31 +870,20 @@ module.exports = grammar({
       seq(
         '"',
         repeat(choice(
-          alias($.unescaped_double_jsx_string_fragment, $.string_fragment),
-          $.html_character_reference,
+          alias($._jsx_double_string_fragment, $.string_fragment),
+          alias($._jsx_attribute_character_reference, $.html_character_reference),
         )),
-        optional(alias(token.immediate('&'), $.string_fragment)),
         '"',
       ),
       seq(
         '\'',
         repeat(choice(
-          alias($.unescaped_single_jsx_string_fragment, $.string_fragment),
-          $.html_character_reference,
+          alias($._jsx_single_string_fragment, $.string_fragment),
+          alias($._jsx_attribute_character_reference, $.html_character_reference),
         )),
-        optional(alias(token.immediate('&'), $.string_fragment)),
         '\'',
       ),
     ),
-
-    // Workaround to https://github.com/tree-sitter/tree-sitter/issues/1156
-    // We give names to the token() constructs containing a regexp
-    // so as to obtain a node in the CST.
-    // An entity prefix interrupted by NUL is text, as is a bare ampersand before the closing quote.
-    unescaped_double_jsx_string_fragment: _ => token.immediate(prec(1, /([^"&\x00]|\x00+|&([^"#A-Za-z\x00]|([A-Za-z]+|#([xX][0-9a-fA-F]*|[0-9]*))?\x00+))+/)),
-
-    // same here
-    unescaped_single_jsx_string_fragment: _ => token.immediate(prec(1, /([^'&\x00]|\x00+|&([^'#A-Za-z\x00]|([A-Za-z]+|#([xX][0-9a-fA-F]*|[0-9]*))?\x00+))+/)),
 
     _jsx_attribute_value: $ => choice(
       alias($._jsx_string, $.string),
@@ -1008,7 +1002,7 @@ module.exports = grammar({
     // A direct assignment is outside that operand, so `await(a).x=b` retains its identifier interpretation.
     await_expression: $ => prec.dynamic(1, prec('unary_void', seq(
       'await',
-      optional($._await_operand_continues),
+      optional(choice($._await_operand_continues, $._await_using)),
       $._await_operand,
     ))),
 
@@ -1530,7 +1524,7 @@ module.exports = grammar({
  * @returns {ChoiceRule}
  */
 function usingDeclaration($, semicolon) {
-  const kind = field('kind', choice('using', seq('await', 'using')));
+  const kind = field('kind', choice('using', seq('await', $._await_using, 'using')));
   return choice(
     seq(kind, commaSep1($._using_declarator), semicolon),
     // TypeScript reads `using as …` and `using satisfies …` as declarations; the static precedence keeps the
