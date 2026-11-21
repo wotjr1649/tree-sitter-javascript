@@ -175,3 +175,109 @@ func TestConciseArrowContinuesAcrossIncludedRanges(t *testing.T) {
 		})
 	}
 }
+
+// A new range ends ASI lookahead in a statement and stops the declaration lookahead in a for head.
+func TestAwaitUsingAtIncludedRangeStart(t *testing.T) {
+	language := tree_sitter.NewLanguage(tree_sitter_javascript.Language())
+	for _, c := range []struct{ name, left, right, awaitKind string }{
+		{"statement", "async function f(){ await", "using x = g(); }", "identifier"},
+		{"for initializer", "async function f(){ for(await", "using x = g();;); }", "using_declaration"},
+		{"for of", "async function f(){ for(await", "using x of xs); }", "for_in_statement"},
+		{"for binding", "async function f(){ for(await using", "x = g();;); }", "using_declaration"},
+	} {
+		t.Run(c.name, func(t *testing.T) {
+			parser := tree_sitter.NewParser()
+			defer parser.Close()
+			if err := parser.SetLanguage(language); err != nil {
+				t.Fatal(err)
+			}
+			source := []byte(c.left + "\n" + c.right)
+			whole := parser.Parse(source, nil)
+			defer whole.Close()
+			if !whole.RootNode().HasError() {
+				t.Fatalf("continuous input should have an error: %s", whole.RootNode().ToSexp())
+			}
+
+			boundary := uint(len(c.left) + 1)
+			if err := parser.SetIncludedRanges([]tree_sitter.Range{
+				{EndByte: boundary, EndPoint: tree_sitter.Point{Row: 1}},
+				{StartByte: boundary, EndByte: uint(len(source)), StartPoint: tree_sitter.Point{Row: 1},
+					EndPoint: tree_sitter.Point{Row: 1, Column: uint(len(c.right))}},
+			}); err != nil {
+				t.Fatal(err)
+			}
+			ranged := parser.Parse(source, nil)
+			defer ranged.Close()
+			root := ranged.RootNode()
+			start := uint(strings.Index(c.left, "await"))
+			await := root.NamedDescendantForByteRange(start, start+uint(len("await")))
+			if root.HasError() || await == nil || await.Kind() != c.awaitKind {
+				t.Errorf("unexpected ranged tree: %s", root.ToSexp())
+			}
+		})
+	}
+}
+
+func TestASIContinuesAcrossSplitComment(t *testing.T) {
+	language := tree_sitter.NewLanguage(tree_sitter_javascript.Language())
+	for _, comment := range []string{"c", "\n"} {
+		source := "a/*" + comment + "*/.b;"
+		t.Run(source, func(t *testing.T) {
+			parser := tree_sitter.NewParser()
+			defer parser.Close()
+			if err := parser.SetLanguage(language); err != nil {
+				t.Fatal(err)
+			}
+			point := func(offset uint) tree_sitter.Point {
+				prefix := source[:offset]
+				return tree_sitter.Point{
+					Row:    uint(strings.Count(prefix, "\n")),
+					Column: uint(len(prefix) - strings.LastIndexByte(prefix, '\n') - 1),
+				}
+			}
+			for _, cut := range []uint{2, 3, 4, 5} {
+				end := uint(len(source))
+				if err := parser.SetIncludedRanges([]tree_sitter.Range{
+					{EndByte: cut, EndPoint: point(cut)},
+					{StartByte: cut, EndByte: end, StartPoint: point(cut), EndPoint: point(end)},
+				}); err != nil {
+					t.Fatal(err)
+				}
+				tree := parser.Parse([]byte(source), nil)
+				got := tree.RootNode().ToSexp()
+				tree.Close()
+				const want = "(program (expression_statement (member_expression object: (identifier) (comment) property: (property_identifier))))"
+				if got != want {
+					t.Errorf("split at %d: %s", cut, got)
+				}
+			}
+		})
+	}
+}
+
+func TestAwaitUsingHTMLCommentAfterEdit(t *testing.T) {
+	parser := tree_sitter.NewParser()
+	defer parser.Close()
+	if err := parser.SetLanguage(tree_sitter.NewLanguage(tree_sitter_javascript.Language())); err != nil {
+		t.Fatal(err)
+	}
+
+	source := "async function f(){for(await/*c*/using\n<!--c\n;;);}"
+	const start = 28
+	old := parser.Parse([]byte(source), nil)
+	defer old.Close()
+	old.Edit(&tree_sitter.InputEdit{
+		StartByte: start, OldEndByte: start, NewEndByte: start + 1,
+		StartPosition: tree_sitter.Point{Column: start}, OldEndPosition: tree_sitter.Point{Column: start},
+		NewEndPosition: tree_sitter.Point{Column: start + 1},
+	})
+	edited := []byte(source[:start] + " " + source[start:])
+	incremental := parser.Parse(edited, old)
+	defer incremental.Close()
+	fresh := parser.Parse(edited, nil)
+	defer fresh.Close()
+	want, got := fresh.RootNode(), incremental.RootNode()
+	if want.HasError() || !strings.Contains(want.ToSexp(), "(html_comment)") || got.ToSexp() != want.ToSexp() {
+		t.Errorf("incremental: %s\nfresh: %s", got.ToSexp(), want.ToSexp())
+	}
+}

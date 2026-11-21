@@ -35,6 +35,7 @@ enum TokenType {
     YIELD_OPERAND,
     YIELD_LINE_TERMINATOR,
     ANNEX_PREFIX,
+    AWAIT_USING,
 };
 
 enum Context {
@@ -182,30 +183,43 @@ static bool is_line_terminator(int32_t c) {
     return c == '\n' || c == '\r' || c == 0x2028 || c == 0x2029;
 }
 
-static ASILookahead scan_annex_marker(TSLexer *lexer) {
+typedef enum {
+    RANGE_IGNORE,
+    RANGE_BETWEEN_TOKENS,
+    RANGE_STOP,
+} RangePolicy;
+
+static bool at_range_start(TSLexer *lexer, bool stop_at_range) {
+    return stop_at_range && lexer->is_at_included_range_start(lexer);
+}
+
+static ASILookahead scan_annex_marker(TSLexer *lexer, bool stop_at_range) {
     if (lexer->lookahead == '<') {
         for (const char *c = "<!--"; *c; c++) {
+            if (at_range_start(lexer, stop_at_range)) return ASI_END;
             if (lexer->lookahead != *c) return ASI_LESS_THAN;
             advance(lexer);
         }
         return ASI_ANNEX;
     }
     advance(lexer);
+    if (at_range_start(lexer, stop_at_range)) return ASI_END;
     if (lexer->lookahead != '-') return ASI_MINUS;
     advance(lexer);
+    if (at_range_start(lexer, stop_at_range)) return ASI_END;
     if (lexer->lookahead != '>') return ASI_DOUBLE_MINUS;
     advance(lexer);
     return ASI_ANNEX;
 }
 
-static void scan_html_comment_body(TSLexer *lexer) {
-    while (!lexer->eof(lexer) && !is_line_terminator(lexer->lookahead)) {
+static void scan_html_comment_body(TSLexer *lexer, bool stop_at_range) {
+    while (!lexer->eof(lexer) && !at_range_start(lexer, stop_at_range) && !is_line_terminator(lexer->lookahead)) {
         advance(lexer);
     }
 }
 
 static bool finish_html_comment(TSLexer *lexer) {
-    scan_html_comment_body(lexer);
+    scan_html_comment_body(lexer, false);
     lexer->result_symbol = HTML_COMMENT;
     lexer->mark_end(lexer);
     return true;
@@ -213,14 +227,15 @@ static bool finish_html_comment(TSLexer *lexer) {
 
 // A line terminator inside a block comment counts as a line terminator between tokens (ECMA-262 12.4).
 static ASILookahead scan_asi_trivia(TSLexer *lexer, ASITrivia *trivia, bool annex_comments, bool preserve_start,
-                                   bool stop_at_range, bool extras_only) {
+                                   RangePolicy range, bool extras_only) {
     // A physical line start and a multiline block both permit a close marker after further blocks.
     bool close_allowed = annex_comments && (trivia->newline || trivia->close_at_line_start);
+    bool stop_at_range = range == RANGE_STOP;
     bool break_since_comment = false;
     bool separated_close = false;
     for (;;) {
         int32_t c = lexer->lookahead;
-        if (lexer->eof(lexer) || (stop_at_range && lexer->is_at_included_range_start(lexer))) {
+        if (lexer->eof(lexer) || at_range_start(lexer, range != RANGE_IGNORE)) {
             return ASI_END;
         }
         if (is_extra_space(c)) {
@@ -238,10 +253,10 @@ static ASILookahead scan_asi_trivia(TSLexer *lexer, ASITrivia *trivia, bool anne
             }
             lexer->advance(lexer, !preserve_start && !(close_allowed && trivia->comment));
         } else if (c == '-' && close_allowed) {
-            ASILookahead next = scan_annex_marker(lexer);
+            ASILookahead next = scan_annex_marker(lexer, stop_at_range);
             return next == ASI_ANNEX && separated_close ? ASI_ANNEX_DEFERRED : next;
         } else if (c == '<' && annex_comments && (trivia->newline || trivia->allow_inline_open)) {
-            ASILookahead next = scan_annex_marker(lexer);
+            ASILookahead next = scan_annex_marker(lexer, stop_at_range);
             if (next != ASI_ANNEX || !trivia->comment) return next;
             // The ordinary comment must be emitted first. A same-line open marker would lose its line break.
             return break_since_comment ? ASI_ANNEX_DEFERRED : ASI_ANNEX_OPEN_PREFIX;
@@ -250,20 +265,24 @@ static ASILookahead scan_asi_trivia(TSLexer *lexer, ASITrivia *trivia, bool anne
         } else {
             bool skip_block = !preserve_start && (!annex_comments || (trivia->comment && !close_allowed));
             lexer->advance(lexer, skip_block);
+            if (at_range_start(lexer, stop_at_range)) return ASI_END;
             if (lexer->lookahead == '/') {
                 if (extras_only) return ASI_NEXT_TOKEN;
                 close_allowed = false;
                 trivia->line_comment = true;
                 lexer->advance(lexer, !preserve_start);
-                while (!lexer->eof(lexer) && !is_line_terminator(lexer->lookahead)) {
+                while (!lexer->eof(lexer) && !at_range_start(lexer, stop_at_range) &&
+                       !is_line_terminator(lexer->lookahead)) {
                     lexer->advance(lexer, !preserve_start);
                 }
             } else if (lexer->lookahead == '*') {
                 lexer->advance(lexer, skip_block);
                 bool block_newline = false;
                 while (!lexer->eof(lexer)) {
+                    if (at_range_start(lexer, stop_at_range)) return ASI_END;
                     c = lexer->lookahead;
                     lexer->advance(lexer, skip_block);
+                    if (at_range_start(lexer, stop_at_range)) return ASI_END;
                     if (c == '*' && lexer->lookahead == '/') {
                         lexer->advance(lexer, skip_block);
                         break;
@@ -293,12 +312,12 @@ static ASILookahead scan_asi_trivia(TSLexer *lexer, ASITrivia *trivia, bool anne
     }
 }
 
-static ASILookahead scan_past_annex(TSLexer *lexer, ASITrivia *trivia, bool stop_at_range) {
+static ASILookahead scan_past_annex(TSLexer *lexer, ASITrivia *trivia, RangePolicy range) {
     ASILookahead next;
     do {
-        scan_html_comment_body(lexer);
+        scan_html_comment_body(lexer, range == RANGE_STOP);
         ASITrivia after = {0};
-        next = scan_asi_trivia(lexer, &after, true, false, stop_at_range, false);
+        next = scan_asi_trivia(lexer, &after, true, false, range, false);
         trivia->newline |= after.newline;
     } while (next >= ASI_ANNEX);
     return next;
@@ -410,6 +429,49 @@ static bool replay_annex(Scanner *scanner, TSLexer *lexer, const bool *valid_sym
     return true;
 }
 
+// The only identifier-like tokens that can continue an await using expression here are binary operators.
+static bool starts_using_binding(TSLexer *lexer) {
+    if (!is_identifier_part(lexer->lookahead) || is_digit(lexer->lookahead)) return false;
+    if (lexer->lookahead != 'i') return true;
+    advance(lexer);
+    if (lexer->lookahead != 'n') return true;
+    advance(lexer);
+    if (!is_identifier_part(lexer->lookahead)) return false;
+    for (const char *word = "stanceof"; *word; word++) {
+        if (lexer->lookahead != *word) return true;
+        advance(lexer);
+    }
+    return is_identifier_part(lexer->lookahead);
+}
+
+// The end is marked before the trivia so the ordinary lexer still emits all extras.
+static bool scan_await_using(const Scanner *scanner, TSLexer *lexer, const bool *valid_symbols,
+                             bool newline, bool asi_for_identifier) {
+    for (const char *word = "using"; *word; word++) {
+        if (lexer->lookahead != *word) return asi_for_identifier;
+        advance(lexer);
+    }
+    if (is_identifier_part(lexer->lookahead)) return asi_for_identifier;
+    if (newline && (scanner->depth || !valid_symbols[AUTOMATIC_SEMICOLON])) {
+        lexer->result_symbol = AWAIT_OPERAND_CONTINUES;
+        return valid_symbols[AWAIT_OPERAND_CONTINUES];
+    }
+
+    ASITrivia after_using = {0};
+    ASILookahead next = scan_asi_trivia(lexer, &after_using, valid_symbols[HTML_COMMENT], false, RANGE_STOP, false);
+    bool binding = next == ASI_NEXT_TOKEN && !after_using.newline && starts_using_binding(lexer);
+    if (newline) {
+        // Keep the top-level expression alternatives unless the following binding needs a Script statement.
+        return binding || asi_for_identifier;
+    }
+    lexer->result_symbol = AWAIT_USING;
+    if (binding || (next == ASI_END && !lexer->eof(lexer))) return true;
+    if (next < ASI_ANNEX) return false;
+    // Keep the existing expression lookahead when an Annex B comment leads to a delimiter, which cannot bind.
+    next = scan_past_annex(lexer, &after_using, RANGE_STOP);
+    return next == ASI_NEXT_TOKEN && lexer->lookahead == ';';
+}
+
 static bool scan_automatic_semicolon(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols, bool *try_ternary,
                                      bool *at_next_token) {
     lexer->result_symbol = AUTOMATIC_SEMICOLON;
@@ -417,20 +479,30 @@ static bool scan_automatic_semicolon(Scanner *scanner, TSLexer *lexer, const boo
 
     // A visible ASCII token cannot start ASI trivia; an included-range boundary can still end a statement.
     int32_t c = lexer->lookahead;
-    if (c > 0 && c < 0x80 && c != '/' && !is_extra_space(c) && !lexer->is_at_included_range_start(lexer)) {
+    if (c > 0 && c < 0x80 && c != '/' && !(c == 'u' && valid_symbols[AWAIT_USING]) &&
+        !is_extra_space(c) && !lexer->is_at_included_range_start(lexer)) {
         *at_next_token = true;
         *try_ternary = c == '?';
         return c == '}';
     }
 
     ASITrivia trivia = {0};
-    ASILookahead next = scan_asi_trivia(lexer, &trivia, valid_symbols[HTML_COMMENT], false, true, false);
+    ASILookahead next = scan_asi_trivia(lexer, &trivia, valid_symbols[HTML_COMMENT], false, RANGE_BETWEEN_TOKENS, false);
     *at_next_token = !trivia.comment && !trivia.newline && next == ASI_NEXT_TOKEN;
     *try_ternary = !trivia.comment && next == ASI_NEXT_TOKEN && lexer->lookahead == '?';
     bool async_field = valid_symbols[RESTRICTED_KEYWORD] && valid_symbols[BINDING_END];
     bool restricted = valid_symbols[RESTRICTED_KEYWORD] && !async_field;
-    if (next >= ASI_ANNEX) {
-        next = scan_past_annex(lexer, &trivia, true);
+    bool annex = next >= ASI_ANNEX;
+    if (annex) next = scan_past_annex(lexer, &trivia, RANGE_BETWEEN_TOKENS);
+    if (valid_symbols[AWAIT_USING] && next == ASI_NEXT_TOKEN && lexer->lookahead == 'u') {
+        *at_next_token = false;
+        bool defer_asi = valid_symbols[LOGICAL_OR] && !trivia.leading_non_cr_break &&
+                         (trivia.break_after_comment || valid_symbols[AWAIT_OPERAND_CONTINUES]);
+        bool asi_for_identifier = trivia.newline && (annex || restricted || !defer_asi);
+        return scan_await_using(scanner, lexer, valid_symbols, trivia.newline, asi_for_identifier) ||
+               (annex && replay_annex(scanner, lexer, valid_symbols));
+    }
+    if (annex) {
         if (next == ASI_END || (next == ASI_NEXT_TOKEN && lexer->lookahead == '}')) return true;
         bool declaration_end = valid_symbols[DECLARATION_END] && !valid_symbols[LOGICAL_OR];
         bool insert = restricted ? (next != ASI_NEXT_TOKEN || lexer->lookahead != ';') :
@@ -442,8 +514,8 @@ static bool scan_automatic_semicolon(Scanner *scanner, TSLexer *lexer, const boo
             // A close comment at a range boundary can still lead to a sequence expression.
             if (!restricted && valid_symbols[ANNEX_PREFIX] && valid_symbols[HTML_COMMENT]) {
                 ASITrivia after = {.newline = trivia.newline};
-                next = scan_asi_trivia(lexer, &after, true, false, false, false);
-                if (next >= ASI_ANNEX && scan_past_annex(lexer, &after, true) == ASI_NEXT_TOKEN &&
+                next = scan_asi_trivia(lexer, &after, true, false, RANGE_IGNORE, false);
+                if (next >= ASI_ANNEX && scan_past_annex(lexer, &after, RANGE_BETWEEN_TOKENS) == ASI_NEXT_TOKEN &&
                     lexer->lookahead == ',') {
                     return replay_annex(scanner, lexer, valid_symbols);
                 }
@@ -484,9 +556,9 @@ static bool scan_automatic_semicolon(Scanner *scanner, TSLexer *lexer, const boo
 static bool scan_yield_operand(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
     lexer->mark_end(lexer);
     ASITrivia trivia = {.allow_inline_open = true};
-    ASILookahead next = scan_asi_trivia(lexer, &trivia, valid_symbols[HTML_COMMENT], false, false, false);
+    ASILookahead next = scan_asi_trivia(lexer, &trivia, valid_symbols[HTML_COMMENT], false, RANGE_IGNORE, false);
     bool annex = next >= ASI_ANNEX;
-    if (annex) next = scan_past_annex(lexer, &trivia, false);
+    if (annex) next = scan_past_annex(lexer, &trivia, RANGE_IGNORE);
     if (next == ASI_NEXT_TOKEN) {
         int32_t c = lexer->lookahead;
         if (c == ';' || c == ',' || c == ':' || c == ')' || c == ']') {
@@ -636,7 +708,7 @@ static bool scan_static_modifier(TSLexer *lexer) {
     lexer->mark_end(lexer);
     if (!is_extra_space(lexer->lookahead) && lexer->lookahead != '/') return false;
     ASITrivia prefix = {0};
-    if (scan_asi_trivia(lexer, &prefix, false, true, true, false) != ASI_NEXT_TOKEN) return false;
+    if (scan_asi_trivia(lexer, &prefix, false, true, RANGE_BETWEEN_TOKENS, false) != ASI_NEXT_TOKEN) return false;
 
     lexer->result_symbol = STATIC_BEFORE_GET_FIELD;
     int32_t next_char = lexer->lookahead;
@@ -650,7 +722,7 @@ static bool scan_static_modifier(TSLexer *lexer) {
         advance(lexer);
     }
     ASITrivia trivia = {0};
-    ASILookahead next = scan_asi_trivia(lexer, &trivia, false, true, true, false);
+    ASILookahead next = scan_asi_trivia(lexer, &trivia, false, true, RANGE_BETWEEN_TOKENS, false);
     return next == ASI_NEXT_TOKEN && trivia.newline && lexer->lookahead == '*';
 }
 
@@ -707,7 +779,7 @@ bool tree_sitter_javascript_external_scanner_scan(void *payload, TSLexer *lexer,
         !valid_symbols[ESCAPE_SEQUENCE] && !valid_symbols[REGEX_PATTERN]) {
         ASITrivia trivia = {.allow_inline_open = true};
         // Replay can start at a range boundary or reach it before the comment.
-        if (scan_asi_trivia(lexer, &trivia, true, false, false, true) != ASI_ANNEX) return false;
+        if (scan_asi_trivia(lexer, &trivia, true, false, RANGE_IGNORE, true) != ASI_ANNEX) return false;
         scanner->annex_pending = false;
         return finish_html_comment(lexer);
     }
@@ -738,9 +810,9 @@ bool tree_sitter_javascript_external_scanner_scan(void *payload, TSLexer *lexer,
         // Keep the body end at the previous token and look past an included-range boundary.
         lexer->mark_end(lexer);
         ASITrivia trivia = {0};
-        ASILookahead next = scan_asi_trivia(lexer, &trivia, valid_symbols[HTML_COMMENT], false, false, false);
+        ASILookahead next = scan_asi_trivia(lexer, &trivia, valid_symbols[HTML_COMMENT], false, RANGE_IGNORE, false);
         bool annex = next >= ASI_ANNEX;
-        if (annex) next = scan_past_annex(lexer, &trivia, false);
+        if (annex) next = scan_past_annex(lexer, &trivia, RANGE_IGNORE);
         if (next == ASI_END || (next == ASI_NEXT_TOKEN && at_concise_body_end(lexer)) ||
             (trivia.newline && semicolon_before_lookahead(lexer, valid_symbols, next, false, false))) {
             return leave_context(scanner, lexer, LEAVE_CONCISE_BODY);
@@ -757,6 +829,25 @@ bool tree_sitter_javascript_external_scanner_scan(void *payload, TSLexer *lexer,
         if (!at_next_token) return false;
     } else {
         lexer->mark_end(lexer);
+    }
+
+    if (valid_symbols[AWAIT_USING] && !valid_symbols[AUTOMATIC_SEMICOLON]) {
+        ASITrivia trivia = {0};
+        ASILookahead next = scan_asi_trivia(lexer, &trivia, valid_symbols[HTML_COMMENT], false, RANGE_STOP, false);
+        bool annex = next >= ASI_ANNEX;
+        if (annex) next = scan_past_annex(lexer, &trivia, RANGE_STOP);
+        if (next == ASI_NEXT_TOKEN && lexer->lookahead == 'u') {
+            return scan_await_using(scanner, lexer, valid_symbols, trivia.newline, false) ||
+                   (annex && replay_annex(scanner, lexer, valid_symbols));
+        }
+        // With no using operand, leave the top-level identifier alternative to its ordinary lexer.
+        if (annex) return scanner->depth && replay_annex(scanner, lexer, valid_symbols);
+        if (next == ASI_END && !lexer->eof(lexer)) {
+            lexer->result_symbol = AWAIT_USING;
+            return true;
+        }
+        // Ordinary comments must be emitted before we scan a contextual identifier.
+        if (trivia.comment || next != ASI_NEXT_TOKEN) return false;
     }
 
     bool enter = valid_symbols[ENTER_STATIC_BLOCK] || valid_symbols[ENTER_PLAIN] || valid_symbols[ENTER_AWAIT] ||
@@ -798,12 +889,15 @@ bool tree_sitter_javascript_external_scanner_scan(void *payload, TSLexer *lexer,
     if (html) {
         int32_t c = lexer->lookahead;
         bool html_line_start = line_start && !context;
-        if ((c == '-' || c == '<') && (html_line_start || !valid_symbols[LOGICAL_OR])) {
-            return scan_annex_marker(lexer) == ASI_ANNEX && finish_html_comment(lexer);
+        // Inside an async scope, a for head can reach an open comment without going through ASI.
+        bool async_open = line_start && c == '<' && !enter && !valid_symbols[AUTOMATIC_SEMICOLON] &&
+                          scanner->depth && (context_flags(scanner) & AWAIT_CONTEXT);
+        if ((c == '-' || c == '<') && (html_line_start || async_open || !valid_symbols[LOGICAL_OR])) {
+            return scan_annex_marker(lexer, false) == ASI_ANNEX && finish_html_comment(lexer);
         }
         if (c == '/') {
             ASITrivia trivia = {.newline = html_line_start, .close_at_line_start = line_start || first_column};
-            ASILookahead next = scan_asi_trivia(lexer, &trivia, true, false, false, true);
+            ASILookahead next = scan_asi_trivia(lexer, &trivia, true, false, RANGE_IGNORE, true);
             if (next == ASI_ANNEX) return finish_html_comment(lexer);
             return next == ASI_ANNEX_OPEN_PREFIX && replay_annex(scanner, lexer, valid_symbols);
         }

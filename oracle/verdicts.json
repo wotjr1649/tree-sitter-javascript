@@ -32,7 +32,7 @@
    }
   },
   "cases_file": "cases.jsonl",
-  "cases_sha256": "c55a15573337b3043325f0856cc22d6141c2560be8a95159cf1d0b2e5411db54",
+  "cases_sha256": "1f3b097a3fcd5f6d10f7ebb7ceab6de0bb1b78350d22d0a0d336566f3d303ec8",
   "runner": "run.mjs",
   "runner_sha256": "06cfe49cd56d0bac9b5c672b1f62fc0f44b37de02c0a2bf04c557e5354c5c24d"
  },
@@ -44721,6 +44721,1821 @@
   {
    "id": "annexb-unified/line-break-before-decrement",
    "sha256": "18aac3401e5b9e9d7944eecddcbb83ab2caebf525abad85d7878fa690106f2b6",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/reject-for-await-lf-using",
+   "sha256": "6a1e38f2f68ee79ef603ceb67b7c13301cda781fc967c82755e486fd113d2c08",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (2:14)",
+      "at": 46
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 38
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 38
+     }
+    ]
+   }
+  },
+  {
+   "id": "i18/reject-for-of-await-lf-using",
+   "sha256": "a315cbcfc7646490f8b3dec279f458c377ff77d8067cff0507d711cd298a9937",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token, expected \")\" (2:11)",
+      "at": 43
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 38
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 38
+     }
+    ]
+   }
+  },
+  {
+   "id": "i18/reject-for-await-cr-using",
+   "sha256": "40d63b630c7b1f45e7c633cea96f4e0962de9660af83fea36cfb3820b8e237f8",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (2:14)",
+      "at": 46
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 38
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 38
+     }
+    ]
+   }
+  },
+  {
+   "id": "i18/reject-for-await-crlf-using",
+   "sha256": "2766b1e7e1189d745303d4e5c7b6e53e321bae8e1c1786b3821bc508b9bda84d",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (2:14)",
+      "at": 47
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 39
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 39
+     }
+    ]
+   }
+  },
+  {
+   "id": "i18/reject-for-await-ls-using",
+   "sha256": "7132cc6e8c7a5262a0cdb33da82ca328741476c5451c3620278d4c4d2772045a",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (2:14)",
+      "at": 48
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 40
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 40
+     }
+    ]
+   }
+  },
+  {
+   "id": "i18/reject-for-of-await-ps-using",
+   "sha256": "154b65e0825bca51a2ff67761c9cd808f262cab1fcf9ccb5945ab9596e91e735",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token, expected \")\" (2:11)",
+      "at": 45
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 40
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 40
+     }
+    ]
+   }
+  },
+  {
+   "id": "i18/reject-for-await-comment-lf-using",
+   "sha256": "722592323d7929492c86df50eaf6842ef6fe58f9752121dd0fcddf4834922f8d",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (2:17)",
+      "at": 52
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 44
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 44
+     }
+    ]
+   }
+  },
+  {
+   "id": "i18/reject-for-of-await-comment-lf-using",
+   "sha256": "a392b44d8f6f78793380e6f9740d2be3725b86134f633aca6b1d53b5080068c6",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token, expected \")\" (2:14)",
+      "at": 49
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 44
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 44
+     }
+    ]
+   }
+  },
+  {
+   "id": "i18/reject-for-await-line-comment-using",
+   "sha256": "2422463123a7c7755d2d60cd5f9d9c6c4e9fc5d7155da835acda0baa0de0a850",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (2:14)",
+      "at": 50
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 42
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 42
+     }
+    ]
+   }
+  },
+  {
+   "id": "i18/reject-for-using-lf-binding",
+   "sha256": "cb071bed73b07b4a6a5146cd493412bc645247dd3532a633d63209444911b935",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (2:8)",
+      "at": 46
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 38
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 38
+     }
+    ]
+   }
+  },
+  {
+   "id": "i18/reject-for-using-cr-binding",
+   "sha256": "25ffa73c412c4b8b9b2613d4dc3ee527161e22bdca7ab4ffd80bc2c22cb4882a",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (2:8)",
+      "at": 46
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 38
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 38
+     }
+    ]
+   }
+  },
+  {
+   "id": "i18/reject-for-using-crlf-binding",
+   "sha256": "c806bb610ca48b522f5271e383092c848455e6634f421141908221ecac33db95",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (2:8)",
+      "at": 47
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 39
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 39
+     }
+    ]
+   }
+  },
+  {
+   "id": "i18/reject-for-using-ls-binding",
+   "sha256": "ace1f53d51aa0844f473c6718d5d84ec9a42cba58e1292f356b7b256f04d3674",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (2:8)",
+      "at": 48
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 40
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 40
+     }
+    ]
+   }
+  },
+  {
+   "id": "i18/reject-for-using-comment-lf-binding",
+   "sha256": "320c205ac7edc285c4ddcb06afd8cceff6310c2c046bfe0d289dfa3156d4a91d",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (2:11)",
+      "at": 52
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 44
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 44
+     }
+    ]
+   }
+  },
+  {
+   "id": "i18/reject-for-of-using-lf-binding",
+   "sha256": "187a3155508be773e4c0be566d0b5e30027198b20c41ba8630e626fe877f32dd",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token, expected \")\" (2:5)",
+      "at": 43
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 38
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 38
+     }
+    ]
+   }
+  },
+  {
+   "id": "i18/reject-for-of-using-cr-binding",
+   "sha256": "c12714d5dcdf586e845a9e220d939ee02284c592dfe9c519185aba14074f4571",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token, expected \")\" (2:5)",
+      "at": 43
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 38
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 38
+     }
+    ]
+   }
+  },
+  {
+   "id": "i18/reject-for-of-using-ps-binding",
+   "sha256": "a0d30ad2abe6600821b49701e1befcc027b4554e20670a7c93c9496f24113563",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token, expected \")\" (2:5)",
+      "at": 45
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 40
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 40
+     }
+    ]
+   }
+  },
+  {
+   "id": "i18/reject-for-of-using-comment-lf-binding",
+   "sha256": "3cf9c24a138a972d8e165a24c16025a6b6528c57e677618e1677163e230376f7",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token, expected \")\" (2:8)",
+      "at": 49
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 44
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 44
+     }
+    ]
+   }
+  },
+  {
+   "id": "i18/reject-for-of-using-lf-in0",
+   "sha256": "fa2efb81a2ff7867e5bce25113101c88b3929998b4702d151cd9c43214879688",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token, expected \")\" (2:7)",
+      "at": 45
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 38
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 38
+     }
+    ]
+   }
+  },
+  {
+   "id": "i18/reject-for-using-lf-in-underscore",
+   "sha256": "ff2cc7379024cce79903ecec042c704846ca375ed6fe049e840a2c45b4bb695c",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (2:10)",
+      "at": 48
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 38
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 38
+     }
+    ]
+   }
+  },
+  {
+   "id": "i18/reject-for-using-lf-instanceof0",
+   "sha256": "638e4ffc760247124e45f5c4d674a7e12f4c0257559ecf00c77418be95aa3ef1",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token, expected \")\" (2:15)",
+      "at": 53
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 38
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 38
+     }
+    ]
+   }
+  },
+  {
+   "id": "i18/reject-for-await-of-using-lf-binding",
+   "sha256": "f80cc61bf290e277f02163ab3368b1d7d3d71317a408a5a7a97e2406ee54059e",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (1:25)",
+      "at": 25
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 44
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 44
+     }
+    ]
+   }
+  },
+  {
+   "id": "i18/reject-for-await-of-lf-using",
+   "sha256": "f593cb4c5d57b0a5c6ca7f25f869f7bc012e28c3ba51d8f448d9866be7519d9e",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (1:25)",
+      "at": 25
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 44
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 44
+     }
+    ]
+   }
+  },
+  {
+   "id": "i18/reject-module-for-await-lf-using",
+   "sha256": "cb05398d5cf7966ee514ad83d8d05bbc8618ba0f676d3a2805194f61f7730e85",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (2:14)",
+      "at": 25
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 17
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 17
+     }
+    ]
+   }
+  },
+  {
+   "id": "i18/reject-module-for-using-lf-binding",
+   "sha256": "c4309df97d7ebaf56c057cf529c6897497bc03d9f7c22c054435d788dadc0cd3",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (2:8)",
+      "at": 25
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 17
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 17
+     }
+    ]
+   }
+  },
+  {
+   "id": "i18/reject-module-for-of-using-lf-binding",
+   "sha256": "4c0c69fde1111dca6293dd7020012007fd7c3646da3c471778d9b4d5a56202b9",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token, expected \")\" (2:5)",
+      "at": 22
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 17
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 17
+     }
+    ]
+   }
+  },
+  {
+   "id": "i18/reject-module-for-of-await-lf-using",
+   "sha256": "ed9efe592275d62af32e15e48845d39cd319d4974518f323d78e236bcfe975fc",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token, expected \")\" (2:11)",
+      "at": 22
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 17
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 17
+     }
+    ]
+   }
+  },
+  {
+   "id": "i18/reject-arrow-for-await-lf-using",
+   "sha256": "cf9343f279b6fea75eb3d166cb7b3c128729b13dced5f76dbbaf2c06da7dad74",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token (2:14)",
+      "at": 39
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 31
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 31
+     }
+    ]
+   }
+  },
+  {
+   "id": "i18/reject-method-for-using-lf-binding",
+   "sha256": "1837815e4e946783efc0989fabcefc89744edd5e4be478687e8fadc8d3c8df60",
+   "sourceType": "module",
+   "verdict": "syntax",
+   "babel": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Unexpected token, expected \")\" (2:5)",
+      "at": 44
+     }
+    ]
+   },
+   "oxc": {
+    "class": "syntax",
+    "errors": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 39
+     }
+    ],
+    "errorsWithSemantic": [
+     {
+      "message": "Expected `;` but found `Identifier`",
+      "at": 39
+     }
+    ]
+   }
+  },
+  {
+   "id": "i18/for-of-comment-between",
+   "sha256": "3b7ace1cb760f6b695ef9c633d7307e1a57c9a0a4016bbd9ae3d9a8f2bdd7e03",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/for-of-comment-after-using",
+   "sha256": "a6d904878098e723e571c1a60c00d5c0ec52b75d9bd37375c3016cc8dbf92ded",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/for-init-comment-between",
+   "sha256": "8a21e419d1cf4d6a6616916fac2e36cafd50dae568205f07cc68130a1be32b5c",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/for-init-comment-after-using",
+   "sha256": "8f542dc9f874a8b5da850f7993674db519bae9c250b86a1efc5ce7528cf1b6bf",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/for-init-two-declarators",
+   "sha256": "43fb787aefd28c876109b9f18f1092064297b84c589241314ef26d971b118df0",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/for-of-of-binding",
+   "sha256": "3d4a34fe21fe71a741a7a6ea40b0c003500265665c5c05b8aa44ccdb037f9c62",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/for-of-in-prefix-binding",
+   "sha256": "d64adb085123701c4c647819d82d78cfcd400acc8ad2b0fb2f842a5d7f7c02a2",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/for-of-instanceof-prefix-binding",
+   "sha256": "1057f3f12e6b358d2d3145664e261445b50be6d9a4c0c21fad4c72fffce8325f",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/for-using-then-semicolon",
+   "sha256": "7d3bab0dd7a8f39372668cbb454a1d2f2bccbd72545e6de6c591c15504116d28",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/for-using-lf-semicolon",
+   "sha256": "93e00db478622350ded9c122f4bd3c61004e9eede9cb339afa40d0d7d2a60af0",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/for-using-lf-member",
+   "sha256": "665d94acefb47b642c93bab5bf5dba5825a32028ab80b3668862f6dfd804ec19",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/for-using-lf-minus",
+   "sha256": "b6a25e4ade084013efbcc30e868bf53835ce119e09bafe82bc8a750dbdf136ca",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/for-using-instanceof",
+   "sha256": "bcb93f5f1b2f78314b301b74cab1dad2488c2432ab3f0680bb7ccef39a82a65b",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/for-await-lf-call",
+   "sha256": "06593244c17f69af9eb3d49d9049fb057ffee0d0e5897f3d4af7347ea3223ebc",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/for-await-lf-paren",
+   "sha256": "1ad0405e12a0aeea5bcac8947f4af43e332fd705e48cef3f817e553358badfc3",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/for-await-lf-using-call",
+   "sha256": "78b3cd7d8f40fc5e1a50841789386e31dd27945fa287a12244ae39d80329a77c",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/for-await-lf-using-semicolon",
+   "sha256": "e6ebfb4bfdb10892b47d2f08d1ffa3e7bab62e174f30511e40d2b3a2e7dc3c14",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/for-await-of-await-using",
+   "sha256": "213c47f200e128c7b51bd863e9fc25b1dd433246963f676991c7ead909159b83",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/stmt-using-lf-binding-asi",
+   "sha256": "2e2f658c36ad00bd11ac0ba140005d127b2d89966e095d1668f8cc4ba68fa818",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/stmt-using-comment-lf-binding-asi",
+   "sha256": "3c284916fc6faabcf4ee0ae406cfd022eadd6b6b02b8f4179c3ed8f06104ba8f",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/stmt-await-lf-using-asi-operand",
+   "sha256": "9914678ee04b35d6b09db5669338593e233231cf9611490c62bbc00ddf6637b5",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/stmt-await-lf-using-lf-asi",
+   "sha256": "2434dea3a33ec831aa6d5affbee8d4d6e3881b37e9cdbee42adee8ff048cad8f",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/stmt-using-lf-member",
+   "sha256": "229abdfc05ebb5ccc462a876c419146018cc73942ebb0ec49c0ad649b5b52c49",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/stmt-using-lf-index",
+   "sha256": "410f6fcd514ac929eb510224acaa10fcbfb6d889045b20fa1014b0788b19d901",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/stmt-using-same-line-index",
+   "sha256": "13953c62dae6c78fe28d5b05797611adae45a8f23b96d60fcec9514ee9852afd",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/stmt-using-binding",
+   "sha256": "507c760b594416bcc0aa93b1d858f38162b97931cc74bf8289d11500ee39eb83",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/stmt-using-binding-comment-between",
+   "sha256": "fc0d2c1609e15a27360572c0fc3e682129d3444ac6a6ae6bbb6743a37de796a2",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/block-using-binding",
+   "sha256": "6c731e572ca80bca7d3453b61717c558c858cb49ea556407680e60d5e9406e59",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/stmt-using-two-lines-bindings",
+   "sha256": "56cd09cdc92b9c2dad18c2c9e807a6231a4d32a26b12d6806c220da09ba6b16a",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/stmt-await-using-in",
+   "sha256": "ac7835540e82b7650e2b399f507d8b15ca7354f1ac4b8e4dde77db92bb30b8ac",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/module-await-using",
+   "sha256": "5c902d1045d26bcbeee144f11c5fd3e98147df922f0e7b0aa7e8e6d4ad439a69",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/module-for-of-await-using",
+   "sha256": "2131a48aee37ebb0c91096a8d6385be150bad06b7152504e1c408d2b8f44f1ad",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/module-for-await-comment-between",
+   "sha256": "ea7bb16e96ea5d1bbd843278e039eac8f1daee95d55e2656323e3fd5df947768",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/module-await-lf-using-operand",
+   "sha256": "ea22d1f0745854e63c3a75ca3a16b4ccc1274c955c38d3b53869e7a65c10715b",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/arrow-await-using",
+   "sha256": "bcb3a0c84b884595809e80425389bef4b3c6ec7209f5fc2a3c130c43d4dd616b",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/method-for-of-await-using",
+   "sha256": "44961337462841874bebd269bbd2b1f23bd51b0b8641ee8a175beaac178e9f57",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/plain-using-lf-binding-asi",
+   "sha256": "c4ce73a903d8b89b4669efd9336a980ddb1c598fae5253a2a2894a984eead47e",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/plain-for-of-using-comment",
+   "sha256": "22913707a1bae2ff08461dd9e86c9fe2b81c95afe8ef625ca51766e4424660d1",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/plain-block-using-comment-lf-asi",
+   "sha256": "fd6048861a399f9f1608b14fc0b7268d8ad95bbbaf938898331d83d8144d962c",
+   "sourceType": "module",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/script-fn-await-lf-using-identifier",
+   "sha256": "09202fd53f38370188897aad149104f897d5b15ae22e7be0acdf5c96a6e06624",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/script-fn-await-comment-lf-using-identifier",
+   "sha256": "640136ba2a230d6cd2a7acd4c7770e380ff79590abdee543676888628e154bf0",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/script-arrow-await-lf-using-identifier",
+   "sha256": "424152dd075edfaca42ff6e6954e99ce613b9a4354a41761c8f0abb6c2d7ebc4",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18/script-method-await-lf-using-identifier",
+   "sha256": "cb57dcd29b10fcbc9a3befc69b6b6ce65b03d52e430c290411eead6c72fdc7ad",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18b/annex-close-for-await",
+   "sha256": "6599de642b4460e5b5ef1a54fd7d82dc79d9d4b472261ecd58f7062456e8643d",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18b/annex-close-for-await-empty",
+   "sha256": "0dd0a102f2498c1cb6b223f245887310edaac1b775e6e9240a146bb3115c4692",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18b/annex-close-for-await-line",
+   "sha256": "54485dabcaaf85cee63441bcd471c3593a8b0d85735b116e1145df8a271f8d1d",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18b/annex-open-for-await-line",
+   "sha256": "ad9ec4267b67eaffe1f03d7f8d161633f330844d85b167d38b533e9f4596f025",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18b/script-block",
+   "sha256": "a4d868672e1b135d2ce7192b2b14014e222f5549040613cbfdbbefb55685f5f1",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18b/script-labeled-block",
+   "sha256": "b297762a3940edb870f3f5d8e2b7d34024cec53051d5ef08e07a0565a7f780e0",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18b/script-block-comment",
+   "sha256": "9911f0d9ccaec1b7e1f688b0a278121e583536b7765bb36ec42517d9a413f84f",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18b/script-labeled-block-comment",
+   "sha256": "b4215bf102684b480837f90bad3654021bf16957e740a162b5c0719705bbaefa",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18b/script-await-line-comment-then-label",
+   "sha256": "fa368dbaf2cc48e0ebb7480e96dd94210e83736fe99fd3cc24cfdd862029ac66",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18b/script-await-line-comment-then-assignment",
+   "sha256": "49dd1e3a082b75e8d192da39da9e6925d59c137b2b0c9f0667708a41bcbd4d78",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18b/script-await-line-comment-then-member-assignment",
+   "sha256": "83647bfcceab4dcd3a9c0e20dc10600d920318ceb26ffb3373b0492c1b4bf173",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18b/script-var-await",
+   "sha256": "c0497c0c59e535ce73f1f31d35f2e88815d3c12744d47f2b20ad6525bfdb33d4",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18b/script-var-await-block",
+   "sha256": "a053eadb04766fafb54527f3e4c1abc65494a07621fde383d0f7a284294fa790",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18b/for-await-yield-block-comment",
+   "sha256": "64fb880585e651bdde45c999641e27ddf6973e463c0773effdf52a497b5a3d9b",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18b/for-await-yield-multiline-comment",
+   "sha256": "d6e6d54b9795f8d521de1465b12d8fbb54b7af5ce6f25c8523fb22a4909a9f35",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18b/for-await-yield-line-comment",
+   "sha256": "d2c17b623cf2c414cb3b9850ab5486da34d28e580a9499a6dd527caa7fdba276",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18b/for-await-yield-comment-chain",
+   "sha256": "4bc110f3b95f5e89ecc07a1d8ae02264a882f68fdcd83bc7a681ff20e3ee9cde",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18b/for-await-yield-space",
+   "sha256": "25ddd920153337583a01fb45ca6888d779d004d492715615fd45083067bc849f",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18b/async-await-using-call",
+   "sha256": "b98e6a256de95034bba829259065f662366437683e6713abfa3d12bed1859559",
+   "sourceType": "script",
+   "verdict": "accept",
+   "babel": {
+    "class": "accept",
+    "errors": []
+   },
+   "oxc": {
+    "class": "accept",
+    "errors": [],
+    "errorsWithSemantic": []
+   }
+  },
+  {
+   "id": "i18c/for-await-using-annex-open",
+   "sha256": "feaa5f136df128b478cd3234aaea5ac3fcb2fff412df9b96d0d6635f9f57041f",
    "sourceType": "script",
    "verdict": "accept",
    "babel": {
