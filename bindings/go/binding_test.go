@@ -1,6 +1,7 @@
 package tree_sitter_javascript_test
 
 import (
+	"strings"
 	"testing"
 
 	tree_sitter "github.com/tree-sitter/go-tree-sitter"
@@ -130,11 +131,25 @@ func TestRestrictedStatementEndsAtIncludedRange(t *testing.T) {
 
 func TestConciseArrowContinuesAcrossIncludedRanges(t *testing.T) {
 	language := tree_sitter.NewLanguage(tree_sitter_javascript.Language())
-	cases := []struct{ left, right string }{
-		{"function f(){ g(async()=>x", " + await y, await / 2); }"},
-		{"function f(){ g(async()=>x", " (await y), await / 2); }"},
-		{"function f(){ g(async()=>x", " ? await y : await z, await / 2); }"},
-		{"async function f(){ g(()=>x", " + await(y), await y); }"},
+	const excluded = "<excluded>\n"
+	cases := []struct{ left, gap, right string }{
+		{"function f(){ g(async()=>x", excluded, " + await y, await / 2); }"},
+		{"function f(){ g(async()=>x", excluded, " (await y), await / 2); }"},
+		{"function f(){ g(async()=>x", excluded, " ? await y : await z, await / 2); }"},
+		{"async function f(){ g(()=>x", excluded, " + await(y), await y); }"},
+		{"var f = () => a", "", "\n--> c\n+ b"},
+		{"var f = () => a", excluded, "\n--> c\n+ b"},
+		{"x = x => a", "", "\n--> c\n,b"},
+		{"x = x => a\n", "", "--> c\n,b"},
+		{"x=>a\n-->x\n", "", "-->y\n,b"},
+		{"x=>a\n-->x\n-->y\n", "", "-->z\n,b"},
+		{"x=>a\n-->x\n--", "", ">y\n-->z\n,b"},
+		{"f(x=>a\n-->x\n", "", "-->y\n-->z\n)"},
+		{"f(x=>a\n-->x\n-->y\n", "", "-->z\n)"},
+		{"f(x=>a\n-->x\n-->y", "", "\n-->z\n)"},
+		{"x=>a\n-->x\n", "", "-->y\n-->z\n+b"},
+		{"x=>a\n-->x\n-->y\n", "", "-->z\n+b"},
+		{"x=>a\n-->x\n--", "", ">y\n-->z\n+b"},
 	}
 	for _, c := range cases {
 		t.Run(c.right, func(t *testing.T) {
@@ -145,13 +160,18 @@ func TestConciseArrowContinuesAcrossIncludedRanges(t *testing.T) {
 			}
 			joined := parser.Parse([]byte(c.left+c.right), nil)
 			defer joined.Close()
-			gap := "<excluded>\n"
-			start := uint(len(c.left) + len(gap))
-			source := c.left + gap + c.right
+			start := uint(len(c.left) + len(c.gap))
+			source := c.left + c.gap + c.right
+			point := func(offset uint) tree_sitter.Point {
+				prefix := source[:offset]
+				return tree_sitter.Point{
+					Row:    uint(strings.Count(prefix, "\n")),
+					Column: uint(len(prefix) - strings.LastIndexByte(prefix, '\n') - 1),
+				}
+			}
 			if err := parser.SetIncludedRanges([]tree_sitter.Range{
-				{EndByte: uint(len(c.left)), EndPoint: tree_sitter.Point{Column: uint(len(c.left))}},
-				{StartByte: start, EndByte: uint(len(source)), StartPoint: tree_sitter.Point{Row: 1},
-					EndPoint: tree_sitter.Point{Row: 1, Column: uint(len(c.right))}},
+				{EndByte: uint(len(c.left)), EndPoint: point(uint(len(c.left)))},
+				{StartByte: start, EndByte: uint(len(source)), StartPoint: point(start), EndPoint: point(uint(len(source)))},
 			}); err != nil {
 				t.Fatal(err)
 			}
