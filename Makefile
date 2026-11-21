@@ -5,6 +5,7 @@ endif
 LANGUAGE_NAME := tree-sitter-javascript
 HOMEPAGE_URL := https://github.com/wotjr1649/tree-sitter-javascript
 VERSION := 4.0.0
+DESCRIPTION := JavaScript grammar for tree-sitter
 
 # repository
 SRC_DIR := src
@@ -60,8 +61,8 @@ endif
 
 $(LANGUAGE_NAME).pc: bindings/c/$(LANGUAGE_NAME).pc.in
 	sed -e 's|@PROJECT_VERSION@|$(VERSION)|' \
-		-e 's|@CMAKE_INSTALL_LIBDIR@|$(LIBDIR:$(PREFIX)/%=%)|' \
-		-e 's|@CMAKE_INSTALL_INCLUDEDIR@|$(INCLUDEDIR:$(PREFIX)/%=%)|' \
+		-e 's|@PC_LIBDIR@|$(LIBDIR:$(PREFIX)/%=$${prefix}/%)|' \
+		-e 's|@PC_INCLUDEDIR@|$(INCLUDEDIR:$(PREFIX)/%=$${prefix}/%)|' \
 		-e 's|@PROJECT_DESCRIPTION@|$(DESCRIPTION)|' \
 		-e 's|@PROJECT_HOMEPAGE_URL@|$(HOMEPAGE_URL)|' \
 		-e 's|@CMAKE_INSTALL_PREFIX@|$(PREFIX)|' $< > $@
@@ -96,4 +97,4 @@ clean:
 test:
 	$(TS) test
 
-.PHONY: all install uninstall clean test
+.PHONY: all install uninstall clean test $(LANGUAGE_NAME).pc

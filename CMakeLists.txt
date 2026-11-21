@@ -17,15 +17,6 @@ endif()
 
 include(GNUInstallDirs)
 
-find_program(TREE_SITTER_CLI tree-sitter DOC "Tree-sitter CLI")
-
-add_custom_command(OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/src/parser.c"
-                   DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/grammar.json"
-                   COMMAND "${TREE_SITTER_CLI}" generate src/grammar.json
-                            --abi=${TREE_SITTER_ABI_VERSION}
-                   WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-                   COMMENT "Generating parser.c")
-
 add_library(tree-sitter-javascript src/parser.c)
 if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/src/scanner.c)
   target_sources(tree-sitter-javascript PRIVATE src/scanner.c)
@@ -46,6 +37,13 @@ set_target_properties(tree-sitter-javascript
                       SOVERSION "${TREE_SITTER_ABI_VERSION}.${PROJECT_VERSION_MAJOR}"
                       DEFINE_SYMBOL "")
 
+foreach(dir IN ITEMS LIBDIR INCLUDEDIR)
+    if(IS_ABSOLUTE "${CMAKE_INSTALL_${dir}}")
+        set(PC_${dir} "${CMAKE_INSTALL_${dir}}")
+    else()
+        set(PC_${dir} "\${prefix}/${CMAKE_INSTALL_${dir}}")
+    endif()
+endforeach()
 configure_file(bindings/c/tree-sitter-javascript.pc.in
                "${CMAKE_CURRENT_BINARY_DIR}/tree-sitter-javascript.pc" @ONLY)
 
@@ -61,6 +59,13 @@ file(GLOB QUERIES queries/*.scm)
 install(FILES ${QUERIES}
         DESTINATION "${CMAKE_INSTALL_DATADIR}/tree-sitter/queries/javascript")
 
-add_custom_target(ts-test "${TREE_SITTER_CLI}" test
-                  WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-                  COMMENT "tree-sitter test")
+find_program(TREE_SITTER_CLI tree-sitter DOC "Tree-sitter CLI")
+if(TREE_SITTER_CLI)
+    add_custom_target(ts-generate
+                      COMMAND "${TREE_SITTER_CLI}" generate --abi "${TREE_SITTER_ABI_VERSION}" --js-runtime native
+                      WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+                      VERBATIM)
+    add_custom_target(ts-test "${TREE_SITTER_CLI}" test
+                      WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+                      VERBATIM)
+endif()
