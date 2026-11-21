@@ -1,0 +1,125 @@
+================================================================================
+Annex B comments keep a continued class field and concise arrow body together
+================================================================================
+
+class C{x=a/**/
+-->x
++b;}
+f(()=>a/**/
+-->x
++b)
+
+--------------------------------------------------------------------------------
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      member: (field_definition
+        property: (property_identifier)
+        value: (binary_expression
+          left: (identifier)
+          (comment)
+          (html_comment)
+          right: (identifier)))))
+  (expression_statement
+    (call_expression
+      function: (identifier)
+      arguments: (arguments
+        (arrow_function
+          parameters: (formal_parameters)
+          body: (binary_expression
+            left: (identifier)
+            (comment)
+            (html_comment)
+            right: (identifier)))))))
+
+================================================================================
+Annex B comments after a statement and before an explicit delimiter
+================================================================================
+
+a
+<!--x
+b;
+()=>a//
+-->x
+;
+(a/*
+*/<!--x
+);
+
+--------------------------------------------------------------------------------
+
+(program
+  (expression_statement
+    (identifier))
+  (html_comment)
+  (expression_statement
+    (identifier))
+  (expression_statement
+    (arrow_function
+      parameters: (formal_parameters)
+      body: (identifier))
+    (comment)
+    (html_comment))
+  (expression_statement
+    (parenthesized_expression
+      (identifier)
+      (comment)
+      (html_comment))))
+
+================================================================================
+Annex B close comments include preceding single-line block comments
+================================================================================
+
+  /**/-->start
+a
+/**/-->x
+b;
+{}
+/* x */ -->y
+a;
+/**/ /* z */ -->z
+f(x
+/**/-->z
++y)
+
+--------------------------------------------------------------------------------
+
+(program
+  (html_comment)
+  (expression_statement (identifier))
+  (html_comment)
+  (expression_statement (identifier))
+  (statement_block)
+  (html_comment)
+  (expression_statement (identifier))
+  (html_comment)
+  (expression_statement
+    (call_expression
+      function: (identifier)
+      arguments: (arguments
+        (binary_expression
+          left: (identifier)
+          (html_comment)
+          right: (identifier))))))
+
+================================================================================
+Annex B close comments preserve contextual await in a continued expression
+================================================================================
+
+x = (await
+ -->x
++b)
+
+--------------------------------------------------------------------------------
+
+(program
+  (expression_statement
+    (assignment_expression
+      left: (identifier)
+      right: (parenthesized_expression
+        (binary_expression
+          left: (identifier)
+          (html_comment)
+          right: (identifier))))))
