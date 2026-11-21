@@ -8897,6 +8897,10 @@
       "name": "html_comment"
     },
     {
+      "type": "SYMBOL",
+      "name": "_html_open_prefix"
+    },
+    {
       "type": "PATTERN",
       "value": "[\\s\\p{Zs}\\uFEFF\\u2028\\u2029\\u2060\\u200B]"
     }
@@ -9321,6 +9325,10 @@
     {
       "type": "SYMBOL",
       "name": "_yield_line_terminator"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_html_open_prefix"
     }
   ],
   "inline": [
