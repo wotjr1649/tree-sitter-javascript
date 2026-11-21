@@ -97,19 +97,24 @@ unsigned tree_sitter_javascript_external_scanner_serialize(void *payload, char *
 
 void tree_sitter_javascript_external_scanner_deserialize(void *payload, const char *buffer, unsigned length) {
     Scanner *scanner = payload;
-    scanner->depth = 0;
-    scanner->overflow = 0;
-    scanner->annex_pending = false;
-    if (length < SCOPE_HEADER_SIZE || length > TREE_SITTER_SERIALIZATION_BUFFER_SIZE) return;
+    if (length < SCOPE_HEADER_SIZE || length > TREE_SITTER_SERIALIZATION_BUFFER_SIZE) goto empty;
 
     uint16_t state;
     memcpy(&state, buffer + sizeof(scanner->overflow), sizeof(state));
     uint16_t depth = state & ~ANNEX_PENDING;
+    if (length == SCOPE_HEADER_SIZE + 1 && depth >= 1 && depth <= 4) {
+        scanner->depth = depth;
+        scanner->annex_pending = state & ANNEX_PENDING;
+        memcpy(&scanner->overflow, buffer, sizeof(scanner->overflow));
+        scanner->flags[0] = (uint8_t)buffer[SCOPE_HEADER_SIZE];
+        scanner->async_arrows[0] = 0;
+        return;
+    }
     unsigned flag_length = (depth + 3u) / 4;
-    if (depth > SCOPE_BYTES * 4 || length < SCOPE_HEADER_SIZE + flag_length) return;
+    if (depth > SCOPE_BYTES * 4 || length < SCOPE_HEADER_SIZE + flag_length) goto empty;
     unsigned arrow_length = (depth + 7u) / 8;
     unsigned copied = length - SCOPE_HEADER_SIZE - flag_length;
-    if (copied > arrow_length) return;
+    if (copied > arrow_length) goto empty;
 
     scanner->depth = depth;
     scanner->annex_pending = state & ANNEX_PENDING;
@@ -117,6 +122,12 @@ void tree_sitter_javascript_external_scanner_deserialize(void *payload, const ch
     memcpy(scanner->flags, buffer + SCOPE_HEADER_SIZE, flag_length);
     memcpy(scanner->async_arrows, buffer + SCOPE_HEADER_SIZE + flag_length, copied);
     memset(scanner->async_arrows + copied, 0, arrow_length - copied);
+    return;
+
+empty:
+    scanner->depth = 0;
+    scanner->overflow = 0;
+    scanner->annex_pending = false;
 }
 
 static void enter_context(Scanner *scanner, unsigned flags) {
