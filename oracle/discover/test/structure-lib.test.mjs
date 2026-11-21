@@ -38,6 +38,46 @@ test("a trailing comment inside a statement and the terminating semicolon are no
   assert.deepEqual(r2.diffs, []);
 });
 
+for (const [label, body, commentStart, precedingComments] of [
+  ["line comment", "a\r\uFEFF// c", 5, []],
+  ["block and line comments", "a\r\uFEFF/**/ //c", 10, [["comment", 5, 9, 1]]],
+]) {
+  for (const [suffix, variant] of [[" ", "space"], ["\uFEFF", "BOM"], ["", "no suffix"]]) {
+    test("EOF " + label + " with " + variant, () => {
+      const src = body + suffix;
+      const end = Buffer.byteLength(src);
+      const r = run(src, [
+        ["program", 0, end, -1], ["expression_statement", 0, end, 0], ["identifier", 0, 1, 1],
+        ...precedingComments, ["comment", commentStart, end, 1],
+      ]);
+      assert.deepEqual([r.diffs, r.lists], [[], []]);
+    });
+  }
+}
+
+test("trailing ECMAScript whitespace outside a line comment preserves its end for lookup", () => {
+  const src = "a// c \r\n\u00A0\u2003\u2028\u2029\u3000\uFEFF";
+  const end = Buffer.byteLength(src);
+  const r = run(src, [
+    ["program", 0, end, -1], ["expression_statement", 0, end, 0], ["identifier", 0, 1, 1], ["comment", 1, 6, 1],
+  ]);
+  assert.deepEqual([r.diffs, r.lists], [[], []]);
+});
+
+test("a trailing line comment leaves the real module await split visible", () => {
+  const src = "await\nusing;\r\uFEFF// c ";
+  const r = run(src, [
+    ["program", 0, 21, -1],
+    ["expression_statement", 0, 5, 0], ["identifier", 0, 5, 1],
+    ["expression_statement", 6, 12, 0], ["identifier", 6, 11, 3],
+    ["comment", 16, 21, 0],
+  ], "module");
+  assert.deepEqual(r.diffs.filter(({ f }) => f === "S:expr").map(({ side, s, e }) => [side, s, e]), [
+    ["B", 0, 11], ["T", 0, 5], ["T", 6, 11],
+  ]);
+  assert.deepEqual(r.lists, [{ owner: "program", babel: 1, ts: 2 }]);
+});
+
 test("for-header statements and the parenthesized head of if are normalised away, the body is not", () => {
   const src = "for(;;) a;\nif (b) c;";
   const rows = [
