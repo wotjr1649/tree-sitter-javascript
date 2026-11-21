@@ -32,14 +32,29 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
+      - name: Read tree-sitter CLI pin
+        id: tree-sitter-pin
+        shell: bash
+        run: node -p '"ref=v" + require("./package.json").devDependencies["tree-sitter-cli"]' >> "$GITHUB_OUTPUT"
       - name: Set up tree-sitter
         uses: tree-sitter/setup-action/cli@v2
         with:
-          tree-sitter-ref: v0.27.2
+          tree-sitter-ref: ${{ steps.tree-sitter-pin.outputs.ref }}
       - name: Verify generated sources
         shell: bash
         run: |-
-          tree-sitter generate --abi 15 --js-runtime native
+          abi=$(cat ci/tree-sitter-abi.txt)
+          tree-sitter generate --abi "$abi" --js-runtime native
+          awk '
+            /^static bool ts_lex\(/ { in_main_lexer = 1 }
+            /^}/ { in_main_lexer = 0 }
+            in_main_lexer && /^[[:space:]]*case [0-9]+:/ { cases++ }
+            /^[[:space:]]*#[[:space:]]*pragma[[:space:]]+(optimize[[:space:]]*\(|clang[[:space:]]+optimize[[:space:]]+off([[:space:]]|$)|GCC[[:space:]]+optimize([[:space:](]|$))/ {
+              print FILENAME ":" FNR ": forbidden optimization pragma: " $0
+              blocked = 1
+            }
+            END { print "Main lexer cases: " (cases + 0); exit (blocked || !cases) }
+          ' src/parser.c
           git diff --exit-code -- src
       - name: Run tests
         uses: tree-sitter/parser-test-action@v2
@@ -324,6 +339,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends valgrind time
+      # Benchmark the generated parser committed at each ref.
       - name: Build, measure and compare
         shell: bash
         env:
