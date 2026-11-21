@@ -9,14 +9,20 @@ on:
       tree_ref:
         description: Git ref to compare across OSes (empty runs regular CI)
         type: string
+      bench_refs:
+        description: 'Parse benchmark refs starting with v1.0.0 ("default" uses v1.0.0 v3.1.0 HEAD)'
+        type: string
+      bench_max_increase_pct:
+        description: Optional maximum instruction increase (%) over v1.0.0 per workload
+        type: string
 
 concurrency:
-  group: ${{github.workflow}}-${{github.ref}}-${{ inputs.tree_ref && 'xplat' || 'ci' }}
+  group: ${{github.workflow}}-${{github.ref}}-${{ inputs.bench_refs && 'bench' || inputs.tree_ref && 'xplat' || 'ci' }}
   cancel-in-progress: true
 
 jobs:
   test:
-    if: ${{ !inputs.tree_ref }}
+    if: ${{ !inputs.tree_ref && !inputs.bench_refs }}
     name: Test parser
     runs-on: ${{matrix.os}}
     strategy:
@@ -67,7 +73,7 @@ jobs:
             examples/*.jsx
 
   swift:
-    if: ${{ !inputs.tree_ref }}
+    if: ${{ !inputs.tree_ref && !inputs.bench_refs }}
     name: Test Swift (${{matrix.os}})
     runs-on: ${{matrix.os}}
     strategy:
@@ -91,7 +97,7 @@ jobs:
         run: cmp Package.resolved "$RUNNER_TEMP/Package.resolved"
 
   swift-min:
-    if: ${{ !inputs.tree_ref }}
+    if: ${{ !inputs.tree_ref && !inputs.bench_refs }}
     name: Test Swift (tools 5.9)
     runs-on: ubuntu-24.04
     container: swift:5.9
@@ -108,7 +114,7 @@ jobs:
         run: cmp Package.resolved "$RUNNER_TEMP/Package.resolved"
 
   gates:
-    if: ${{ !inputs.tree_ref }}
+    if: ${{ !inputs.tree_ref && !inputs.bench_refs }}
     name: Node kinds and parser cost
     runs-on: ubuntu-24.04
     steps:
@@ -128,7 +134,7 @@ jobs:
         run: node scripts/parser-cost.mjs
 
   oracle:
-    if: ${{ !inputs.tree_ref }}
+    if: ${{ !inputs.tree_ref && !inputs.bench_refs }}
     name: Oracle replay
     runs-on: ubuntu-24.04
     steps:
@@ -288,5 +294,49 @@ jobs:
         with:
           name: cst-diff
           path: build/xplat/diff.md
+          if-no-files-found: error
+          retention-days: 7
+
+  parse-bench:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.bench_refs != '' }}
+    name: Measure parser instructions
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout benchmark tools and refs
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          package-manager-cache: false
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version: "1.23"
+          cache: false
+      - name: Install Callgrind
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends valgrind time
+      - name: Build, measure and compare
+        shell: bash
+        env:
+          BENCH_REFS: ${{ inputs.bench_refs }}
+          BENCH_MAX_INCREASE_PCT: ${{ inputs.bench_max_increase_pct }}
+          GOMAXPROCS: "3"
+          npm_config_loglevel: error
+        run: bash scripts/parse-bench.sh
+      - name: Upload benchmark evidence
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: parse-instructions
+          path: build/cibench/artifacts/
           if-no-files-found: error
           retention-days: 7

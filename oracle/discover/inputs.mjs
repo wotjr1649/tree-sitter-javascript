@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
-import { readFileSync, readdirSync } from "node:fs";
-import { join } from "node:path";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { join, relative } from "node:path";
 
 // test/corpus/*.txt: `====` name `====` input `---` expected tree; the attribute line `:error` marks inputs that must not parse.
 export function corpusInputs(dir) {
@@ -33,4 +33,25 @@ export function readVerified(path, sha256) {
   const got = createHash("sha256").update(buf).digest("hex");
   if (got !== sha256) throw new Error(`sha256 ${got} differs from the collected ${sha256}`);
   return new TextDecoder("utf-8", { ignoreBOM: true }).decode(buf);
+}
+
+export function* walk(dir) {
+  for (const e of readdirSync(dir, { withFileTypes: true }).sort((a, b) => (a.name < b.name ? -1 : 1))) {
+    const p = join(dir, e.name);
+    if (e.isDirectory()) yield* walk(p);
+    else yield p;
+  }
+}
+
+export function* npmInputs(data, packages) {
+  for (const pkg of packages) {
+    const root = join(data, "pkgs", `${pkg.name.replace(/^@/, "").replace("/", "__")}-${pkg.version}`, "package");
+    if (!existsSync(root)) continue;
+    for (const p of walk(root)) {
+      if (!/\.(js|jsx|mjs|cjs)$/.test(p)) continue;
+      const inPkg = relative(root, p).replaceAll("\\", "/");
+      if (pkg.include && !pkg.include.some((i) => inPkg.startsWith(i))) continue;
+      yield { set: "npm", pkg: `${pkg.name}@${pkg.version}`, abs: p, rel: relative(data, p).replaceAll("\\", "/") };
+    }
+  }
 }
