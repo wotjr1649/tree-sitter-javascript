@@ -175,6 +175,7 @@ typedef struct {
     bool line_comment;
     bool ends_at_block_comment;
     bool allow_inline_open;
+    bool close_at_line_start;
 } ASITrivia;
 
 static bool is_line_terminator(int32_t c) {
@@ -214,7 +215,7 @@ static bool finish_html_comment(TSLexer *lexer) {
 static ASILookahead scan_asi_trivia(TSLexer *lexer, ASITrivia *trivia, bool annex_comments, bool preserve_start,
                                    bool stop_at_range, bool extras_only) {
     // A physical line start and a multiline block both permit a close marker after further blocks.
-    bool close_allowed = annex_comments && trivia->newline;
+    bool close_allowed = annex_comments && (trivia->newline || trivia->close_at_line_start);
     bool break_since_comment = false;
     bool separated_close = false;
     for (;;) {
@@ -437,10 +438,22 @@ static bool scan_automatic_semicolon(Scanner *scanner, TSLexer *lexer, const boo
         return (trivia.newline && insert) || replay_annex(scanner, lexer, valid_symbols);
     }
     if (next == ASI_END) {
+        if (!lexer->eof(lexer)) {
+            // A close comment at a range boundary can still lead to a sequence expression.
+            if (!restricted && valid_symbols[ANNEX_PREFIX] && valid_symbols[HTML_COMMENT]) {
+                ASITrivia after = {.newline = trivia.newline};
+                next = scan_asi_trivia(lexer, &after, true, false, false, false);
+                if (next >= ASI_ANNEX && scan_past_annex(lexer, &after, true) == ASI_NEXT_TOKEN &&
+                    lexer->lookahead == ',') {
+                    return replay_annex(scanner, lexer, valid_symbols);
+                }
+            }
+            return true;
+        }
         // A trailing comment can be lexed as an extra before the ordinary EOF insertion.
         bool defer_eof = !restricted && valid_symbols[LOGICAL_OR] && !trivia.leading_non_cr_break &&
                          (trivia.line_comment || trivia.ends_at_block_comment);
-        return !defer_eof || !lexer->eof(lexer);
+        return !defer_eof;
     }
     if (next == ASI_NEXT_TOKEN && lexer->lookahead == '}') {
         return true;
@@ -693,7 +706,8 @@ bool tree_sitter_javascript_external_scanner_scan(void *payload, TSLexer *lexer,
     if (scanner->annex_pending && valid_symbols[HTML_COMMENT] &&
         !valid_symbols[ESCAPE_SEQUENCE] && !valid_symbols[REGEX_PATTERN]) {
         ASITrivia trivia = {.allow_inline_open = true};
-        if (scan_asi_trivia(lexer, &trivia, true, false, true, true) != ASI_ANNEX) return false;
+        // Replay can start at a range boundary or reach it before the comment.
+        if (scan_asi_trivia(lexer, &trivia, true, false, false, true) != ASI_ANNEX) return false;
         scanner->annex_pending = false;
         return finish_html_comment(lexer);
     }
@@ -745,9 +759,22 @@ bool tree_sitter_javascript_external_scanner_scan(void *payload, TSLexer *lexer,
         lexer->mark_end(lexer);
     }
 
-    if (valid_symbols[ENTER_STATIC_BLOCK] || valid_symbols[ENTER_PLAIN] || valid_symbols[ENTER_AWAIT] ||
-        valid_symbols[ENTER_YIELD] || valid_symbols[ENTER_BOTH]) {
-        while (is_extra_space(lexer->lookahead)) skip(lexer);
+    bool enter = valid_symbols[ENTER_STATIC_BLOCK] || valid_symbols[ENTER_PLAIN] || valid_symbols[ENTER_AWAIT] ||
+                 valid_symbols[ENTER_YIELD] || valid_symbols[ENTER_BOTH];
+    bool context = enter || valid_symbols[CONTEXT_IDENTIFIER];
+    bool html = valid_symbols[HTML_COMMENT] && !valid_symbols[ESCAPE_SEQUENCE] && !valid_symbols[REGEX_PATTERN];
+    bool line_start = false;
+    bool first_column = false;
+    if (context || html) {
+        int32_t c = lexer->lookahead;
+        first_column = html && (c == '/' || is_extra_space(c)) && lexer->is_at_included_range_start(lexer) &&
+                       lexer->get_column(lexer) == 0;
+        while (is_extra_space(lexer->lookahead)) {
+            line_start |= is_line_terminator(lexer->lookahead);
+            skip(lexer);
+        }
+    }
+    if (enter) {
         unsigned token = ENTER_PLAIN_EXPRESSION;
         if (valid_symbols[ENTER_STATIC_BLOCK] && lexer->lookahead == '{') {
             token = ENTER_STATIC_BLOCK;
@@ -763,25 +790,20 @@ bool tree_sitter_javascript_external_scanner_scan(void *payload, TSLexer *lexer,
     }
 
     if (valid_symbols[CONTEXT_IDENTIFIER]) {
-        while (is_extra_space(lexer->lookahead)) skip(lexer);
         if (lexer->lookahead == 'a' || lexer->lookahead == 'y') {
             return scan_context_identifier(scanner, lexer);
         }
     }
 
-    if (valid_symbols[HTML_COMMENT] && !valid_symbols[ESCAPE_SEQUENCE] && !valid_symbols[REGEX_PATTERN]) {
-        bool line_start = false;
-        while (is_extra_space(lexer->lookahead)) {
-            line_start |= is_line_terminator(lexer->lookahead);
-            skip(lexer);
-        }
+    if (html) {
         int32_t c = lexer->lookahead;
-        if ((c == '-' || c == '<') && (line_start || !valid_symbols[LOGICAL_OR])) {
+        bool html_line_start = line_start && !context;
+        if ((c == '-' || c == '<') && (html_line_start || !valid_symbols[LOGICAL_OR])) {
             return scan_annex_marker(lexer) == ASI_ANNEX && finish_html_comment(lexer);
         }
         if (c == '/') {
-            ASITrivia trivia = {.newline = line_start};
-            ASILookahead next = scan_asi_trivia(lexer, &trivia, true, false, true, true);
+            ASITrivia trivia = {.newline = html_line_start, .close_at_line_start = line_start || first_column};
+            ASILookahead next = scan_asi_trivia(lexer, &trivia, true, false, false, true);
             if (next == ASI_ANNEX) return finish_html_comment(lexer);
             return next == ASI_ANNEX_OPEN_PREFIX && replay_annex(scanner, lexer, valid_symbols);
         }
