@@ -30,8 +30,9 @@ approval. go-treesitter regenerates `src/parser.c` with its own pinned CLI.
     that the previous release parsed without errors. Add a CHANGELOG entry and migration notes. Valid input is
     accepted by both `@babel/parser` and `oxc-parser` as pinned in `oracle/`.
   - MINOR covers additions, error-to-ok fixes, accepted invalid input becoming an error, changes to recovery CSTs
-    for inputs with errors in both versions (`ERROR` and `MISSING` included), and tree-identical performance work.
-    Record all minor changes in the CHANGELOG.
+    for inputs with errors in both versions (`ERROR` and `MISSING` included), incremental-parse fixes that keep fresh
+    CSTs and make an incremental parse equal a fresh parse of the same edited input, and tree-identical performance
+    work. Record all minor changes in the CHANGELOG.
   - PATCH covers build, tooling and documentation changes and CLI regeneration with identical trees.
 - The release PR updates the release version in all manifests and their own lockfile entries, including
   `tree-sitter.json` `metadata.version`, then regenerates `src/` because `src/parser.c` embeds that version.

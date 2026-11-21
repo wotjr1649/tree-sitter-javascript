@@ -54,13 +54,18 @@ enum Context {
 // shortcut: excess scopes use the base lexer until they close; use parser states if deeper nesting needs full context.
 enum {
     SCOPE_HEADER_SIZE = 6,
-    ANNEX_PENDING = 0x8000, // Scope depths fit below this serialized bit.
+    // Scope depths fit below the serialized flags.
+    ANNEX_PENDING = 0x8000,
+    ASI_PENDING = 0x4000,
+    ANNEX_PREFIX_PENDING = 0x2000,
+    DECLARATION_PENDING = 0x1000,
     SCOPE_BYTES = TREE_SITTER_SERIALIZATION_BUFFER_SIZE - SCOPE_HEADER_SIZE,
 };
 
 typedef struct {
     uint32_t overflow;
     uint16_t depth;
+    uint16_t pending_token;
     bool annex_pending;
     uint8_t flags[SCOPE_BYTES];
     uint8_t async_arrows[(SCOPE_BYTES + 1) / 2];
@@ -72,11 +77,11 @@ void tree_sitter_javascript_external_scanner_destroy(void *payload) { free(paylo
 
 unsigned tree_sitter_javascript_external_scanner_serialize(void *payload, char *buffer) {
     const Scanner *scanner = payload;
-    if (!scanner->depth && !scanner->annex_pending) return 0;
+    if (!scanner->depth && !scanner->annex_pending && !scanner->pending_token) return 0;
 
     unsigned length = (scanner->depth + 3) / 4;
     memcpy(buffer, &scanner->overflow, sizeof(scanner->overflow));
-    uint16_t state = scanner->depth | (scanner->annex_pending ? ANNEX_PENDING : 0);
+    uint16_t state = scanner->depth | (scanner->annex_pending ? ANNEX_PENDING : 0) | scanner->pending_token;
     memcpy(buffer + sizeof(scanner->overflow), &state, sizeof(state));
     memcpy(buffer + SCOPE_HEADER_SIZE, scanner->flags, length);
     unsigned used_bits = (scanner->depth % 4) * 2;
@@ -100,7 +105,8 @@ void tree_sitter_javascript_external_scanner_deserialize(void *payload, const ch
 
     uint16_t state;
     memcpy(&state, buffer + sizeof(scanner->overflow), sizeof(state));
-    uint16_t depth = state & ~ANNEX_PENDING;
+    uint16_t depth = state & ~(ANNEX_PENDING | ASI_PENDING | ANNEX_PREFIX_PENDING | DECLARATION_PENDING);
+    scanner->pending_token = state & (ASI_PENDING | ANNEX_PREFIX_PENDING | DECLARATION_PENDING);
     if (length == SCOPE_HEADER_SIZE + 1 && depth >= 1 && depth <= 4) {
         scanner->depth = depth;
         scanner->annex_pending = state & ANNEX_PENDING;
@@ -125,6 +131,7 @@ void tree_sitter_javascript_external_scanner_deserialize(void *payload, const ch
 
 empty:
     scanner->depth = 0;
+    scanner->pending_token = 0;
     scanner->overflow = 0;
     scanner->annex_pending = false;
 }
@@ -467,6 +474,13 @@ static bool replay_annex(Scanner *scanner, TSLexer *lexer) {
     return true;
 }
 
+// Attach the lookahead decision to the subtree so it survives reuse.
+static bool remember_lookahead(Scanner *scanner, TSLexer *lexer, uint16_t pending_token) {
+    scanner->pending_token = pending_token;
+    lexer->result_symbol = DECLARATION_END;
+    return true;
+}
+
 // The only identifier-like tokens that can continue an await using expression here are binary operators.
 static bool starts_using_binding(TSLexer *lexer) {
     if (!is_identifier_part(lexer->lookahead) || is_digit(lexer->lookahead)) return false;
@@ -578,12 +592,18 @@ static bool scan_automatic_semicolon(Scanner *scanner, TSLexer *lexer, const boo
         (trivia.break_after_comment || valid_symbols[AWAIT_OPERAND_CONTINUES])) {
         return false;
     }
-    bool declaration_end = valid_symbols[DECLARATION_END];
+    bool saved_declaration = scanner->pending_token == DECLARATION_PENDING;
+    bool declaration_end = valid_symbols[DECLARATION_END] || saved_declaration;
     bool defer_binding = trivia.non_cr_break_after_comment && (trivia.leading_non_cr_break || trivia.can_defer_binding);
     if (async_field && next == ASI_NEXT_TOKEN && (lexer->lookahead == '*' || lexer->lookahead == '[')) {
         return true;
     }
-    return semicolon_before_lookahead(lexer, valid_symbols, next, declaration_end, defer_binding);
+    // Mark before any comments are shifted so they keep their original parent after reduction.
+    bool remember_declaration = valid_symbols[DECLARATION_END] && !saved_declaration && trivia.comment;
+    if (!semicolon_before_lookahead(lexer, valid_symbols, next, declaration_end,
+                                    defer_binding && !remember_declaration)) return false;
+    if (remember_declaration) return remember_lookahead(scanner, lexer, DECLARATION_PENDING);
+    return true;
 }
 
 // A line break before an operand or '*' cannot be skipped, even where ASI is unavailable.
@@ -596,17 +616,16 @@ static bool scan_yield_operand(Scanner *scanner, TSLexer *lexer, const bool *val
     if (next == ASI_NEXT_TOKEN) {
         int32_t c = lexer->lookahead;
         if (c == ';' || c == ',' || c == ':' || c == ')' || c == ']') {
-            return annex && replay_annex(scanner, lexer);
+            return annex && remember_lookahead(scanner, lexer, ANNEX_PREFIX_PENDING);
         }
     }
     if (next == ASI_END || (next == ASI_NEXT_TOKEN && lexer->lookahead == '}')) {
         lexer->result_symbol = AUTOMATIC_SEMICOLON;
-        return valid_symbols[AUTOMATIC_SEMICOLON] || (annex && replay_annex(scanner, lexer));
+        return valid_symbols[AUTOMATIC_SEMICOLON] || (annex && remember_lookahead(scanner, lexer, ANNEX_PREFIX_PENDING));
     }
     if (trivia.newline) {
         if (valid_symbols[AUTOMATIC_SEMICOLON]) {
-            lexer->result_symbol = AUTOMATIC_SEMICOLON;
-            return true;
+            return remember_lookahead(scanner, lexer, ASI_PENDING);
         }
         lexer->result_symbol = YIELD_LINE_TERMINATOR;
         return true;
@@ -820,6 +839,20 @@ bool tree_sitter_javascript_external_scanner_scan(void *payload, TSLexer *lexer,
         return scan_template_chars(lexer);
     }
 
+    if (scanner->pending_token) {
+        if (scanner->pending_token == ASI_PENDING && valid_symbols[AUTOMATIC_SEMICOLON]) {
+            scanner->pending_token = 0;
+            lexer->mark_end(lexer);
+            lexer->result_symbol = AUTOMATIC_SEMICOLON;
+            return true;
+        }
+        if (scanner->pending_token == ANNEX_PREFIX_PENDING && valid_symbols[ANNEX_PREFIX]) {
+            scanner->pending_token = 0;
+            lexer->mark_end(lexer);
+            return replay_annex(scanner, lexer);
+        }
+    }
+
     // Quoted JSX attributes treat Annex B markers and NUL as text.
     if (valid_symbols[JSX_ATTRIBUTE_CHARACTER_REFERENCE]) {
         return scan_jsx_attribute_string(lexer, valid_symbols[JSX_DOUBLE_STRING_FRAGMENT]);
@@ -885,7 +918,12 @@ bool tree_sitter_javascript_external_scanner_scan(void *payload, TSLexer *lexer,
     } else if (valid_symbols[AUTOMATIC_SEMICOLON]) {
         bool try_ternary = false;
         bool at_next_token = false;
-        if (scan_automatic_semicolon(scanner, lexer, valid_symbols, &try_ternary, &at_next_token)) return true;
+        if (scan_automatic_semicolon(scanner, lexer, valid_symbols, &try_ternary, &at_next_token)) {
+            if (scanner->pending_token == DECLARATION_PENDING && lexer->result_symbol != DECLARATION_END) {
+                scanner->pending_token = 0;
+            }
+            return true;
+        }
         if (try_ternary && valid_symbols[TERNARY_QMARK]) return scan_ternary_qmark(lexer);
         if (!at_next_token) return false;
     } else {
