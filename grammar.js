@@ -45,7 +45,7 @@ module.exports = grammar({
     // Never produced: the scanner only reads whether it is valid, after `return`, `break`, `continue` and a label, where a
     // lone CR ends the statement like any other line terminator (ECMA-262 12.9.1: no LineTerminator here).
     $._restricted_keyword,
-    // A declaration without an initializer can end before an opening parenthesis on the next line.
+    // Preserve a bare declaration or yield expression's lookahead decision across incremental reuse.
     $._declaration_end,
     // Only the validity of this marker is used, to tell a modifier from a field before '*'.
     $._generator_method_continues,
@@ -693,6 +693,7 @@ module.exports = grammar({
         seq($._yield_operand, optional('*'), $.expression),
         // Require a semicolon for recovery if a line break cannot end the expression by ASI.
         seq($._yield_line_terminator, ';'),
+        $._declaration_end,
       )),
     )),
 

@@ -29,6 +29,44 @@ func TestCanLoadGrammar(t *testing.T) {
 	}
 }
 
+func TestLookaheadAfterSubtreeReuse(t *testing.T) {
+	language := tree_sitter.NewLanguage(tree_sitter_javascript.Language())
+	for _, c := range []struct{ name, prefix, suffix, insertion string }{
+		{"bare declarator", "", "let x/*\n*/+y", " "},
+		{"bare yield ASI", "function* g(){return ", "yield yield\n(x);}", "/*review\n*/"},
+		{"bare yield Annex B", "function* g(){ f(", "yield<!--x\n); }", "/*review\n*/"},
+	} {
+		t.Run(c.name, func(t *testing.T) {
+			parser := tree_sitter.NewParser()
+			defer parser.Close()
+			if err := parser.SetLanguage(language); err != nil {
+				t.Fatal(err)
+			}
+
+			prefix := c.prefix + c.insertion
+			edited := []byte(prefix + c.suffix)
+			old := parser.Parse([]byte(c.prefix+c.suffix), nil)
+			defer old.Close()
+			start := tree_sitter.Point{Column: uint(len(c.prefix))}
+			end := tree_sitter.Point{
+				Row:    uint(strings.Count(prefix, "\n")),
+				Column: uint(len(prefix) - 1 - strings.LastIndexByte(prefix, '\n')),
+			}
+			old.Edit(&tree_sitter.InputEdit{
+				StartByte: uint(len(c.prefix)), OldEndByte: uint(len(c.prefix)), NewEndByte: uint(len(prefix)),
+				StartPosition: start, OldEndPosition: start, NewEndPosition: end,
+			})
+			incremental := parser.Parse(edited, old)
+			defer incremental.Close()
+			fresh := parser.Parse(edited, nil)
+			defer fresh.Close()
+			if got, want := incremental.RootNode().ToSexp(), fresh.RootNode().ToSexp(); fresh.RootNode().HasError() || got != want {
+				t.Fatalf("incremental: %s\nfresh: %s", got, want)
+			}
+		})
+	}
+}
+
 func TestIncompleteMethodNameAfterEdit(t *testing.T) {
 	language := tree_sitter.NewLanguage(tree_sitter_javascript.Language())
 	const prefix = "class C {"

@@ -2860,6 +2860,10 @@
                         "value": ";"
                       }
                     ]
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "_declaration_end"
                   }
                 ]
               },
