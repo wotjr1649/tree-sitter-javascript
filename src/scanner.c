@@ -97,19 +97,24 @@ unsigned tree_sitter_javascript_external_scanner_serialize(void *payload, char *
 
 void tree_sitter_javascript_external_scanner_deserialize(void *payload, const char *buffer, unsigned length) {
     Scanner *scanner = payload;
-    scanner->depth = 0;
-    scanner->overflow = 0;
-    scanner->annex_pending = false;
-    if (length < SCOPE_HEADER_SIZE || length > TREE_SITTER_SERIALIZATION_BUFFER_SIZE) return;
+    if (length < SCOPE_HEADER_SIZE || length > TREE_SITTER_SERIALIZATION_BUFFER_SIZE) goto empty;
 
     uint16_t state;
     memcpy(&state, buffer + sizeof(scanner->overflow), sizeof(state));
     uint16_t depth = state & ~ANNEX_PENDING;
+    if (length == SCOPE_HEADER_SIZE + 1 && depth >= 1 && depth <= 4) {
+        scanner->depth = depth;
+        scanner->annex_pending = state & ANNEX_PENDING;
+        memcpy(&scanner->overflow, buffer, sizeof(scanner->overflow));
+        scanner->flags[0] = (uint8_t)buffer[SCOPE_HEADER_SIZE];
+        scanner->async_arrows[0] = 0;
+        return;
+    }
     unsigned flag_length = (depth + 3u) / 4;
-    if (depth > SCOPE_BYTES * 4 || length < SCOPE_HEADER_SIZE + flag_length) return;
+    if (depth > SCOPE_BYTES * 4 || length < SCOPE_HEADER_SIZE + flag_length) goto empty;
     unsigned arrow_length = (depth + 7u) / 8;
     unsigned copied = length - SCOPE_HEADER_SIZE - flag_length;
-    if (copied > arrow_length) return;
+    if (copied > arrow_length) goto empty;
 
     scanner->depth = depth;
     scanner->annex_pending = state & ANNEX_PENDING;
@@ -117,6 +122,12 @@ void tree_sitter_javascript_external_scanner_deserialize(void *payload, const ch
     memcpy(scanner->flags, buffer + SCOPE_HEADER_SIZE, flag_length);
     memcpy(scanner->async_arrows, buffer + SCOPE_HEADER_SIZE + flag_length, copied);
     memset(scanner->async_arrows + copied, 0, arrow_length - copied);
+    return;
+
+empty:
+    scanner->depth = 0;
+    scanner->overflow = 0;
+    scanner->annex_pending = false;
 }
 
 static void enter_context(Scanner *scanner, unsigned flags) {
@@ -308,9 +319,8 @@ static ASILookahead scan_asi_trivia(TSLexer *lexer, ASITrivia *trivia, bool anne
             } else if (lexer->lookahead == '*') {
                 lexer->advance(lexer, skip_block);
                 bool block_newline = false;
-                while (!lexer->eof(lexer)) {
+                while ((c = lexer->lookahead) != 0 || !lexer->eof(lexer)) {
                     if (at_range_start(lexer, stop_at_range)) return ASI_END;
-                    c = lexer->lookahead;
                     lexer->advance(lexer, skip_block);
                     if (at_range_start(lexer, stop_at_range)) return ASI_END;
                     if (c == '*' && lexer->lookahead == '/') {
@@ -942,17 +952,19 @@ bool tree_sitter_javascript_external_scanner_scan(void *payload, TSLexer *lexer,
     bool enter = valid_symbols[ENTER_STATIC_BLOCK] || valid_symbols[ENTER_PLAIN] || valid_symbols[ENTER_AWAIT] ||
                  valid_symbols[ENTER_YIELD] || valid_symbols[ENTER_BOTH];
     bool context = enter || valid_symbols[CONTEXT_IDENTIFIER];
-    bool await_keyword = valid_symbols[CONTEXT_AWAIT] && (context_flags(scanner) & ASYNC_ARROW_CONTEXT);
     bool html = valid_symbols[HTML_COMMENT] && !valid_symbols[ESCAPE_SEQUENCE] && !valid_symbols[REGEX_PATTERN];
     bool line_start = false;
     bool first_column = false;
-    if (context || html || await_keyword) {
+    if (context || html || (valid_symbols[CONTEXT_AWAIT] && (context_flags(scanner) & ASYNC_ARROW_CONTEXT))) {
         int32_t c = lexer->lookahead;
-        first_column = html && (c == '/' || is_extra_space(c)) && lexer->is_at_included_range_start(lexer) &&
+        bool space = is_extra_space(c);
+        first_column = html && (c == '/' || space) && lexer->is_at_included_range_start(lexer) &&
                        lexer->get_column(lexer) == 0;
-        while (is_extra_space(lexer->lookahead)) {
-            line_start |= is_line_terminator(lexer->lookahead);
+        while (space) {
+            line_start |= is_line_terminator(c);
             skip(lexer);
+            c = lexer->lookahead;
+            space = is_extra_space(c);
         }
     }
     if (enter) {
@@ -970,7 +982,7 @@ bool tree_sitter_javascript_external_scanner_scan(void *payload, TSLexer *lexer,
         }
     }
 
-    if (await_keyword && lexer->lookahead == 'a') {
+    if (lexer->lookahead == 'a' && valid_symbols[CONTEXT_AWAIT] && (context_flags(scanner) & ASYNC_ARROW_CONTEXT)) {
         return scan_context_word(scanner, lexer, true);
     }
     if (valid_symbols[CONTEXT_IDENTIFIER] && (lexer->lookahead == 'a' || lexer->lookahead == 'y')) {
