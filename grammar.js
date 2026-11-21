@@ -73,6 +73,12 @@ module.exports = grammar({
     $._jsx_attribute_character_reference,
     $._jsx_double_string_fragment,
     $._jsx_single_string_fragment,
+    // ASI reads these markers after a completed arrow or postfix update.
+    $._arrow_function_end,
+    $._postfix_update_end,
+    // A line break before using can also end a Script statement.
+    $._await_using_asi,
+    $._context_await,
   ],
 
   extras: $ => [
@@ -112,6 +118,7 @@ module.exports = grammar({
     $._lhs_expression,
     $._keyword_identifier,
     $._jsx_keyword_identifier,
+    $._await_keyword,
     $._await_operand,
     $._postfix_expression,
   ],
@@ -512,7 +519,7 @@ module.exports = grammar({
           field('operator', 'of'),
         ),
         seq(
-          field('kind', seq('await', $._await_using, 'using')),
+          field('kind', seq($._await_keyword, $._await_using, 'using')),
           field('left', choice(
             $.identifier,
             alias('of', $.identifier),
@@ -963,6 +970,7 @@ module.exports = grammar({
         seq(field('body', $.expression), $._leave_concise_body),
         seq(field('body', $.statement_block), $._leave_context),
       ),
+      optional($._arrow_function_end),
     ),
 
     _arrow_parameters: $ => choice(
@@ -998,11 +1006,14 @@ module.exports = grammar({
       field('arguments', optional(prec.dynamic(1, $.arguments))),
     )),
 
+    // Async arrows give their await keyword precedence over the Script identifier fallback.
+    _await_keyword: $ => choice('await', alias($._context_await, 'await')),
+
     // Prefer the keyword interpretation when await has a unary operand.
     // A direct assignment is outside that operand, so `await(a).x=b` retains its identifier interpretation.
     await_expression: $ => prec.dynamic(1, prec('unary_void', seq(
-      'await',
-      optional(choice($._await_operand_continues, $._await_using)),
+      $._await_keyword,
+      optional(choice($._await_operand_continues, $._await_using, $._await_using_asi)),
       $._await_operand,
     ))),
 
@@ -1138,6 +1149,7 @@ module.exports = grammar({
       seq(
         field('argument', choice($.expression, $.primary_expression)),
         field('operator', choice('++', '--')),
+        optional($._postfix_update_end),
       ),
       seq(
         field('operator', choice('++', '--')),
@@ -1401,6 +1413,7 @@ module.exports = grammar({
       $._enter_plain_expression,
       field('value', $.expression),
       $._leave_concise_body,
+      optional($._binding_end),
     ),
 
     formal_parameters: $ => seq(
@@ -1511,7 +1524,7 @@ module.exports = grammar({
       ...CONTEXTUAL_KEYWORDS,
     ),
 
-    _semicolon: $ => choice($._automatic_semicolon, ';'),
+    _semicolon: $ => choice($._automatic_semicolon, $._await_using_asi, ';'),
   },
 });
 
@@ -1524,7 +1537,7 @@ module.exports = grammar({
  * @returns {ChoiceRule}
  */
 function usingDeclaration($, semicolon) {
-  const kind = field('kind', choice('using', seq('await', $._await_using, 'using')));
+  const kind = field('kind', choice('using', seq($._await_keyword, $._await_using, 'using')));
   return choice(
     seq(kind, commaSep1($._using_declarator), semicolon),
     // TypeScript reads `using as …` and `using satisfies …` as declarations; the static precedence keeps the
