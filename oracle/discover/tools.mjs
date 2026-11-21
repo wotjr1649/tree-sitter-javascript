@@ -3,7 +3,7 @@
 // This repeats the options, the error classes and the UTF-16 to UTF-8 conversion of ../run.mjs on purpose: run.mjs is a script
 // whose own sha256 is recorded in ../verdicts.json, so it cannot be split into a module without regenerating that file. The
 // plan: when run.mjs is next changed for another reason, move these functions to a module both import. Until then
-// test/tools-parity.test.mjs runs run.mjs on a few cases and fails when the two disagree.
+// test/pinned.test.mjs runs run.mjs on a few cases and fails when the two disagree.
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createRequire } from "node:module";
@@ -16,7 +16,7 @@ const { parseSync: oxcParse } = require("oxc-parser");
 const bytePos = (src, u16) => (Number.isInteger(u16) ? Buffer.byteLength(src.slice(0, u16), "utf8") : null);
 export function babel(src, sourceType) {
   try {
-    const ast = babelParse(src, { sourceType, plugins: ["jsx"], errorRecovery: true });
+    const ast = babelParse(src, { sourceType, plugins: ["jsx", "decorators"], errorRecovery: true });
     const e = ast.errors[0];
     return e ? { c: "early", at: bytePos(src, e.pos), m: e.message.slice(0, 160), n: ast.errors.length } : { c: "accept" };
   } catch (e) {

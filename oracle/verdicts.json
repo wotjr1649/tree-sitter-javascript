@@ -11,7 +11,8 @@
     "options": {
      "sourceType": "per case",
      "plugins": [
-      "jsx"
+      "jsx",
+      "decorators"
      ],
      "errorRecovery": true
     }
@@ -34,7 +35,7 @@
   "cases_file": "cases.jsonl",
   "cases_sha256": "4d398713f332d33fff4493da57c0f039f97cd80f4931cf0cb749605f0d96e22c",
   "runner": "run.mjs",
-  "runner_sha256": "06cfe49cd56d0bac9b5c672b1f62fc0f44b37de02c0a2bf04c557e5354c5c24d"
+  "runner_sha256": "1b5426fb0947aea67d3162e79bfdb1b30eff9eee1eba1661b46d2a27de3fd289"
  },
  "results": [
   {

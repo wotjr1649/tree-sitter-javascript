@@ -14,9 +14,9 @@ TypeScript and TSX are not covered here.
 
 ## Verdicts
 
-Each tool classifies a case, for its `sourceType` (`module` unless the case says `script`), UTF-8 bytes, ECMAScript level at the tool's default (no proposal plugins):
+Each tool classifies a case, for its `sourceType` (`module` unless the case says `script`), UTF-8 bytes, ECMAScript level at the tool's default plus JSX and Stage 3 decorators in Babel:
 
-| Class | Babel (`parse(src, { sourceType, plugins: ["jsx"], errorRecovery: true })`) | oxc (`parseSync("oracle.jsx", src, { lang: "jsx", sourceType, showSemanticErrors })`) |
+| Class | Babel (`parse(src, { sourceType, plugins: ["jsx", "decorators"], errorRecovery: true })`) | oxc (`parseSync("oracle.jsx", src, { lang: "jsx", sourceType, showSemanticErrors })`) |
 | --- | --- | --- |
 | `accept` | no error | no error with `showSemanticErrors: true` |
 | `syntax` | throws | errors with `showSemanticErrors: false` |

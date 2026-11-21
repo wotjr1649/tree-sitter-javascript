@@ -15,7 +15,7 @@ Inputs (pinned in `manifest.json`):
 The cross-platform comparison checks the selected valid counts in `xplat_valid_counts`. Recount the valid inputs
 when changing the input or reference-parser pins.
 
-Babel 8.1.2 and oxc 0.159.0 answer with the exact options of `../run.mjs` (JSX on, `errorRecovery`, `showSemanticErrors`).
+Babel 8.1.2 and oxc 0.159.0 answer with the exact options of `../run.mjs` (JSX and Stage 3 decorators in Babel, `errorRecovery`, `showSemanticErrors`).
 Their classes are `accept` (no error), `early` (Babel: recovered errors only; oxc: errors only with `showSemanticErrors`) and
 `syntax` (a parse error). This grammar is run through the Go binding of the repository by `tsparse`, with the faithfulness
 rule of `../replay` (no ERROR, MISSING or zero-width node, leaves cover the input); the rule is copied (`scan` and `isGap`
