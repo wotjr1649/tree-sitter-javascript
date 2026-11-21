@@ -429,14 +429,8 @@ static bool scan_automatic_semicolon(Scanner *scanner, TSLexer *lexer, const boo
     *try_ternary = !trivia.comment && next == ASI_NEXT_TOKEN && lexer->lookahead == '?';
     bool async_field = valid_symbols[RESTRICTED_KEYWORD] && valid_symbols[BINDING_END];
     bool restricted = valid_symbols[RESTRICTED_KEYWORD] && !async_field;
-    if (next >= ASI_ANNEX) {
-        next = scan_past_annex(lexer, &trivia, true);
-        if (next == ASI_END || (next == ASI_NEXT_TOKEN && lexer->lookahead == '}')) return true;
-        bool declaration_end = valid_symbols[DECLARATION_END] && !valid_symbols[LOGICAL_OR];
-        bool insert = restricted ? (next != ASI_NEXT_TOKEN || lexer->lookahead != ';') :
-                      semicolon_before_lookahead(lexer, valid_symbols, next, declaration_end, false);
-        return (trivia.newline && insert) || replay_annex(scanner, lexer, valid_symbols);
-    }
+    bool annex = next >= ASI_ANNEX;
+    if (annex) next = scan_past_annex(lexer, &trivia, true);
     if (next == ASI_END) {
         if (!lexer->eof(lexer)) {
             // A close comment at a range boundary can still lead to a sequence expression.
@@ -450,6 +444,7 @@ static bool scan_automatic_semicolon(Scanner *scanner, TSLexer *lexer, const boo
             }
             return true;
         }
+        if (annex) return true;
         // A trailing comment can be lexed as an extra before the ordinary EOF insertion.
         bool defer_eof = !restricted && valid_symbols[LOGICAL_OR] && !trivia.leading_non_cr_break &&
                          (trivia.line_comment || trivia.ends_at_block_comment);
@@ -457,6 +452,12 @@ static bool scan_automatic_semicolon(Scanner *scanner, TSLexer *lexer, const boo
     }
     if (next == ASI_NEXT_TOKEN && lexer->lookahead == '}') {
         return true;
+    }
+    if (annex) {
+        bool declaration_end = valid_symbols[DECLARATION_END] && !valid_symbols[LOGICAL_OR];
+        bool insert = restricted ? (next != ASI_NEXT_TOKEN || lexer->lookahead != ';') :
+                      semicolon_before_lookahead(lexer, valid_symbols, next, declaration_end, false);
+        return (trivia.newline && insert) || replay_annex(scanner, lexer, valid_symbols);
     }
     if (!trivia.newline) {
         return false;
