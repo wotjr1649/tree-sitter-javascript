@@ -13,22 +13,22 @@ JavaScript and JSX inputs that parsed cleanly in v3.1.0 and are accepted by both
 is `tree_sitter_javascript`, and the parser ABI is 15. In the examples below, `\n`, `\r`, `\r\n`, `\0` and `\u2028`
 denote actual source characters.
 
-The Windows comparison with v3.1.0 covered 59,390 records: the 3,726 default inputs (corpus, examples,
+The Windows comparison with v3.1.0 covered 59,468 records: the 3,804 default inputs (corpus, examples,
 highlights, tags and oracle), the 1,068 fixed N-of-M inputs and the 54,596 pinned inputs labeled valid by
 Discovery. Records can appear in more than one set.
 
 | Input set | Total | Same | Changed clean | Clean to error | Error to clean | Changed recovery |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| Default | 3,726 | 1,580 | 1,048 | 54 | 543 | 501 |
+| Default | 3,804 | 1,622 | 1,072 | 55 | 554 | 501 |
 | Fixed N-of-M | 1,068 | 1,045 | 6 | 15 | 0 | 2 |
 | Pinned Discovery valid | 54,596 | 54,368 | 210 | 0 | 18 | 0 |
-| **Total** | **59,390** | **56,993** | **1,264** | **69** | **561** | **503** |
+| **Total** | **59,468** | **57,035** | **1,288** | **70** | **572** | **503** |
 
-Both reference parsers accept all 1,264 changed clean records in their source goal, and the structure of
-each agrees with Babel after the approved normalisations below. Both references reject all 69 clean-to-error
-records in Script and in Module, so no input they accept moved from clean to error. Under ADR-0001 those 69 are
-minor changes and are listed under Fixed, while Breaking changes lists the CST changes of valid input. The 561 error-to-clean
-records include 543 default inputs whose structure agrees with Babel. In the pinned Discovery set, all 54,596
+Both reference parsers accept all 1,288 changed clean records in their source goal, and the structure of
+each agrees with Babel after the approved normalisations below. Both references reject all 70 clean-to-error
+records in Script and in Module, so no input they accept moved from clean to error. Under ADR-0001 those 70 are
+minor changes and are listed under Fixed, while Breaking changes lists the CST changes of valid input. The 572 error-to-clean
+records include 554 default inputs whose structure agrees with Babel. In the pinned Discovery set, all 54,596
 valid inputs are clean, and the classification has A1 0, A2 0 and B1 152. The structure comparison found two
 raw differences, the Module readings of top-level `await` and of inline `<!--`, and no unapproved difference.
 
@@ -78,9 +78,23 @@ raw differences, the Module readings of top-level `await` and of inline `<!--`, 
 - In `function* f(){ yield\n(x); }`, a bare `yield_expression` is followed by an expression statement
   for `(x)`. A line terminator inside a comment also separates the operand where ASI applies.
   `yield *\n x` still delegates (#56).
-- In an async function, `await\nusing;` is one `await_expression`, where v3.1.0 has two identifier
-  statements. In `async function f(){for(await /*c*/using\n<!--c\n;;);}`, the initializer is an
-  `await_expression` followed by an `html_comment`, where v3.1.0 reads a comparison (#18, #26, #62).
+- In an async function and at the top level, `await\nusing;` is one `await_expression`, where v3.1.0 has two
+  identifier statements. In `async function f(){for(await /*c*/using\n<!--c\n;;);}`, the initializer is an
+  `await_expression` followed by an `html_comment`, where v3.1.0 reads a comparison. At the top level the
+  Module reading applies when it parses, and the Script reading remains where it does not: `await\nusing => x;`
+  and `await\nusing: g();` are still two statements, and `{await\nusing x=g();}` is still an identifier statement
+  followed by a `using_declaration` (#18, #26, #62, #66).
+- In the concise body of an async arrow function, `await` is a keyword. `async x => await\nusing;` and
+  `async x => await\nf()` have one `await_expression` as the arrow body, where v3.1.0 has an arrow whose
+  body is the identifier `await` followed by a separate statement. Inside it, a non-async arrow keeps the
+  Script reading of `await` as an identifier, as in `async x => y => await` and `x => await\nusing;` (#66).
+- A line terminator ends an arrow function before a token that cannot continue it. A block-bodied arrow
+  followed by a line-start regular expression or `[` is a complete statement: `x => {}\n/b/g` and
+  `async x => {}\n/b/g` have an arrow statement and a separate regular expression statement, where v3.1.0
+  reads a division chain, and `y => {}\n[a]()` has two statements, where v3.1.0 indexes the arrow. A concise
+  body ending in a postfix update ends before a line-start template: `x => a++\n\`b\`` is an arrow statement
+  followed by a template statement, where v3.1.0 reads a call with a template argument. A tagged template
+  (`tag\n\`x\``) and a division inside a concise body (`x => y\n/b/g`) still continue (#66).
 - A bare `&` immediately before either JSX attribute closing quote is a `string_fragment`, including
   when U+0000 precedes it. Each example below has two attributes, `x` and `y`, with `/> //` inside
   the value of `y`. v3.1.0 produces one attribute followed by a JavaScript comment (#45, #48, #50,
@@ -101,13 +115,14 @@ raw differences, the Module readings of top-level `await` and of inline `<!--`, 
 
 ### Fixed
 
-- Reject input that parsed cleanly in v3.1.0 and that both reference parsers reject in Script and in Module (69
+- Reject input that parsed cleanly in v3.1.0 and that both reference parsers reject in Script and in Module (70
   records of the comparison above; a minor change under ADR-0001). `yield` with an operand outside a generator, as
   in `yield db.users.where('x')` (#52). `a/*\r*/++`, `class A{get/*\n*/[g]=1}` and `class A{set//c\n[g]=1}`, where a
   line terminator follows `get` or `set` before a computed field name (#55). `function* f(){ yield\n*x; }` and
   `function* f(){ g(yield\n(x)); }`, where a line terminator follows `yield` (#56). A line terminator inside
   `await using` in a `for` head, as in `async function f(){ for (await\nusing x = f();;) {} }` and
-  `async function f(){ for (await using\nx of y) {} }` (#18, #26, #62).
+  `async function f(){ for (await using\nx of y) {} }` (#18, #26, #62). `await` as an assignment target in the
+  concise body of an async arrow, as in `async x => await = y;` (#66).
 - Count lone CR and line terminators in block comments for ASI. `a\rb` and `let a=b/*\n*/++c`
   have the required statement break. Names such as `in_` and `instanceof_` can start a statement.
   Declarations, initializers, calls, computed method names and tagged templates can still continue
@@ -132,6 +147,12 @@ raw differences, the Module readings of top-level `await` and of inline `<!--`, 
 - Treat `<!--`, `-->`, `//`, `/* ... */` and incomplete character references as string content inside
   quoted JSX attributes, including when they occur alongside U+0000. `<a b='<!--' c="d"/>` and
   `<a b="-->" c="d"/>` give an `ERROR` in v3.1.0 and parse cleanly now (#63).
+- End a postfix update before a line-start template: `a++\n\`b\`` is an expression statement followed by a
+  template statement, where v3.1.0 gives an `ERROR` at the update. End a class field after a block-bodied
+  arrow before a computed or generator method: `class C { x = y => {}\n [a](){} }` and
+  `class C { x = y => {}\n *g(){} }` have a field followed by a method, where v3.1.0 gives an `ERROR`. The
+  Annex B forms `async x => a++ /* \n */ -->x\n\`b\`` and `async x => {} /*x*/\n -->x\n/b/g` keep the
+  separate statements that v3.1.0 gives (#66).
 
 ### Changed
 
@@ -152,6 +173,10 @@ raw differences, the Module readings of top-level `await` and of inline `<!--`, 
 - The same Module reading applies to top-level `await(y)` in Script-only Annex B inputs. In
   `const fs=[async()=>x/*α\nβ*/<!--x\n,await(y)]`, both references accept the input in Script and the
   parser returns an `await_expression` where Babel's Script parse has a call (#41, #61).
+- Top-level `await\nusing;` follows the Module reading too: one `await_expression`, where Babel's Script
+  parse has two identifier statements. This also holds in the Script-only `var await;\nawait\nusing;`, where
+  the declared `await` is an `identifier` and the following expression is an `await_expression`, as for
+  top-level `await(y)` above (#18, #26, #41, #62, #66).
 - Inline `<!--` in `x = -1 <!--x;` follows Babel's Module expression structure. Babel's Script parse
   ends the assignment before an HTML-like comment. The parser API has no Script/Module selector
   (#41, #46, #49).
@@ -182,9 +207,10 @@ raw differences, the Module readings of top-level `await` and of inline `<!--`, 
   pragma. The Go binding compiles `src/scanner.c` as its own translation unit, because including it after
   `parser.c` extended the pragma to the scanner under cgo (#63, #64).
 - Linux CI instruction counts (callgrind, the 375-file npm sample, all clean, v1.0.0 = 100 %), run 44873992978
-  at `1864a60`, whose generated `src/parser.c` differs from the release head only in the two `.metadata`
-  version lines (the two commits differ in 12 release files): fresh parse 104.68 %,
-  incremental parse 107.44 %. For comparison, v3.1.0 measures 105.55 % and 103.84 %, and `dde79c0` before
+  at `1864a60`, before #65 and #66 (#66 changes the grammar and the scanner and grows the generated
+  `src/parser.c` by 149,857 bytes and 56 states; the main lexer stays at 264 states and there is still no
+  pragma). No instruction count of the release content had been measured when this entry was written:
+  fresh parse 104.68 %, incremental parse 107.44 % at `1864a60`. For comparison, v3.1.0 measures 105.55 % and 103.84 %, and `dde79c0` before
   #61 to #64 measured 109.71 % and 110.72 %. On the #63 branch (run 44863360925), a control with the pragma
   removed by hand gave 104.15 % and 107.12 % against the branch's 104.23 % and 107.13 %, so the pragma
   explains the difference. The default inputs measure 92.68 % fresh and 63.91 % incremental, and the N-of-M
@@ -197,10 +223,10 @@ raw differences, the Module readings of top-level `await` and of inline `<!--`, 
   in the default, N-of-M and pinned Discovery valid sets in fresh parses and after a one-space edit.
   Between those trees generated `src/parser.c` fell from 3,971,999 to 3,704,797 bytes and parser states
   from 3,412 to 2,797 (#58).
-- Generated `src/parser.c` is 3,763,141 bytes and has 2,798 parser states with the v4.0.0 metadata.
-  Compared with v3.1.0 (3,427,488 bytes and 2,263 states), that is 335,653 more bytes (+9.79 %) and 535 more
-  states (+23.64 %). Compared with v1.0.0 (2,855,926 bytes and 1,870 states), it is larger by 31.77 % and
-  49.63 %.
+- Generated `src/parser.c` is 3,912,998 bytes and has 2,854 parser states with the v4.0.0 metadata.
+  Compared with v3.1.0 (3,427,488 bytes and 2,263 states), that is 485,510 more bytes (+14.17 %) and 591 more
+  states (+26.12 %). Compared with v1.0.0 (2,855,926 bytes and 1,870 states), it is larger by 37.01 % and
+  52.62 %. Before #66 it was 3,763,141 bytes and 2,798 states (#66).
 
 The Windows measurements below come from two runs of four paired rounds on the #58 changes before
 integration with `19bb871`. The cells give median parse-time changes and the observed ranges within
@@ -249,16 +275,10 @@ are kept as history; the release criterion is the Linux CI instruction count abo
 - In Script, a same-line close suffix such as `x; -->z\n+y;` is still accepted, and
   `function f(){throw/*\r*/x}` still parses despite the line terminator after `throw` (#41, #46, #49,
   #55, #56).
-- Two random Annex B probe inputs outside the matrix still differ from the references, and both contain
-  comments. In `async x => a++\u2028/* \n */\u2028-->x\n\`b\``, the update expression `[11,14)` is an `ERROR`.
-  `async x => {}\u2028/*x*/\n -->x\n/b/g` reads a division chain instead of a separate regular expression
-  statement. v3.1.0 gives a separate statement in both. The comment-free forms `async x => a++\n\`b\`` and
-  `async x => {}\n/b/g` show the same defect (v3.1.0 reads the first as a call with a template argument and the
-  second as a division chain) (#61).
-- The Module-only `export {};\nawait\nusing;` keeps two identifier statements, because without a program
-  mode it cannot be told from the Script-only `var await;\nawait\nusing;`. Some invalid `using` forms are
-  still accepted: `for (using {a} of y);`, `label: using x = 1;` and a `using` declaration directly under
-  `case` (#18, #26, #62).
+- Some invalid `using` forms are still accepted: `for (using {a} of y);`, `label: using x = 1;` and a `using`
+  declaration directly under `case` (#18, #26, #62).
+- A statement that starts with an unnamed function expression, as in `function(){}\n/b/g`, is still accepted
+  and divides the function expression, although both references reject it (v3.1.0 does the same) (#66).
 - Optional chains such as `a?.b = 1;`, `a?.b++;` and `[a?.b] = c;` still parse as assignment, update and
   destructuring targets (#19). `if (x) class A {}`, `a ?? b || c;` and `class A extends x + y {}` still
   parse cleanly although both references reject them. The other invalid constructs documented under
@@ -268,7 +288,9 @@ are kept as history; the release criterion is the Linux CI instruction count abo
   without error (#20).
 - `function f(){ for await (const x of xs) x; }` can still parse outside an async context. Beyond 4,072
   saved function contexts, the scanner can fall back to the default keyword reading until it returns
-  to a saved context (#35, #36).
+  to a saved context. From about 2,700 nested contexts on, the marks that make `await` a keyword in the
+  concise body of the innermost async arrows no longer fit the serialization buffer and are dropped first, so
+  such a body can read `await` as an identifier (#35, #36, #66).
 - The early-error policy still allows cases such as duplicate import attribute keys and a `using`
   declaration without an initializer. TypeScript's `import x = a.class;` family (TS1359) remains a
   downstream limitation.

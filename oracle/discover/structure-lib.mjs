@@ -155,27 +155,31 @@ const STRIP = (f) => (f.startsWith("S:") && f !== "S:empty") || f === "M:field" 
 // The end of a statement or field: without trailing white space and comments (this grammar keeps a trailing comment
 // inside the statement it ends, Babel does not) and without one terminating `;`. cm maps a comment end to its start.
 function trimEnd(buf, s, e, cm) {
-  const ws = () => {
+  const trimTrivia = () => {
     while (e > s) {
+      // A line comment can end with whitespace, so check its recorded boundary before trimming a character.
+      const commentStart = cm.get(e);
+      if (commentStart !== undefined && commentStart > s) {
+        e = commentStart;
+        continue;
+      }
       const c = buf[e - 1];
-      if (c === 0x20 || (c >= 0x09 && c <= 0x0d)) e--;
-      else if (e - s >= 2 && c === 0xa0 && buf[e - 2] === 0xc2) e -= 2; // NBSP
-      else if (e - s >= 3 && ((buf[e - 3] === 0xe2 && buf[e - 2] === 0x80 && (c === 0xa8 || c === 0xa9)) || (buf[e - 3] === 0xef && buf[e - 2] === 0xbb && c === 0xbf))) e -= 3; // LS PS BOM
-      else return;
+      if (c === 0x20 || (c >= 0x09 && c <= 0x0d)) {
+        e--;
+        continue;
+      }
+      if (c < 0x80) return;
+
+      // ECMAScript whitespace and line terminators take at most three UTF-8 bytes.
+      const last = buf.toString("utf8", Math.max(s, e - 3), e).at(-1);
+      if (last.trim()) return;
+      e -= Buffer.byteLength(last);
     }
   };
-  const comments = () => {
-    for (;;) {
-      ws();
-      const c = cm.get(e);
-      if (c === undefined || c <= s) return;
-      e = c;
-    }
-  };
-  comments();
+  trimTrivia();
   if (e > s && buf[e - 1] === 0x3b) {
     e--;
-    comments();
+    trimTrivia();
   }
   return e;
 }
