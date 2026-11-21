@@ -4028,37 +4028,22 @@
                     "type": "ALIAS",
                     "content": {
                       "type": "SYMBOL",
-                      "name": "unescaped_double_jsx_string_fragment"
+                      "name": "_jsx_double_string_fragment"
                     },
                     "named": true,
                     "value": "string_fragment"
                   },
                   {
-                    "type": "SYMBOL",
-                    "name": "html_character_reference"
+                    "type": "ALIAS",
+                    "content": {
+                      "type": "SYMBOL",
+                      "name": "_jsx_attribute_character_reference"
+                    },
+                    "named": true,
+                    "value": "html_character_reference"
                   }
                 ]
               }
-            },
-            {
-              "type": "CHOICE",
-              "members": [
-                {
-                  "type": "ALIAS",
-                  "content": {
-                    "type": "IMMEDIATE_TOKEN",
-                    "content": {
-                      "type": "STRING",
-                      "value": "&"
-                    }
-                  },
-                  "named": true,
-                  "value": "string_fragment"
-                },
-                {
-                  "type": "BLANK"
-                }
-              ]
             },
             {
               "type": "STRING",
@@ -4082,37 +4067,22 @@
                     "type": "ALIAS",
                     "content": {
                       "type": "SYMBOL",
-                      "name": "unescaped_single_jsx_string_fragment"
+                      "name": "_jsx_single_string_fragment"
                     },
                     "named": true,
                     "value": "string_fragment"
                   },
                   {
-                    "type": "SYMBOL",
-                    "name": "html_character_reference"
+                    "type": "ALIAS",
+                    "content": {
+                      "type": "SYMBOL",
+                      "name": "_jsx_attribute_character_reference"
+                    },
+                    "named": true,
+                    "value": "html_character_reference"
                   }
                 ]
               }
-            },
-            {
-              "type": "CHOICE",
-              "members": [
-                {
-                  "type": "ALIAS",
-                  "content": {
-                    "type": "IMMEDIATE_TOKEN",
-                    "content": {
-                      "type": "STRING",
-                      "value": "&"
-                    }
-                  },
-                  "named": true,
-                  "value": "string_fragment"
-                },
-                {
-                  "type": "BLANK"
-                }
-              ]
             },
             {
               "type": "STRING",
@@ -4121,28 +4091,6 @@
           ]
         }
       ]
-    },
-    "unescaped_double_jsx_string_fragment": {
-      "type": "IMMEDIATE_TOKEN",
-      "content": {
-        "type": "PREC",
-        "value": 1,
-        "content": {
-          "type": "PATTERN",
-          "value": "([^\"&\\x00]|\\x00+|&([^\"#A-Za-z\\x00]|([A-Za-z]+|#([xX][0-9a-fA-F]*|[0-9]*))?\\x00+))+"
-        }
-      }
-    },
-    "unescaped_single_jsx_string_fragment": {
-      "type": "IMMEDIATE_TOKEN",
-      "content": {
-        "type": "PREC",
-        "value": 1,
-        "content": {
-          "type": "PATTERN",
-          "value": "([^'&\\x00]|\\x00+|&([^'#A-Za-z\\x00]|([A-Za-z]+|#([xX][0-9a-fA-F]*|[0-9]*))?\\x00+))+"
-        }
-      }
     },
     "_jsx_attribute_value": {
       "type": "CHOICE",
@@ -9362,6 +9310,18 @@
     {
       "type": "SYMBOL",
       "name": "_await_using"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_jsx_attribute_character_reference"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_jsx_double_string_fragment"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_jsx_single_string_fragment"
     }
   ],
   "inline": [

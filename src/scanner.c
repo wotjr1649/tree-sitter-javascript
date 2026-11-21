@@ -36,6 +36,9 @@ enum TokenType {
     YIELD_LINE_TERMINATOR,
     ANNEX_PREFIX,
     AWAIT_USING,
+    JSX_ATTRIBUTE_CHARACTER_REFERENCE,
+    JSX_DOUBLE_STRING_FRAGMENT,
+    JSX_SINGLE_STRING_FRAGMENT,
 };
 
 enum Context {
@@ -644,6 +647,35 @@ static bool scan_character_reference_tail(TSLexer *lexer) {
     return length > 0 && lexer->lookahead == ';';
 }
 
+static bool scan_jsx_attribute_string(TSLexer *lexer, bool double_quote) {
+    int32_t quote = double_quote ? '"' : '\'';
+    lexer->result_symbol = double_quote ? JSX_DOUBLE_STRING_FRAGMENT : JSX_SINGLE_STRING_FRAGMENT;
+    bool has_text = false;
+
+    while (lexer->lookahead != quote && (lexer->lookahead != 0 || !lexer->eof(lexer))) {
+        if (lexer->lookahead == '&') {
+            lexer->mark_end(lexer);
+            advance(lexer);
+            // Keep the trailing ampersand in its own fragment.
+            if (has_text && lexer->lookahead == quote) return true;
+            if (scan_character_reference_tail(lexer)) {
+                if (!has_text) {
+                    advance(lexer);
+                    lexer->mark_end(lexer);
+                    lexer->result_symbol = JSX_ATTRIBUTE_CHARACTER_REFERENCE;
+                }
+                return true;
+            }
+        } else {
+            advance(lexer);
+        }
+        has_text = true;
+    }
+
+    lexer->mark_end(lexer);
+    return has_text;
+}
+
 static bool scan_jsx_text(TSLexer *lexer) {
     // saw_text will be true if we see any non-whitespace content, or any whitespace content that is not a newline and
     // does not immediately follow a newline.
@@ -773,6 +805,11 @@ bool tree_sitter_javascript_external_scanner_scan(void *payload, TSLexer *lexer,
             return false;
         }
         return scan_template_chars(lexer);
+    }
+
+    // Quoted JSX attributes treat Annex B markers and NUL as text.
+    if (valid_symbols[JSX_ATTRIBUTE_CHARACTER_REFERENCE]) {
+        return scan_jsx_attribute_string(lexer, valid_symbols[JSX_DOUBLE_STRING_FRAGMENT]);
     }
 
     if (scanner->annex_pending && valid_symbols[HTML_COMMENT] &&

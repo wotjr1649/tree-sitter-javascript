@@ -1,0 +1,43 @@
+==========================================
+Annex B markers in quoted JSX attributes
+==========================================
+
+<a b='<!--' c="<!--" d='-->' e="-->" />;
+
+---
+
+(program
+  (expression_statement
+    (jsx_self_closing_element
+      name: (identifier)
+      attribute: (jsx_attribute
+        (property_identifier)
+        (string (string_fragment)))
+      attribute: (jsx_attribute
+        (property_identifier)
+        (string (string_fragment)))
+      attribute: (jsx_attribute
+        (property_identifier)
+        (string (string_fragment)))
+      attribute: (jsx_attribute
+        (property_identifier)
+        (string (string_fragment))))))
+
+=====================================================
+Quoted JSX attribute text around character references
+=====================================================
+
+<a b='// &unfinished' c="  &amp;&#x26;" />;
+
+---
+
+(program
+  (expression_statement
+    (jsx_self_closing_element
+      name: (identifier)
+      attribute: (jsx_attribute
+        (property_identifier)
+        (string (string_fragment)))
+      attribute: (jsx_attribute
+        (property_identifier)
+        (string (string_fragment) (html_character_reference) (html_character_reference))))))

@@ -70,6 +70,9 @@ module.exports = grammar({
     $._annex_prefix,
     // A declaration requires both gaps in await using Binding to have no line terminator.
     $._await_using,
+    $._jsx_attribute_character_reference,
+    $._jsx_double_string_fragment,
+    $._jsx_single_string_fragment,
   ],
 
   extras: $ => [
@@ -867,31 +870,20 @@ module.exports = grammar({
       seq(
         '"',
         repeat(choice(
-          alias($.unescaped_double_jsx_string_fragment, $.string_fragment),
-          $.html_character_reference,
+          alias($._jsx_double_string_fragment, $.string_fragment),
+          alias($._jsx_attribute_character_reference, $.html_character_reference),
         )),
-        optional(alias(token.immediate('&'), $.string_fragment)),
         '"',
       ),
       seq(
         '\'',
         repeat(choice(
-          alias($.unescaped_single_jsx_string_fragment, $.string_fragment),
-          $.html_character_reference,
+          alias($._jsx_single_string_fragment, $.string_fragment),
+          alias($._jsx_attribute_character_reference, $.html_character_reference),
         )),
-        optional(alias(token.immediate('&'), $.string_fragment)),
         '\'',
       ),
     ),
-
-    // Workaround to https://github.com/tree-sitter/tree-sitter/issues/1156
-    // We give names to the token() constructs containing a regexp
-    // so as to obtain a node in the CST.
-    // An entity prefix interrupted by NUL is text, as is a bare ampersand before the closing quote.
-    unescaped_double_jsx_string_fragment: _ => token.immediate(prec(1, /([^"&\x00]|\x00+|&([^"#A-Za-z\x00]|([A-Za-z]+|#([xX][0-9a-fA-F]*|[0-9]*))?\x00+))+/)),
-
-    // same here
-    unescaped_single_jsx_string_fragment: _ => token.immediate(prec(1, /([^'&\x00]|\x00+|&([^'#A-Za-z\x00]|([A-Za-z]+|#([xX][0-9a-fA-F]*|[0-9]*))?\x00+))+/)),
 
     _jsx_attribute_value: $ => choice(
       alias($._jsx_string, $.string),
