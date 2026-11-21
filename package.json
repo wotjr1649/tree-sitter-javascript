@@ -1,6 +1,6 @@
 {
   "name": "tree-sitter-javascript",
-  "version": "4.2.0",
+  "version": "4.3.0",
   "description": "JavaScript grammar for tree-sitter",
   "repository": "https://github.com/wotjr1649/tree-sitter-javascript",
   "license": "MIT",

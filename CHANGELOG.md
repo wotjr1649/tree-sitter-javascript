@@ -5,17 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [4.3.0] - 2026-11-22
 
 ### Fixed
 
-- Preserve automatic semicolon insertion across comments when incrementally reusing a bare variable declarator.
-  Incremental parses now equal fresh parses of the edited input here (126 inputs of the default benchmark set
-  parsed with errors incrementally only).
-- Preserve automatic semicolon insertion and Annex B comments when incrementally reusing a bare `yield` expression.
+- Preserve automatic semicolon insertion (ASI) across comments when incrementally reusing bare variable declarators.
+  Preserve ASI and Annex B lookahead when reusing bare `yield` expressions. Fresh CSTs match v4.2.0 on all 102,473 fixed inputs.
+  All 742 changed incremental CSTs now match a fresh parse of the same edited input, including 44 that were
+  previously error-free. In the separate default benchmark pack, incremental error inputs fell from 221 to 95.
+  The fixed set still has nine included-range divergences due to runtime reuse and three other pre-existing
+  incremental divergences. LR states increased from 2,854 to 2,857; all 36 external token names and their order
+  are unchanged. [#76](https://github.com/wotjr1649/tree-sitter-javascript/pull/76)
 
-Consumers that snapshot incremental trees should refresh affected snapshots from the edited source. Incremental
-reparsing now matches the comment and expression boundaries of a fresh parse in these cases.
+Consumers that snapshot incremental trees should refresh affected snapshots from the edited source.
+
+### Changed
+
+- Simplify the scanner and grammar, removing 54 source lines. All six generated files from #76 are byte-identical
+  after this refactor. [#77](https://github.com/wotjr1649/tree-sitter-javascript/pull/77)
+- Linux Callgrind instruction counts for the #76 candidate changed as shown below relative to v4.2.0.
+  Peak RSS differed by up to 192 KiB across the paired workloads.
+  [Callgrind CI run](https://github.com/wotjr1649/tree-sitter-javascript/actions/runs/44929412258)
+
+| Input set | Fresh | Incremental |
+| --- | ---: | ---: |
+| Default | +0.47% | -17.41% |
+| N-of-M | +0.20% | +0.03% |
+| npm | +0.20% | +0.07% |
 
 ## [4.2.0] - 2026-11-22
 
@@ -1012,6 +1028,7 @@ Not fixed in 2.0.0; tracked as GitHub Issues where a number is given:
   build as `cp310-abi3`, and `make install` leaves the pkg-config description empty and prefixes absolute paths
   ([#22](https://github.com/wotjr1649/tree-sitter-javascript/issues/22)).
 
+[4.3.0]: https://github.com/wotjr1649/tree-sitter-javascript/compare/v4.2.0...v4.3.0
 [4.2.0]: https://github.com/wotjr1649/tree-sitter-javascript/compare/v4.1.0...v4.2.0
 [4.1.0]: https://github.com/wotjr1649/tree-sitter-javascript/compare/v4.0.1...v4.1.0
 [4.0.1]: https://github.com/wotjr1649/tree-sitter-javascript/compare/v4.0.0...v4.0.1
