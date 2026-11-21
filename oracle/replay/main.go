@@ -2,6 +2,7 @@
 //
 //	replay [-oracle DIR] [-tree]
 //	replay -dump OUT.jsonl [-hash] [-root DIR] [-input-list IDS.jsonl] [INPUT...]
+//	replay -pack-inputs OUT.bin [-root DIR] [INPUT...]
 //
 // The second form writes every input's tree as JSONL (see dump.go and oracle/README.md); exit 2 on any failure.
 // Exit codes: 0 every gated case is consistent; 1 a result differs (listed); 2 the inputs are inconsistent
@@ -235,11 +236,15 @@ func load(dir string) (cases []Case, verdicts map[string]string, problems []stri
 
 func main() { os.Exit(run()) }
 
-func runDump(to, root string, patterns []string, hashTrees bool, inputList string) error {
+func loadSelectedInputs(root string, patterns []string) ([]input, error) {
 	if len(patterns) == 0 {
 		patterns = defaultInputs
 	}
-	inputs, err := loadInputs(root, patterns)
+	return loadInputs(root, patterns)
+}
+
+func runDump(to, root string, patterns []string, hashTrees bool, inputList string) error {
+	inputs, err := loadSelectedInputs(root, patterns)
 	if err != nil {
 		return err
 	}
@@ -272,9 +277,18 @@ func run() int {
 	showTree := flag.Bool("tree", false, "print every case's tree with byte ranges (for writing expect entries)")
 	dumpTo := flag.String("dump", "", "write the tree of every input as JSONL to this file (- for stdout) instead of judging")
 	hashTrees := flag.Bool("hash", false, "write the SHA-256 of each tree in the dump")
-	root := flag.String("root", "../..", "the repository root, for -dump inputs")
+	packTo := flag.String("pack-inputs", "", "pack benchmark inputs as length-prefixed bytes and write their hashes")
+	root := flag.String("root", "../..", "the repository root for -dump or -pack-inputs")
 	inputList := flag.String("input-list", "", "write the IDs of the selected inputs as JSONL before dumping")
 	flag.Parse()
+
+	if *packTo != "" {
+		if err := packInputs(*packTo, *root, flag.Args()); err != nil {
+			fmt.Fprintln(os.Stderr, "replay:", err)
+			return 2
+		}
+		return 0
+	}
 
 	if *dumpTo != "" {
 		if err := runDump(*dumpTo, *root, flag.Args(), *hashTrees, *inputList); err != nil {

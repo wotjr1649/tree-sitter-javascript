@@ -4,10 +4,11 @@
 // Writes one JSON record per input to FILE (default build/discovery/oracle.jsonl); see README.md for the fields.
 // Tool versions and options are those of ../package.json and ../run.mjs (the oracle's pins), so the two stay one oracle.
 import { createHash } from "node:crypto";
-import { createWriteStream, existsSync, readFileSync, readdirSync, statSync } from "node:fs";
+import { createWriteStream, existsSync, readFileSync, statSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { babel, oxc } from "./tools.mjs";
+import { npmInputs, walk } from "./inputs.mjs";
 import { checkoutDiffers } from "./pinned.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -24,15 +25,6 @@ const manifest = JSON.parse(readFileSync(join(here, "manifest.json"), "utf8"));
 
 const sha256 = (b) => createHash("sha256").update(b).digest("hex");
 const MAX_BYTES = 16 * 1024 * 1024;
-
-// ---- walk ----------------------------------------------------------------------------------------------------------
-function* walk(dir) {
-  for (const e of readdirSync(dir, { withFileTypes: true }).sort((a, b) => (a.name < b.name ? -1 : 1))) {
-    const p = join(dir, e.name);
-    if (e.isDirectory()) yield* walk(p);
-    else yield p;
-  }
-}
 
 // ---- test262 -------------------------------------------------------------------------------------------------------
 const t262 = join(data, "test262");
@@ -88,20 +80,6 @@ function* babelJsxInputs() {
   for (const p of walk(root)) {
     if (!/\/input\.(js|jsx|mjs)$/.test(p.replaceAll("\\", "/"))) continue;
     yield { set: "babel-jsx", abs: p, rel: relative(data, p).replaceAll("\\", "/") };
-  }
-}
-
-// ---- npm -----------------------------------------------------------------------------------------------------------
-function* npmInputs() {
-  for (const pkg of manifest.packages) {
-    const root = join(data, "pkgs", `${pkg.name.replace(/^@/, "").replace("/", "__")}-${pkg.version}`, "package");
-    if (!existsSync(root)) continue;
-    for (const p of walk(root)) {
-      if (!/\.(js|jsx|mjs|cjs)$/.test(p)) continue;
-      const inPkg = relative(root, p).replaceAll("\\", "/");
-      if (pkg.include && !pkg.include.some((i) => inPkg.startsWith(i))) continue;
-      yield { set: "npm", pkg: `${pkg.name}@${pkg.version}`, abs: p, rel: relative(data, p).replaceAll("\\", "/") };
-    }
   }
 }
 
@@ -169,7 +147,7 @@ const out = createWriteStream(outPath);
 let n = 0;
 const t0 = Date.now();
 const tally = {};
-for (const gen of [test262Inputs, babelJsxInputs, npmInputs]) {
+for (const gen of [test262Inputs, babelJsxInputs, () => npmInputs(data, manifest.packages)]) {
   for (const inp of gen()) {
     if (only && inp.set !== only) continue;
     if (ids && !ids.has(inp.rel)) continue;
