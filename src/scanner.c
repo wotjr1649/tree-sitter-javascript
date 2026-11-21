@@ -29,7 +29,6 @@ enum TokenType {
     ENTER_PLAIN_EXPRESSION,
     ENTER_ASYNC_ARROW,
     ENTER_STATIC_BLOCK,
-    ENTER_ORDINARY_METHOD,
     LEAVE_CONTEXT,
     LEAVE_CONCISE_BODY,
     YIELD_OPERAND,
@@ -827,9 +826,9 @@ bool tree_sitter_javascript_external_scanner_scan(void *payload, TSLexer *lexer,
         return leave_context(scanner, lexer, LEAVE_CONTEXT);
     }
 
-    if (valid_symbols[ENTER_PLAIN_EXPRESSION] || valid_symbols[ENTER_ASYNC_ARROW] || valid_symbols[ENTER_ORDINARY_METHOD]) {
+    if (valid_symbols[ENTER_PLAIN_EXPRESSION] || valid_symbols[ENTER_ASYNC_ARROW]) {
         unsigned token = valid_symbols[ENTER_ASYNC_ARROW] ? ENTER_ASYNC_ARROW :
-                         valid_symbols[ENTER_ORDINARY_METHOD] ? ENTER_ORDINARY_METHOD : ENTER_PLAIN_EXPRESSION;
+                         ENTER_PLAIN_EXPRESSION;
         lexer->mark_end(lexer);
         unsigned flags = 0;
         if (token == ENTER_ASYNC_ARROW) {
