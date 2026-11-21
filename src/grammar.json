@@ -3774,8 +3774,17 @@
                 {
                   "type": "ALIAS",
                   "content": {
-                    "type": "SYMBOL",
-                    "name": "_jsx_keyword_identifier"
+                    "type": "CHOICE",
+                    "members": [
+                      {
+                        "type": "SYMBOL",
+                        "name": "_jsx_keyword_identifier"
+                      },
+                      {
+                        "type": "SYMBOL",
+                        "name": "jsx_identifier"
+                      }
+                    ]
                   },
                   "named": true,
                   "value": "identifier"
