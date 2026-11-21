@@ -19,7 +19,7 @@ const RESERVED_WORDS = [
 ];
 
 const CONTEXTUAL_KEYWORDS = [
-  'get', 'set', 'async', 'await', 'static', 'export', 'let', 'using',
+  'get', 'set', 'async', 'await', 'static', 'let', 'using',
 ];
 
 module.exports = grammar({
@@ -61,7 +61,6 @@ module.exports = grammar({
     $._enter_plain_expression,
     $._enter_async_arrow,
     $._enter_static_block,
-    $._enter_ordinary_method,
     $._leave_context,
     $._leave_concise_body,
     $._yield_operand,
@@ -1480,7 +1479,7 @@ module.exports = grammar({
 
     _ordinary_method_parameters: $ => seq(
       '(',
-      $._enter_ordinary_method,
+      $._enter_plain_expression,
       optional($._parameter_list),
       ')',
     ),
@@ -1514,7 +1513,7 @@ module.exports = grammar({
       ']',
     ),
 
-    _reserved_identifier: _ => choice(...CONTEXTUAL_KEYWORDS.filter(word => word !== 'export')),
+    _reserved_identifier: _ => choice(...CONTEXTUAL_KEYWORDS),
 
     // `this`, `super`, `true`, `false` and `null` are named token rules: listing their strings here would turn
     // each into a non-terminal with an anonymous child, so the rules themselves are used instead.

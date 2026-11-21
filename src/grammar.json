@@ -8542,7 +8542,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "_enter_ordinary_method"
+          "name": "_enter_plain_expression"
         },
         {
           "type": "CHOICE",
@@ -8893,10 +8893,6 @@
         {
           "type": "STRING",
           "value": "static"
-        },
-        {
-          "type": "STRING",
-          "value": "export"
         },
         {
           "type": "STRING",
@@ -9344,10 +9340,6 @@
     {
       "type": "SYMBOL",
       "name": "_enter_static_block"
-    },
-    {
-      "type": "SYMBOL",
-      "name": "_enter_ordinary_method"
     },
     {
       "type": "SYMBOL",
