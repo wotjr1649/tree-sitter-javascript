@@ -81,7 +81,7 @@ for (const [key, pkg, version] of TOOLS) {
   if (installed !== version || entry?.version !== version) fail(`${pkg}: installed ${installed}, lock ${entry?.version}, pin ${version}`);
   meta.tools[key] = { package: pkg, version, integrity: entry.integrity };
 }
-meta.tools.babel.options = { sourceType: "per case", plugins: ["jsx"], errorRecovery: true };
+meta.tools.babel.options = { sourceType: "per case", plugins: ["jsx", "decorators"], errorRecovery: true };
 meta.tools.oxc.options = { filename: "oracle.jsx", lang: "jsx", sourceType: "per case", showSemanticErrors: [false, true] };
 meta.cases_file = basename(casesPath);
 meta.cases_sha256 = sha256(casesBytes);
@@ -94,7 +94,7 @@ const byteAt = (src, utf16) => (Number.isInteger(utf16) ? Buffer.byteLength(src.
 
 function babel(c) {
   try {
-    const ast = babelParse(c.source, { sourceType: c.sourceType, plugins: ["jsx"], errorRecovery: true });
+    const ast = babelParse(c.source, { sourceType: c.sourceType, plugins: ["jsx", "decorators"], errorRecovery: true });
     const errors = ast.errors.map((e) => ({ message: e.message, at: byteAt(c.source, e.pos) }));
     return { class: errors.length ? "early" : "accept", errors };
   } catch (e) {

@@ -1352,6 +1352,7 @@ module.exports = grammar({
       '@',
       choice(
         $.identifier,
+        $.parenthesized_expression,
         alias($.decorator_member_expression, $.member_expression),
         alias($.decorator_call_expression, $.call_expression),
       ),

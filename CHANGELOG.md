@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Support parenthesized decorator expressions such as `@(decorator || fallback)`.
+
 ### Fixed
 
 - Keep trailing comments attached to their declarations when incremental parsing reuses an initializer or declarator.
