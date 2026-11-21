@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.2.0] - 2026-11-22
+
+### Changed
+
+- Classify ASCII whitespace first and call the external lexer's EOF callback only on zero lookahead in the
+  line-comment and automatic-semicolon-insertion trivia loops (#74). Full fresh and incremental CSTs match
+  v4.1.0 on 102,473 inputs, including parses with included ranges. The node-type snapshot and all 36 external
+  token names and their order are unchanged. The generated parser differs only in the embedded version.
+- Linux Callgrind instruction counts decreased slightly from v4.1.0, by at most 0.12%. With v1.0.0 set to 100,
+  npm remains above 100 in both modes. Peak RSS was similar, with differences of up to 196 KiB across paired
+  measurements. CI measured the scanner changes together at candidate commit `70e7a3f`.
+  [Callgrind CI run](https://github.com/wotjr1649/tree-sitter-javascript/actions/runs/44924059705)
+
+| Input set | v4.1.0 fresh | v4.1.0 incremental | v4.2.0 candidate fresh | v4.2.0 candidate incremental |
+| --- | ---: | ---: | ---: | ---: |
+| Default | 92.47 | 64.68 | 92.36 | 64.65 |
+| N-of-M | 98.48 | 67.17 | 98.37 | 67.16 |
+| npm | 104.12 | 107.37 | 104.07 | 107.36 |
+
 ## [4.1.0] - 2026-11-22
 
 ### Changed
@@ -981,6 +1000,7 @@ Not fixed in 2.0.0; tracked as GitHub Issues where a number is given:
   build as `cp310-abi3`, and `make install` leaves the pkg-config description empty and prefixes absolute paths
   ([#22](https://github.com/wotjr1649/tree-sitter-javascript/issues/22)).
 
+[4.2.0]: https://github.com/wotjr1649/tree-sitter-javascript/compare/v4.1.0...v4.2.0
 [4.1.0]: https://github.com/wotjr1649/tree-sitter-javascript/compare/v4.0.1...v4.1.0
 [4.0.1]: https://github.com/wotjr1649/tree-sitter-javascript/compare/v4.0.0...v4.0.1
 [4.0.0]: https://github.com/wotjr1649/tree-sitter-javascript/compare/v3.1.0...v4.0.0
