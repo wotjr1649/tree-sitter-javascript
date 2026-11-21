@@ -308,9 +308,8 @@ static ASILookahead scan_asi_trivia(TSLexer *lexer, ASITrivia *trivia, bool anne
             } else if (lexer->lookahead == '*') {
                 lexer->advance(lexer, skip_block);
                 bool block_newline = false;
-                while (!lexer->eof(lexer)) {
+                while ((c = lexer->lookahead) != 0 || !lexer->eof(lexer)) {
                     if (at_range_start(lexer, stop_at_range)) return ASI_END;
-                    c = lexer->lookahead;
                     lexer->advance(lexer, skip_block);
                     if (at_range_start(lexer, stop_at_range)) return ASI_END;
                     if (c == '*' && lexer->lookahead == '/') {
@@ -942,17 +941,19 @@ bool tree_sitter_javascript_external_scanner_scan(void *payload, TSLexer *lexer,
     bool enter = valid_symbols[ENTER_STATIC_BLOCK] || valid_symbols[ENTER_PLAIN] || valid_symbols[ENTER_AWAIT] ||
                  valid_symbols[ENTER_YIELD] || valid_symbols[ENTER_BOTH];
     bool context = enter || valid_symbols[CONTEXT_IDENTIFIER];
-    bool await_keyword = valid_symbols[CONTEXT_AWAIT] && (context_flags(scanner) & ASYNC_ARROW_CONTEXT);
     bool html = valid_symbols[HTML_COMMENT] && !valid_symbols[ESCAPE_SEQUENCE] && !valid_symbols[REGEX_PATTERN];
     bool line_start = false;
     bool first_column = false;
-    if (context || html || await_keyword) {
+    if (context || html || (valid_symbols[CONTEXT_AWAIT] && (context_flags(scanner) & ASYNC_ARROW_CONTEXT))) {
         int32_t c = lexer->lookahead;
-        first_column = html && (c == '/' || is_extra_space(c)) && lexer->is_at_included_range_start(lexer) &&
+        bool space = is_extra_space(c);
+        first_column = html && (c == '/' || space) && lexer->is_at_included_range_start(lexer) &&
                        lexer->get_column(lexer) == 0;
-        while (is_extra_space(lexer->lookahead)) {
-            line_start |= is_line_terminator(lexer->lookahead);
+        while (space) {
+            line_start |= is_line_terminator(c);
             skip(lexer);
+            c = lexer->lookahead;
+            space = is_extra_space(c);
         }
     }
     if (enter) {
@@ -970,7 +971,7 @@ bool tree_sitter_javascript_external_scanner_scan(void *payload, TSLexer *lexer,
         }
     }
 
-    if (await_keyword && lexer->lookahead == 'a') {
+    if (lexer->lookahead == 'a' && valid_symbols[CONTEXT_AWAIT] && (context_flags(scanner) & ASYNC_ARROW_CONTEXT)) {
         return scan_context_word(scanner, lexer, true);
     }
     if (valid_symbols[CONTEXT_IDENTIFIER] && (lexer->lookahead == 'a' || lexer->lookahead == 'y')) {
