@@ -337,3 +337,62 @@ JSX empty attribute value on a namespaced opening tag
 i = <Foo:Bar bar={}>{...children}</Foo:Bar>
 
 ---
+
+
+==============================================
+JSX member tags with a hyphenated first segment
+==============================================
+
+<a-b.C/>;
+<a-b.C></a-b.C>;
+<a-b.C.D/>;
+<this-foo.Bar />;
+
+---
+
+(program
+  (expression_statement
+    (jsx_self_closing_element
+      name: (member_expression
+        object: (identifier)
+        property: (property_identifier))))
+  (expression_statement
+    (jsx_element
+      open_tag: (jsx_opening_element
+        name: (member_expression
+          object: (identifier)
+          property: (property_identifier)))
+      close_tag: (jsx_closing_element
+        name: (member_expression
+          object: (identifier)
+          property: (property_identifier)))))
+  (expression_statement
+    (jsx_self_closing_element
+      name: (member_expression
+        object: (member_expression
+          object: (identifier)
+          property: (property_identifier))
+        property: (property_identifier))))
+  (expression_statement
+    (jsx_self_closing_element
+      name: (member_expression
+        object: (identifier)
+        property: (property_identifier)))))
+
+==============================================
+JSX member tag with a hyphen after the dot
+:error
+==============================================
+
+<A.b-c/>
+
+---
+
+==============================================
+JSX member chain with hyphens before and after a dot
+:error
+==============================================
+
+<a-b.C.d-e/>
+
+---
