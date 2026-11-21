@@ -183,7 +183,8 @@ static bool scan_template_chars(TSLexer *lexer) {
 // White space and line terminators as the grammar's `extras` regex has them (extras_character_set_1 in parser.c).
 // Explicit, not iswspace: that differs between C runtimes (C locale, glibc, Windows UCRT).
 static bool is_extra_space(int32_t c) {
-    return (c >= '\t' && c <= '\r') || c == ' ' || c == 0xa0 || c == 0x1680 || (c >= 0x2000 && c <= 0x200b) ||
+    if ((uint32_t)c < 0x80) return (c >= '\t' && c <= '\r') || c == ' ';
+    return c == 0xa0 || c == 0x1680 || (c >= 0x2000 && c <= 0x200b) ||
            c == 0x2028 || c == 0x2029 || c == 0x202f || c == 0x205f || c == 0x2060 || c == 0x3000 || c == 0xfeff;
 }
 
@@ -252,8 +253,11 @@ static ASILookahead scan_annex_marker(TSLexer *lexer, bool stop_at_range) {
     return ASI_ANNEX;
 }
 
+// The runtime sets lookahead to 0 at EOF, so the trivia loops call eof() only for a 0 lookahead.
 static void scan_line_comment_body(TSLexer *lexer, bool stop_at_range, bool skip_body) {
-    while (!lexer->eof(lexer) && !at_range_start(lexer, stop_at_range) && !is_line_terminator(lexer->lookahead)) {
+    for (;;) {
+        int32_t c = lexer->lookahead;
+        if ((c == 0 && lexer->eof(lexer)) || at_range_start(lexer, stop_at_range) || is_line_terminator(c)) return;
         lexer->advance(lexer, skip_body);
     }
 }
@@ -275,7 +279,7 @@ static ASILookahead scan_asi_trivia(TSLexer *lexer, ASITrivia *trivia, bool anne
     bool separated_close = false;
     for (;;) {
         int32_t c = lexer->lookahead;
-        if (lexer->eof(lexer) || at_range_start(lexer, range != RANGE_IGNORE)) {
+        if ((c == 0 && lexer->eof(lexer)) || at_range_start(lexer, range != RANGE_IGNORE)) {
             return ASI_END;
         }
         if (is_extra_space(c)) {
