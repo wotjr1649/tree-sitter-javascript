@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.1] - 2026-11-21
+
+No CST change. The grammar and scanner sources (`grammar.js` and `src/scanner.c`) are identical to v4.0.0.
+The regenerated parser (`src/parser.c`) differs only in the embedded version.
+
+### Added
+
+- Add the on-demand Linux Callgrind instruction-count benchmark (`parse-bench`, #67).
+
+### Changed
+
+- Extend the node-type compatibility gate to check child types and the `multiple` and `required` flags
+  (#68, fixes #38).
+- Pin the CLI in `package.json` and the ABI in `ci/tree-sitter-abi.txt`. Fail CI if the generated parser
+  contains an optimize-off pragma (#70).
+
+### Fixed
+
+- Build with CMake without the tree-sitter CLI and derive `SOVERSION` from the generated parser's `LANGUAGE_VERSION`
+  (#69, fixes #22).
+- Correct free-threaded Python wheel tagging and pkg-config install paths and escaping
+  (#69, fixes #22).
+
 ## [4.0.0] - 2026-11-21
 
 Compared with v3.1.0 (`12956e2`), this major release changes concrete syntax trees (CSTs) for some
@@ -936,6 +959,7 @@ Not fixed in 2.0.0; tracked as GitHub Issues where a number is given:
   build as `cp310-abi3`, and `make install` leaves the pkg-config description empty and prefixes absolute paths
   ([#22](https://github.com/wotjr1649/tree-sitter-javascript/issues/22)).
 
+[4.0.1]: https://github.com/wotjr1649/tree-sitter-javascript/compare/v4.0.0...v4.0.1
 [4.0.0]: https://github.com/wotjr1649/tree-sitter-javascript/compare/v3.1.0...v4.0.0
 [3.1.0]: https://github.com/wotjr1649/tree-sitter-javascript/compare/v3.0.0...v3.1.0
 [3.0.0]: https://github.com/wotjr1649/tree-sitter-javascript/compare/v2.2.0...v3.0.0
