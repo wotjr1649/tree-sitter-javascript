@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- Preserve automatic semicolon insertion across comments when incrementally reusing a bare variable declarator.
+  Incremental parses now equal fresh parses of the edited input here (126 inputs of the default benchmark set
+  parsed with errors incrementally only).
+- Preserve automatic semicolon insertion and Annex B comments when incrementally reusing a bare `yield` expression.
+
+Consumers that snapshot incremental trees should refresh affected snapshots from the edited source. Incremental
+reparsing now matches the comment and expression boundaries of a fresh parse in these cases.
+
 ## [4.2.0] - 2026-11-22
 
 ### Changed
