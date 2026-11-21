@@ -822,6 +822,7 @@ module.exports = grammar({
     // Keyword objects are JSX-only: TS also uses nested_identifier in namespace and type paths.
     _jsx_keyword_member_expression: $ => prec('member', seq(
       field('object', choice(
+        $.identifier,
         $.this,
         alias($._jsx_keyword_identifier, $.identifier),
         alias($._jsx_keyword_member_expression, $.member_expression),
@@ -834,7 +835,6 @@ module.exports = grammar({
 
     _jsx_element_name: $ => choice(
       $._jsx_identifier,
-      alias($.nested_identifier, $.member_expression),
       alias($._jsx_keyword_member_expression, $.member_expression),
       $.jsx_namespace_name,
     ),

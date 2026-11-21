@@ -3765,6 +3765,10 @@
               "members": [
                 {
                   "type": "SYMBOL",
+                  "name": "identifier"
+                },
+                {
+                  "type": "SYMBOL",
                   "name": "this"
                 },
                 {
@@ -3840,15 +3844,6 @@
         {
           "type": "SYMBOL",
           "name": "_jsx_identifier"
-        },
-        {
-          "type": "ALIAS",
-          "content": {
-            "type": "SYMBOL",
-            "name": "nested_identifier"
-          },
-          "named": true,
-          "value": "member_expression"
         },
         {
           "type": "ALIAS",
