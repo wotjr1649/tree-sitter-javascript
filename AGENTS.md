@@ -13,9 +13,10 @@ kept as `refs/upstream/v0.25.0` in the owner's local clone only
 
 - Source is `grammar.js` and hand-written `src/scanner.c`. `src/parser.c`, `src/grammar.json`, `src/node-types.json`
   and `src/tree_sitter/*.h` are generated: edit the grammar, run `tree-sitter generate --abi 15 --js-runtime native`
-  with CLI 0.27.2, commit all of them. `src/scanner.c` carries the JSX bare-ampersand fix (origin PR #388's scanner
-  hunks, identical to go-treesitter's ADR-0023 patch record 0001; ADR-0001 amendment 2026-11-19) and, on top of it,
-  ASCII-only digit checks for character references (J1b), so it no longer equals that record's result; v1.0.0 kept the
+  with CLI 0.27.2, commit all of them. `src/scanner.c` carries the JSX bare-ampersand fix. It was introduced as origin PR #388's scanner
+  hunks (identical to go-treesitter's ADR-0023 patch record 0001; ADR-0001 amendment 2026-11-19). ASCII-only digit
+  checks for character references (J1b) followed, and #63 restructured the quoted attribute scan and shares the
+  character-reference scan, so it no longer equals that record's result; v1.0.0 kept the
   origin's scanner and left that patch in go-treesitter, which retires it only in a later, separately approved pin move
   to a release containing the fix (its ADR-0024 7.6).
 - Manifests, their lockfiles' own entries and `tree-sitter.json` `metadata.version` carry the release version (4.0.0
