@@ -536,6 +536,12 @@ static bool scan_automatic_semicolon(Scanner *scanner, TSLexer *lexer, const boo
     ASILookahead next = scan_asi_trivia(lexer, &trivia, valid_symbols[HTML_COMMENT], false, RANGE_BETWEEN_TOKENS, false);
     *at_next_token = !trivia.comment && !trivia.newline && next == ASI_NEXT_TOKEN;
     *try_ternary = !trivia.comment && next == ASI_NEXT_TOKEN && lexer->lookahead == '?';
+    // Reuse can skip the lexer state that allows || and defers ASI across trailing comments.
+    // A reduced statement tail still allows await-using ASI, without the binding or keyword markers.
+    bool reduced_expression = valid_symbols[AWAIT_USING_ASI] && !valid_symbols[DECLARATION_END] &&
+                              !valid_symbols[BINDING_END] && !valid_symbols[CONTEXT_IDENTIFIER] &&
+                              !valid_symbols[RESTRICTED_KEYWORD] && scanner->pending_token != DECLARATION_PENDING;
+    bool defer_comments = valid_symbols[LOGICAL_OR] || reduced_expression;
     bool async_field = valid_symbols[RESTRICTED_KEYWORD] && valid_symbols[BINDING_END];
     bool restricted = valid_symbols[RESTRICTED_KEYWORD] && !async_field;
     bool annex = next >= ASI_ANNEX;
@@ -562,7 +568,7 @@ static bool scan_automatic_semicolon(Scanner *scanner, TSLexer *lexer, const boo
         }
         if (annex) return true;
         // A trailing comment can be lexed as an extra before the ordinary EOF insertion.
-        bool defer_eof = !restricted && valid_symbols[LOGICAL_OR] && !trivia.leading_non_cr_break &&
+        bool defer_eof = !restricted && defer_comments && !trivia.leading_non_cr_break &&
                          (trivia.line_comment || trivia.ends_at_block_comment);
         return !defer_eof;
     }
@@ -582,7 +588,7 @@ static bool scan_automatic_semicolon(Scanner *scanner, TSLexer *lexer, const boo
     }
 
     // Leave room for the await operand or for extras to consume a comment before the next scan.
-    if (valid_symbols[LOGICAL_OR] && !trivia.leading_non_cr_break &&
+    if (defer_comments && !trivia.leading_non_cr_break &&
         (trivia.break_after_comment || valid_symbols[AWAIT_OPERAND_CONTINUES])) {
         return false;
     }

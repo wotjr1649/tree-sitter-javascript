@@ -35,6 +35,10 @@ func TestLookaheadAfterSubtreeReuse(t *testing.T) {
 		{"bare declarator", "", "let x/*\n*/+y", " "},
 		{"bare yield ASI", "function* g(){return ", "yield yield\n(x);}", "/*review\n*/"},
 		{"bare yield Annex B", "function* g(){ f(", "yield<!--x\n); }", "/*review\n*/"},
+		{"initializer before prefix increment", "let", " a=b/**//*\u2028*/++c", " "},
+		{"initializer before prefix decrement", "let", " a=b//\u2029--c", " "},
+		{"declarator before line comment", "let a=b", "\nlet d=e//\nc;d;", " "},
+		{"initializer before comment at EOF", "let", " a=b//", " "},
 	} {
 		t.Run(c.name, func(t *testing.T) {
 			parser := tree_sitter.NewParser()
