@@ -45,6 +45,8 @@ approval. go-treesitter regenerates `src/parser.c` with its own pinned CLI.
   sets the language on a parser and parses a small input. `Package.swift` declares the `swift-tools-version` its
   SwiftTreeSitter dependency requires; change it only together with that dependency.
 - Keep the grammar name `javascript` and the C symbol `tree_sitter_javascript`.
+- Keep the v4.1.0 external-token names and order throughout 4.x because TypeScript vendors them,
+  and make any change to either in a major release.
 - A fix starts from a failing case (corpus test or oracle case) and cites its evidence. Existing corpus tests keep
   passing unless the change alters them on purpose and says why.
 - Keep every copyright line in `LICENSE` and the attribution in `NOTICE` (MIT).

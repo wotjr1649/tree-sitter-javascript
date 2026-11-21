@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.1.0] - 2026-11-22
+
+### Changed
+
+- Reduce scanner work by sharing trivia scans and keyword probes, removing unreachable paths, and simplifying
+  scanner state restoration (#72). Full fresh and incremental CSTs match v4.0.1 on 102,473 inputs, including
+  parses with included ranges. The node-type snapshot is unchanged.
+- Linux Callgrind instruction counts (`v1.0.0 = 100`) improved across all three input sets. Default and N-of-M
+  are below v1.0.0 in both modes. npm remains above v1.0.0 in both modes. CI measured `fa1927f` before it was
+  merged with v4.0.1. [Callgrind CI run](https://github.com/wotjr1649/tree-sitter-javascript/actions/runs/44910526646)
+
+| Input set | v4.0.0 fresh | v4.0.0 incremental | `fa1927f` fresh | `fa1927f` incremental |
+| --- | ---: | ---: | ---: | ---: |
+| Default | 94.01 | 64.96 | 92.47 | 64.68 |
+| N-of-M | 100.17 | 67.50 | 98.48 | 67.17 |
+| npm | 106.07 | 107.98 | 104.12 | 107.37 |
+
+- The JavaScript external-token count drops from 37 to 36. Ordinary methods now use `ENTER_PLAIN_EXPRESSION`
+  (index 20). Removing `ENTER_ORDINARY_METHOD` (index 23) shifts subsequent tokens down by one. When updating
+  a vendored copy in TypeScript, update the grammar and scanner enum together, then regenerate TypeScript and TSX.
+  The v4.1.0 external-token names and order are fixed for all 4.x releases. Changes require a major release.
+
 ## [4.0.1] - 2026-11-21
 
 No CST change. The grammar and scanner sources (`grammar.js` and `src/scanner.c`) are identical to v4.0.0.
@@ -959,6 +981,7 @@ Not fixed in 2.0.0; tracked as GitHub Issues where a number is given:
   build as `cp310-abi3`, and `make install` leaves the pkg-config description empty and prefixes absolute paths
   ([#22](https://github.com/wotjr1649/tree-sitter-javascript/issues/22)).
 
+[4.1.0]: https://github.com/wotjr1649/tree-sitter-javascript/compare/v4.0.1...v4.1.0
 [4.0.1]: https://github.com/wotjr1649/tree-sitter-javascript/compare/v4.0.0...v4.0.1
 [4.0.0]: https://github.com/wotjr1649/tree-sitter-javascript/compare/v3.1.0...v4.0.0
 [3.1.0]: https://github.com/wotjr1649/tree-sitter-javascript/compare/v3.0.0...v3.1.0
