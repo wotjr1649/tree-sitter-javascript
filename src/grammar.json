@@ -967,6 +967,10 @@
                         "value": "await"
                       },
                       {
+                        "type": "SYMBOL",
+                        "name": "_await_using"
+                      },
+                      {
                         "type": "STRING",
                         "value": "using"
                       }
@@ -1028,6 +1032,10 @@
                         {
                           "type": "STRING",
                           "value": "await"
+                        },
+                        {
+                          "type": "SYMBOL",
+                          "name": "_await_using"
                         },
                         {
                           "type": "STRING",
@@ -1185,6 +1193,10 @@
                         "value": "await"
                       },
                       {
+                        "type": "SYMBOL",
+                        "name": "_await_using"
+                      },
+                      {
                         "type": "STRING",
                         "value": "using"
                       }
@@ -1246,6 +1258,10 @@
                         {
                           "type": "STRING",
                           "value": "await"
+                        },
+                        {
+                          "type": "SYMBOL",
+                          "name": "_await_using"
                         },
                         {
                           "type": "STRING",
@@ -2013,6 +2029,10 @@
                       {
                         "type": "STRING",
                         "value": "await"
+                      },
+                      {
+                        "type": "SYMBOL",
+                        "name": "_await_using"
                       },
                       {
                         "type": "STRING",
@@ -5024,8 +5044,17 @@
               "type": "CHOICE",
               "members": [
                 {
-                  "type": "SYMBOL",
-                  "name": "_await_operand_continues"
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "SYMBOL",
+                      "name": "_await_operand_continues"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "_await_using"
+                    }
+                  ]
                 },
                 {
                   "type": "BLANK"
@@ -9329,6 +9358,10 @@
     {
       "type": "SYMBOL",
       "name": "_annex_prefix"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_await_using"
     }
   ],
   "inline": [

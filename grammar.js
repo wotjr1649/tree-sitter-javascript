@@ -50,7 +50,7 @@ module.exports = grammar({
     // Only the validity of this marker is used, to tell a modifier from a field before '*'.
     $._generator_method_continues,
     $._static_before_get_field,
-    // Never produced. An await operand may follow a line terminator in trivia.
+    // A line break before using can select the await operand instead of the declaration.
     $._await_operand_continues,
     // The scanner returns the same identifier token for await and yield when their keyword is inactive.
     $.identifier,
@@ -68,6 +68,8 @@ module.exports = grammar({
     $._yield_line_terminator,
     // Replay the next Annex B extra after deciding whether the preceding construct ends.
     $._annex_prefix,
+    // A declaration requires both gaps in await using Binding to have no line terminator.
+    $._await_using,
   ],
 
   extras: $ => [
@@ -507,7 +509,7 @@ module.exports = grammar({
           field('operator', 'of'),
         ),
         seq(
-          field('kind', seq('await', 'using')),
+          field('kind', seq('await', $._await_using, 'using')),
           field('left', choice(
             $.identifier,
             alias('of', $.identifier),
@@ -1008,7 +1010,7 @@ module.exports = grammar({
     // A direct assignment is outside that operand, so `await(a).x=b` retains its identifier interpretation.
     await_expression: $ => prec.dynamic(1, prec('unary_void', seq(
       'await',
-      optional($._await_operand_continues),
+      optional(choice($._await_operand_continues, $._await_using)),
       $._await_operand,
     ))),
 
@@ -1530,7 +1532,7 @@ module.exports = grammar({
  * @returns {ChoiceRule}
  */
 function usingDeclaration($, semicolon) {
-  const kind = field('kind', choice('using', seq('await', 'using')));
+  const kind = field('kind', choice('using', seq('await', $._await_using, 'using')));
   return choice(
     seq(kind, commaSep1($._using_declarator), semicolon),
     // TypeScript reads `using as …` and `using satisfies …` as declarations; the static precedence keeps the
