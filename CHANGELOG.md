@@ -5,43 +5,52 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [4.0.0] - 2026-11-21
+
+Compared with v3.1.0 (`12956e2`), this major release changes concrete syntax trees (CSTs) for some
+JavaScript and JSX inputs that parsed cleanly in v3.1.0 and are accepted by both reference parsers,
+`@babel/parser` and `oxc-parser`, as pinned in `oracle/`. The grammar is `javascript`, the C entry point
+is `tree_sitter_javascript`, and the parser ABI is 15. In the examples below, `\n`, `\r`, `\r\n` and `\0`
+denote actual source characters.
 
 ### Breaking changes
 
-- Automatic semicolon insertion (ASI) can change statement and declaration boundaries around comments. In
-  `let x\r//\r;` the explicit semicolon belongs to the declaration, with no sibling `empty_statement`.
-  `async /*\n*/ x => x` becomes an identifier statement followed by an ordinary arrow. In
-  `{ using /*\n*/ x = f(); }`, `using` is an identifier statement followed by an assignment. These boundaries
-  agree with Babel (#46, #17, #39, #18).
-- An expression can continue across the same trivia. In `export default a\n//x\r/*z*/(b)`, the call becomes
-  the default export's value. `a\n//x\r/*z*//b/g` becomes a division chain in one statement, matching Babel's
-  expression structure. Comment attachment can also move while the statement structure agrees with Babel,
-  as in `a /* \0 */\nb` (#46).
-- Class members can split or combine across line terminators. `class A{async\n*g(){}}` has an `async` field
-  followed by a synchronous generator. `class A {static get\n/*c*/*g(){}}` has a static `get` field followed
-  by a generator. `class A{get/*\n*/[x](){}}` has one computed accessor, and
-  `class A{static/*\n*/*g(){}}` has one static generator. The member kinds and boundaries agree with Babel
-  (#46, #49).
-- Annex B comments can change both the surrounding expression and the comment range. Babel's Script parse of
-  `f(x\n/*c*/-->z\n+y);` has one argument, `x + y`, and the CST now has that same expression.
-  In `<!--x\rnext();`, the `html_comment` ends before the CR and `next()` is a separate call, matching
-  Babel's Script ranges. With CRLF, the comment also ends before the CR. This moves the ends of comment
-  nodes in test262's single-line HTML comment fixtures (#46, #49, #55).
-- Recognise Script `<!--` at statement boundaries after a line terminator in the source or inside
-  a block comment.
-  In `a\n/**/<!--x\rb` and `a/*x\ny*/<!--x\rb`, `<!--x` is an `html_comment` and `a` and `b`
-  are separate expression statements. The two statement ranges and the HTML comment range match Babel
-  in both examples (#55).
-- Function context can change identifier and operator nodes. In `function f(){ return await(x)(y); }`,
-  Babel and the CST read two nested calls. In `function* f(){ return ()=>yield(x); }`, they read a call in
-  the ordinary arrow. In `function* f(){ function g(x = yield(1)){ return yield(x); } yield 2; }`, the default
-  value and ordinary function body use calls, and the outer generator uses a yield expression (#35, #36).
-- Parse a bare ampersand immediately before either JSX attribute closing quote as a
-  `string_fragment`, including when U+0000 precedes the ampersand. In both examples below, v3.1.0
-  produces one attribute followed by a JavaScript comment. The corrected CST has two attributes,
-  `x` and `y`, with `/> //` inside the quoted value of `y`, matching Babel's attribute boundaries
-  (#45, #50).
+- In `function f() {} // x` at EOF without a final newline, the `comment` moves from the
+  `body: statement_block` to a direct child of `function_declaration`, beside the body.
+  The body ends at the closing brace and the declaration still spans the comment (#52).
+- Automatic semicolon insertion (ASI) changes statement boundaries around comments. In `let x\r//\r;`,
+  the semicolon belongs to the declaration and the sibling `empty_statement` disappears. In
+  `async /*\n*/ x => x`, `async` is an identifier statement followed by an ordinary arrow. In
+  `{ using /*\n*/ x = f(); }`, `using` is an identifier statement followed by an assignment (#17, #18,
+  #39, #46, #55).
+- Expressions can continue across comments and line terminators. In `export default a\n//x\r/*z*/(b)`,
+  the call is the default export's value. In `a\n//x\r/*z*//b/g`, the division chain is one statement.
+  Comment attachment can also move, as in `a /* \0 */\nb` (#46, #55).
+- Class member boundaries can change. `class A{async\n*g(){}}` has an `async` field followed by a
+  synchronous generator. `class A{get/*\n*/[x](){}}` has one computed accessor (#46, #49, #55).
+- Annex B comments can change the surrounding expression and comment range. In Script,
+  `f(x\n/*c*/-->z\n+y);` has one argument, `x + y`. In `<!--x\rnext();`, the `html_comment` ends
+  before the CR and `next()` is a separate call. With CRLF, the comment also ends before the CR.
+  These expression and comment boundaries follow Babel's Script parse (#46, #49, #55).
+- At statement boundaries in Script, `a/*\n*/<!--x\n<!--y\nb` has two `html_comment` nodes between
+  separate expression statements. A single opener after line-terminating trivia also works, as in
+  `a\n/**/<!--x\rb` and `a/*x\ny*/<!--x\rb` (#55, #56).
+- In Script, Annex B opening comments can appear where an expression continues or before an
+  explicit delimiter. In `a/*\n*/<!--x\n<!--y\n+b`, two `html_comment` nodes keep separate ranges
+  and the expression is `a + b`. In `a/*\n*/<!--x\n;`, the explicit semicolon terminates
+  the expression statement. In `f(() => a/*\n*/<!--x\n, c);`, the arrow body ends at `a`, the comments
+  belong to the argument list and the comma separates the two arguments (#59).
+- Function context changes the roles of `await` and `yield`. `function f(){ return await(x)(y); }` has
+  two nested calls. In `function* f(){ return ()=>yield(x); }`, the ordinary arrow body has a call.
+  In `function* f(){ function g(x = yield(1)){ return yield(x); } yield 2; }`, both uses in `g` are calls
+  and the outer generator has a `yield_expression` (#35, #36, #52).
+- In `function* f(){ yield\n(x); }`, a bare `yield_expression` is followed by an expression statement
+  for `(x)`. A line terminator inside a comment also separates the operand where ASI applies.
+  `yield\n*x` gives a syntax error in a generator and `yield *\n x` still delegates (#56).
+- A bare `&` immediately before either JSX attribute closing quote is a `string_fragment`, including
+  when U+0000 precedes it. Each example below has two attributes, `x` and `y`, with `/> //` inside
+  the value of `y`. v3.1.0 produces one attribute followed by a JavaScript comment (#45, #48, #50,
+  #53, #57).
 
 ~~~jsx
 <a x="&" y='" /> //' />
@@ -50,45 +59,111 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Count lone CR and line terminators in block comments for ASI. `a\rb`, `a/*\n*/b` and
-  `let a=b/*\n*/++c` parse with the required statement break. Identifiers such as `in_` and `instanceof_`
-  after a CR or a comment can start a new statement. Preserve continuations through comments before a
-  declarator, initializer, call, computed method name or tagged template, including the initializer in
-  `for(using a\n//x\r/*z*/=b;;);` (#46, #17, #39).
-- Parse `get` and `set` fields before a next-line generator, including `class A { get\n*g() {} }`. Preserve
-  a static `get` field in `class A{static/*\n*/get\n*g(){}}`. A line terminator after an `async` field
-  can also separate a following computed method (#46, #49).
-- Recognise Annex B close comments after line-start block comments and preserve the surrounding expression
-  (#46, #49).
-- Accept U+0000 inside Annex B opening and closing comments. In `<!--\0\rnext();` and `-->\0\rnext();`,
-  the NUL stays in the comment and the call starts after the CR. A NUL after the CR, outside the comment,
-  is a syntax error. The HTML-like comment changes for CR and U+0000 were deferred from #48 and are in #55.
-- Use the enclosing context for `await` and `yield` at function, method, arrow and class boundaries.
-  Sloppy Script forms such as `var yield; yield=1;` can use `yield` as an identifier. A concise arrow's
-  expression can continue across a CR-terminated line comment or across included ranges (#35, #36).
-- Report a syntax error for `for (using\rx = f();;) {}` and `for (using /*\n*/ x = f();;) {}` (#17, #18,
-  #46). The await/yield context fix also rejects `function f(){ await using x = y; }` and the tested
-  `await using` loop forms in ordinary functions (#26, #35).
+- Count lone CR and line terminators in block comments for ASI. `a\rb` and `let a=b/*\n*/++c`
+  have the required statement break. Names such as `in_` and `instanceof_` can start a statement.
+  Declarations, initializers, calls, computed method names and tagged templates can still continue
+  across comments where the following token permits it (#17, #39, #46, #55).
+- Parse `get` and `set` fields before a next-line generator, including `class A { get\n*g() {} }`.
+  Recognise Annex B close comments after line-start block comments and preserve the surrounding expression
+  (#46, #49, #55).
+- Accept U+0000 inside Annex B opening and closing comments, as in `<!--\0\rnext();` and
+  `-->\0\rnext();`. The call starts after the CR. U+0000 outside the comment after the CR gives a
+  syntax error. These CR and U+0000 changes were deferred from v3.1.0 (#45, #48, #55).
+- Use the enclosing function, method, arrow or class context for `await` and `yield`. Sloppy Script
+  `var yield; yield=1;` can use `yield` as an identifier. Concise arrow expressions can continue
+  across CR-terminated comments and included ranges (#35, #36, #52, #55).
+- Reject `for (using\rx = f();;) {}` and `for (using /*\n*/ x = f();;) {}`.
+  Reject `function f(){ await using x = y; }` and the tested `await using` loop forms in ordinary
+  functions (#17, #18, #26, #46, #52, #55).
+- Keep bare `yield` as the sole argument in the Script example `function* g(){f(yield/*\n*/-->x\n)}`.
+  Report the stray semicolon in `function* g(){f(yield\n<!--x\n;)}` (#56).
 
 ### Approved normalisations
 
-- Ambiguous top-level `await` follows the Module reading. For `await(x)(y);`, the CST agrees with Babel
-  in Module mode. Babel's Script parse uses nested calls. Script-only bindings named `await` can still
-  differ, including the binding in the test262 dynamic-import attributes fixture (#35, #36).
-- At the top level, inline `<!--` in `x = -1 <!--x;` follows Babel's Module expression structure.
-  Babel's Script parse ends the assignment before an HTML-like comment. The parser API has no Script/Module
-  selector (#41, #46, #49).
-- For static import and re-export attributes, the structure comparison normalises the `object` and its
-  direct `pair` children under `import_attribute` to compare with Babel's attributes. The key and value
-  ranges are still compared. The public CST retains these wrapper nodes, for example in
-  `export * from 'x' with {type: 'json'}` (#41).
+- Ambiguous top-level `await` follows the Module reading. In `await(x)(y);`, Babel's Script parse uses
+  nested calls. In test262's `2nd-param-await-ident.js`, the binding is an `identifier` and the dynamic
+  import's second argument is an `await_expression` where Babel's Script parse has a call (#35, #36,
+  #41, #52, #57).
+- Inline `<!--` in `x = -1 <!--x;` follows Babel's Module expression structure. Babel's Script parse
+  ends the assignment before an HTML-like comment. The parser API has no Script/Module selector
+  (#41, #46, #49).
+- The Babel comparison normalises `object` and its direct `pair` children under `import_attribute`
+  in static imports and re-exports. It still checks key and value ranges. The public CST keeps the
+  wrappers in examples such as `export * from 'x' with {type: 'json'}` (#41, #55, #57).
 - In test262's `generator-function-expression.js`, trailing `/* after */` comments attach inside the
   initializers and extend the `generator_function` and `variable_declarator` ranges. The executable
-  structure agrees with Babel when comment placement and the affected ranges are disregarded (#46).
+  structure agrees with Babel after normalising those ranges and comment placement (#46).
 - In `f(x/*\n*/--> z\n+ y);`, one `html_comment` spans the line-terminating block comment and its close
-  suffix. Babel exposes separate block and HTML comment ranges. Both expose `x + y` as the argument.
-  The combined CST range follows the multiline-comment production with a close suffix.
+  suffix. Babel exposes two comment ranges. Both parsers expose `x + y` as the argument.
   [ECMA-262 B.1.1](https://tc39.es/ecma262/multipage/additional-ecmascript-features-for-web-browsers.html#sec-html-like-comments)
+
+### Performance
+
+- Stop Annex B close-comment probes once a close comment can no longer match, share the async and
+  generator method head, and use a fast path for ASI before visible ASCII tokens (#58).
+- The #58 comparison between `19bb871` and the tree merged at `976c65b` found matching full CSTs
+  in the default, N-of-M and pinned Discovery valid sets in fresh parses and after a one-space edit.
+  The targeted comparisons found differences in error recovery for incomplete method heads. Incomplete async and generator method heads now retain a `name` field inside `ERROR`, which can also enclose the leading `async` and intervening comments in object literals (#58).
+- With #58 merged at `976c65b`, generated `src/parser.c` fell from 3,971,999 to 3,704,797 bytes and
+  parser states from 3,412 to 2,797 compared with `19bb871`. The earlier comparison against `1fcdc7b`
+  went from 3,976,003 to 3,708,766 bytes (−6.72%) and from 3,392 to 2,777 states.
+- With #59 and the v4.0.0 metadata, generated `src/parser.c` is 3,799,933 bytes and has 2,797 parser
+  states. Compared with v3.1.0, that is 372,445 more bytes (+10.87%) and 534 more states (+23.60%).
+
+The Windows measurements below come from two runs of four paired rounds on the #58 changes before
+integration with `19bb871`. The cells give median parse-time changes and the observed ranges within
+each run. Negative values mean lower parse time. The v3.1.0 comparison includes 18 Discovery inputs
+that gave errors in v3.1.0 and parsed cleanly in the benchmarked #58 version. The release performance
+criterion is Linux CI instruction counts. The current CI reports generated parser size and table
+counts. Fresh and incremental parsing instruction counts against v3.1.0 are unavailable (#58).
+
+| Windows run | Input | Base | Fresh parse | Incremental parse |
+| --- | --- | --- | ---: | ---: |
+| Author | Discovery valid set | `1fcdc7b` | −2.4% [−8.7%, +19.1%] | −16.6% [−23.5%, −7.4%] |
+| Author | All npm files | `1fcdc7b` | −7.8% [−10.0%, +3.7%] | −10.2% [−15.0%, −1.6%] |
+| Author | Discovery valid set | v3.1.0 | +4.2% [−20.2%, +47.3%] | +9.4% [−15.1%, +51.7%] |
+| Author | All npm files | v3.1.0 | +4.3% [+2.3%, +47.0%] | +9.2% [+5.1%, +59.8%] |
+| Review | Discovery sample | `1fcdc7b` | +3.22% [−5.53%, +22.39%] | −12.85% [−18.27%, +21.78%] |
+| Review | All npm files | `1fcdc7b` | −1.58% [−10.33%, −0.88%] | −6.44% [−18.35%, −4.82%] |
+
+### Migration
+
+- When upgrading from before v3.0.0, `using {a} = f();` and
+  `{ using {a} = b; }` give syntax errors. Babel and oxc both reject these destructuring
+  bindings in using declarations. The v3.1.0 baseline already reports the errors (#44).
+- Recheck queries that depend on sibling order, byte ranges or comment attachment around ASI, default
+  exports and class members. Check `comment` and `html_comment` captures, including the combined
+  block-comment and Annex B close-suffix range.
+- Recheck `await_expression` and `yield_expression` captures in nested functions, arrows and default
+  values. Check for bare `yield` at a line break in generators and for the `name` field inside `ERROR`
+  when editing an incomplete async or generator method.
+- Recheck JSX attribute, `string_fragment` and trailing-comment captures. Refresh cached numeric
+  symbol IDs against the new parser.
+- tree-sitter-typescript vendors this grammar. Its matching grammar and scanner changes for TypeScript
+  and TSX, including the external-token ordering, and their validation are handled in a separate
+  handoff. go-treesitter currently pins this repository's v1.0.0 (`d6501de`). Downstream adoption
+  follows #41.
+
+### Known limitations
+
+- JSX opening and closing names are parsed independently. `<a></b>` can still parse without error (#20).
+- Optional chains such as `a?.b = 1;` can still parse as assignment targets (#19). Some async
+  `await using` line-break cases still parse without error, including
+  `async function g() { for (await\nusing x = f();;) {} }` and
+  `async function g() { for (await using\nx of y); }` (#18).
+- `function f(){throw/*\r*/x}` can still parse despite the line terminator after `throw`. In Script,
+  the same-line close suffix in `x; -->z\n+y;` can still be accepted (#41, #46, #49, #55, #56).
+- For some `<!--` inputs that Babel alone accepts in Module, the parser follows the Script
+  interpretation shared by Babel and oxc. For example, in `a/*\n*/<!--x\n+b` it reads `<!--x` as a
+  comment. The parser API has no Script/Module selector (#59).
+- `function f(){ for await (const x of xs) x; }` can still parse outside an async context. Beyond 4,072
+  saved function contexts, the scanner can fall back to the default keyword reading until it returns
+  to a saved context (#35, #36).
+- The early-error policy still allows cases such as duplicate import attribute keys. TypeScript's
+  `import x = a.class;` family (TS1359) remains a downstream limitation.
+- The node-type snapshot still omits direct `children` types and `multiple` and `required` flags (#38).
+  Inherited CMake, free-threaded CPython and pkg-config template defects remain tracked in #22.
+  Downstream pin and vendoring criteria are tracked in #41.
 
 ## [3.1.0] - 2026-11-21
 
@@ -728,6 +803,7 @@ Not fixed in 2.0.0; tracked as GitHub Issues where a number is given:
   build as `cp310-abi3`, and `make install` leaves the pkg-config description empty and prefixes absolute paths
   ([#22](https://github.com/wotjr1649/tree-sitter-javascript/issues/22)).
 
+[4.0.0]: https://github.com/wotjr1649/tree-sitter-javascript/compare/v3.1.0...v4.0.0
 [3.1.0]: https://github.com/wotjr1649/tree-sitter-javascript/compare/v3.0.0...v3.1.0
 [3.0.0]: https://github.com/wotjr1649/tree-sitter-javascript/compare/v2.2.0...v3.0.0
 [2.2.0]: https://github.com/wotjr1649/tree-sitter-javascript/compare/v2.1.0...v2.2.0

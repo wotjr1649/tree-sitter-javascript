@@ -1,16 +1,16 @@
 {
-  "label": "v3.1.0 600922b",
+  "label": "v4.0.0 dde79c0",
   "metrics": {
-    "parser_c_bytes": 3427488,
-    "state_count": 2263,
+    "parser_c_bytes": 3799933,
+    "state_count": 2797,
     "large_state_count": 428,
-    "symbol_count": 288,
+    "symbol_count": 310,
     "alias_count": 4,
-    "token_count": 143,
+    "token_count": 160,
     "field_count": 36,
-    "parse_table_entries": 123264,
-    "small_parse_table_entries": 73789,
-    "small_parse_table_map_entries": 1835,
-    "parse_action_entries": 4538
+    "parse_table_entries": 132680,
+    "small_parse_table_entries": 86484,
+    "small_parse_table_map_entries": 2369,
+    "parse_action_entries": 5362
   }
 }
