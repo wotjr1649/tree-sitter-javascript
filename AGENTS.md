@@ -1,23 +1,25 @@
 # AGENTS.md — tree-sitter-javascript
 
 Owner-maintained tree-sitter grammar for JavaScript, continued from `tree-sitter/tree-sitter-javascript` v0.25.0
-(`44c892e`) to keep it correct and fix defects fast. Intended consumer: `go-treesitter`. It still pins the origin
-(`58404d8`) today; it would pin a commit here only through its own separately approved pin-move PR under its ADR-0024
-rule 7 (the 7.5 comparison against the old pin, owner approval per 7.10), then regenerating `src/parser.c` with
-tree-sitter CLI 0.27.2. The repository is independent (`docs/decisions/ADR-0001-continue-from-upstream.md`): the
-origin's v0.25.0 is commit `44c892e` in this history, kept as `refs/upstream/v0.25.0` in the owner's local clone only
+(`44c892e`) to keep it correct and fix defects fast. Intended consumer: `go-treesitter`. It pins this repository's
+v1.0.0 (`d6501de`) as of its `d5116ea` commit on 2026-11-19. Any further pin move requires its own
+separately approved PR under ADR-0024 rule 7, with a comparison against the current pin and owner approval
+per 7.10, then regeneration of `src/parser.c` with tree-sitter CLI 0.27.2. The repository is independent
+(`docs/decisions/ADR-0001-continue-from-upstream.md`). The origin's v0.25.0 is commit `44c892e` in this history,
+kept as `refs/upstream/v0.25.0` in the owner's local clone only
 (not pushed; `remote.upstream.tagopt` is `--no-tags`), and its later changes are adopted deliberately, never synchronized.
 
 ## Rules
 
 - Source is `grammar.js` and hand-written `src/scanner.c`. `src/parser.c`, `src/grammar.json`, `src/node-types.json`
   and `src/tree_sitter/*.h` are generated: edit the grammar, run `tree-sitter generate --abi 15 --js-runtime native`
-  with CLI 0.27.2, commit all of them. `src/scanner.c` carries the JSX bare-ampersand fix (origin PR #388's scanner
-  hunks, identical to go-treesitter's ADR-0023 patch record 0001; ADR-0001 amendment 2026-11-19) and, on top of it,
-  ASCII-only digit checks for character references (J1b), so it no longer equals that record's result; v1.0.0 kept the
+  with CLI 0.27.2, commit all of them. `src/scanner.c` carries the JSX bare-ampersand fix. It was introduced as origin PR #388's scanner
+  hunks (identical to go-treesitter's ADR-0023 patch record 0001; ADR-0001 amendment 2026-11-19). ASCII-only digit
+  checks for character references (J1b) followed, and #63 restructured the quoted attribute scan and shares the
+  character-reference scan, so it no longer equals that record's result; v1.0.0 kept the
   origin's scanner and left that patch in go-treesitter, which retires it only in a later, separately approved pin move
   to a release containing the fix (its ADR-0024 7.6).
-- Manifests, their lockfiles' own entries and `tree-sitter.json` `metadata.version` carry the release version (3.1.0
+- Manifests, their lockfiles' own entries and `tree-sitter.json` `metadata.version` carry the release version (4.0.0
   now); CLI 0.27.2 compiles `metadata.version` into `parser.c` (`.metadata`), so regenerate `src/` after changing it.
 - Releases are `vMAJOR.MINOR.PATCH` (first independent `v2.0.0` after the `v1.0.0` baseline), each an annotated tag plus
   a GitHub Release without binaries (ADR-0001 amendment 2026-11-19). SemVer: breaking (major) means a node kind, field

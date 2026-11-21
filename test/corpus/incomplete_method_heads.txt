@@ -1,0 +1,2555 @@
+============================
+Incomplete method head recovery (method-82)
+============================
+
+class C {
+async m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-83)
+============================
+
+class C {
+async m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-90)
+============================
+
+class C {
+async /*one*/m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-91)
+============================
+
+class C {
+async /*one*/m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-122)
+============================
+
+class C {
+*m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-123)
+============================
+
+class C {
+*m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-130)
+============================
+
+class C {
+*/*one*/m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-131)
+============================
+
+class C {
+*/*one*/m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-138)
+============================
+
+class C {
+*/*one
+*/m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-139)
+============================
+
+class C {
+*/*one
+*/m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-146)
+============================
+
+class C {
+*
+m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-147)
+============================
+
+class C {
+*
+m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-154)
+============================
+
+class C {
+*//one
+m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-155)
+============================
+
+class C {
+*//one
+m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-162)
+============================
+
+class C {
+async *m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-163)
+============================
+
+class C {
+async *m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-170)
+============================
+
+class C {
+async */*one*/m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-171)
+============================
+
+class C {
+async */*one*/m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-178)
+============================
+
+class C {
+async */*one
+*/m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-179)
+============================
+
+class C {
+async */*one
+*/m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-186)
+============================
+
+class C {
+async *
+m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-187)
+============================
+
+class C {
+async *
+m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-194)
+============================
+
+class C {
+async *//one
+m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-195)
+============================
+
+class C {
+async *//one
+m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-202)
+============================
+
+class C {
+async get m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-203)
+============================
+
+class C {
+async get m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-210)
+============================
+
+class C {
+async get /*one*/m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-211)
+============================
+
+class C {
+async get /*one*/m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-218)
+============================
+
+class C {
+async get /*one
+*/m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-219)
+============================
+
+class C {
+async get /*one
+*/m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-226)
+============================
+
+class C {
+async get 
+m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-227)
+============================
+
+class C {
+async get 
+m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-234)
+============================
+
+class C {
+async get //one
+m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-235)
+============================
+
+class C {
+async get //one
+m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-242)
+============================
+
+class C {
+async set m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-243)
+============================
+
+class C {
+async set m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-250)
+============================
+
+class C {
+async set /*one*/m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-251)
+============================
+
+class C {
+async set /*one*/m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-258)
+============================
+
+class C {
+async set /*one
+*/m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-259)
+============================
+
+class C {
+async set /*one
+*/m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-266)
+============================
+
+class C {
+async set 
+m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-267)
+============================
+
+class C {
+async set 
+m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-274)
+============================
+
+class C {
+async set //one
+m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-275)
+============================
+
+class C {
+async set //one
+m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-362)
+============================
+
+class C {
+static async m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-363)
+============================
+
+class C {
+static async m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-370)
+============================
+
+class C {
+static async /*one*/m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-371)
+============================
+
+class C {
+static async /*one*/m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-402)
+============================
+
+class C {
+static *m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-403)
+============================
+
+class C {
+static *m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-410)
+============================
+
+class C {
+static */*one*/m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-411)
+============================
+
+class C {
+static */*one*/m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-418)
+============================
+
+class C {
+static */*one
+*/m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-419)
+============================
+
+class C {
+static */*one
+*/m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-426)
+============================
+
+class C {
+static *
+m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-427)
+============================
+
+class C {
+static *
+m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-434)
+============================
+
+class C {
+static *//one
+m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-435)
+============================
+
+class C {
+static *//one
+m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-442)
+============================
+
+class C {
+static async *m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-443)
+============================
+
+class C {
+static async *m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-450)
+============================
+
+class C {
+static async */*one*/m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-451)
+============================
+
+class C {
+static async */*one*/m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-458)
+============================
+
+class C {
+static async */*one
+*/m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-459)
+============================
+
+class C {
+static async */*one
+*/m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-466)
+============================
+
+class C {
+static async *
+m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-467)
+============================
+
+class C {
+static async *
+m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-474)
+============================
+
+class C {
+static async *//one
+m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-475)
+============================
+
+class C {
+static async *//one
+m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-482)
+============================
+
+class C {
+static async get m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-483)
+============================
+
+class C {
+static async get m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-490)
+============================
+
+class C {
+static async get /*one*/m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-491)
+============================
+
+class C {
+static async get /*one*/m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-498)
+============================
+
+class C {
+static async get /*one
+*/m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-499)
+============================
+
+class C {
+static async get /*one
+*/m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-506)
+============================
+
+class C {
+static async get 
+m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-507)
+============================
+
+class C {
+static async get 
+m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-514)
+============================
+
+class C {
+static async get //one
+m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-515)
+============================
+
+class C {
+static async get //one
+m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-522)
+============================
+
+class C {
+static async set m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-523)
+============================
+
+class C {
+static async set m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-530)
+============================
+
+class C {
+static async set /*one*/m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-531)
+============================
+
+class C {
+static async set /*one*/m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-538)
+============================
+
+class C {
+static async set /*one
+*/m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-539)
+============================
+
+class C {
+static async set /*one
+*/m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-546)
+============================
+
+class C {
+static async set 
+m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-547)
+============================
+
+class C {
+static async set 
+m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-554)
+============================
+
+class C {
+static async set //one
+m(
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-555)
+============================
+
+class C {
+static async set //one
+m(...)
+}
+
+---
+
+(program
+  (class_declaration
+    name: (identifier)
+    body: (class_body
+      (ERROR
+        (comment)
+        name: (property_identifier)))))
+
+============================
+Incomplete method head recovery (method-642)
+============================
+
+let o = {
+async m(
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-643)
+============================
+
+let o = {
+async m(...)
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-650)
+============================
+
+let o = {
+async /*one*/m(
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          (comment)
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-651)
+============================
+
+let o = {
+async /*one*/m(...)
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          (comment)
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-658)
+============================
+
+let o = {
+async /*one
+*/m(
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          (comment)
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-659)
+============================
+
+let o = {
+async /*one
+*/m(...)
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          (comment)
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-666)
+============================
+
+let o = {
+async 
+m(
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-667)
+============================
+
+let o = {
+async 
+m(...)
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-674)
+============================
+
+let o = {
+async //one
+m(
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          (comment)
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-675)
+============================
+
+let o = {
+async //one
+m(...)
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          (comment)
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-682)
+============================
+
+let o = {
+*m(
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-683)
+============================
+
+let o = {
+*m(...)
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-690)
+============================
+
+let o = {
+*/*one*/m(
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          (comment)
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-691)
+============================
+
+let o = {
+*/*one*/m(...)
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          (comment)
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-698)
+============================
+
+let o = {
+*/*one
+*/m(
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          (comment)
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-699)
+============================
+
+let o = {
+*/*one
+*/m(...)
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          (comment)
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-706)
+============================
+
+let o = {
+*
+m(
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-707)
+============================
+
+let o = {
+*
+m(...)
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-714)
+============================
+
+let o = {
+*//one
+m(
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          (comment)
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-715)
+============================
+
+let o = {
+*//one
+m(...)
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          (comment)
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-722)
+============================
+
+let o = {
+async *m(
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-723)
+============================
+
+let o = {
+async *m(...)
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-730)
+============================
+
+let o = {
+async */*one*/m(
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          (comment)
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-731)
+============================
+
+let o = {
+async */*one*/m(...)
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          (comment)
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-738)
+============================
+
+let o = {
+async */*one
+*/m(
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          (comment)
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-739)
+============================
+
+let o = {
+async */*one
+*/m(...)
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          (comment)
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-746)
+============================
+
+let o = {
+async *
+m(
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-747)
+============================
+
+let o = {
+async *
+m(...)
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-754)
+============================
+
+let o = {
+async *//one
+m(
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          (comment)
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-755)
+============================
+
+let o = {
+async *//one
+m(...)
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          (comment)
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-762)
+============================
+
+let o = {
+async get m(
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-763)
+============================
+
+let o = {
+async get m(...)
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-770)
+============================
+
+let o = {
+async get /*one*/m(
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          (comment)
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-771)
+============================
+
+let o = {
+async get /*one*/m(...)
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          (comment)
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-778)
+============================
+
+let o = {
+async get /*one
+*/m(
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          (comment)
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-779)
+============================
+
+let o = {
+async get /*one
+*/m(...)
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          (comment)
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-786)
+============================
+
+let o = {
+async get 
+m(
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-787)
+============================
+
+let o = {
+async get 
+m(...)
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-794)
+============================
+
+let o = {
+async get //one
+m(
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          (comment)
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-795)
+============================
+
+let o = {
+async get //one
+m(...)
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          (comment)
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-802)
+============================
+
+let o = {
+async set m(
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-803)
+============================
+
+let o = {
+async set m(...)
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-810)
+============================
+
+let o = {
+async set /*one*/m(
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          (comment)
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-811)
+============================
+
+let o = {
+async set /*one*/m(...)
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          (comment)
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-818)
+============================
+
+let o = {
+async set /*one
+*/m(
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          (comment)
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-819)
+============================
+
+let o = {
+async set /*one
+*/m(...)
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          (comment)
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-826)
+============================
+
+let o = {
+async set 
+m(
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-827)
+============================
+
+let o = {
+async set 
+m(...)
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-834)
+============================
+
+let o = {
+async set //one
+m(
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          (comment)
+          name: (property_identifier))))))
+
+============================
+Incomplete method head recovery (method-835)
+============================
+
+let o = {
+async set //one
+m(...)
+};
+
+---
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (ERROR
+          (comment)
+          name: (property_identifier))))))

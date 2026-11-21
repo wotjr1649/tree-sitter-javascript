@@ -19,7 +19,7 @@
 //   - a spread in a JSX element is a spread_element inside jsx_expression (dropped; Babel: JSXSpread*, braces included),
 //     and `this` in `<this.Foo/>` is a JSXIdentifier in Babel
 //   - the `default` of an import/export specifier is a keyword token in this grammar (Babel: Identifier, dropped); the
-//     attributes of `import ... with { ... }` are an object node with pairs here (dropped)
+//     attributes of static imports and re-exports are an object node with pairs here (dropped)
 //   - Identifier children of MetaProperty and PrivateName are tokens in this grammar (dropped); a shorthand
 //     ObjectProperty is no pair (its key and value are the same identifier)
 //   - ObjectPattern/ObjectExpression and ArrayPattern/ArrayExpression share a family, as do the identifier-like kinds
@@ -77,7 +77,7 @@ export const T_FAMILY = {
 // kinds the grammar has in the statement/declaration/expression/pattern supertypes that no family covers on purpose
 export const T_UNCOVERED_OK = new Set([]);
 // extra kinds the dump needs for context (owners of statement lists, parents that drive normalisations)
-export const T_CONTEXT = ["program", "switch_body", "comment", "html_comment"];
+export const T_CONTEXT = ["program", "switch_body", "comment", "html_comment", "import_attribute"];
 const COMMENT = new Set(["comment", "html_comment"]);
 
 // ---- tree-sitter side ----------------------------------------------------------------------------------------------
@@ -132,8 +132,8 @@ export function tsItems(dump, kinds, fields, buf, norm = {}) {
     }
     if (kind === "spread_element" && pk.startsWith("jsx_")) { bump("jsxSpread"); continue; } // Babel: JSXSpreadAttribute/JSXSpreadChild, braces included
     if (kind === "parenthesized_expression" && HEAD_PARENT.has(pk) && p >= 0) { bump("headParen"); continue; }
-    if (kind === "object" && pk === "import_statement") { bump("importAttributes"); continue; } // `with { type: "json" }` is an object here
-    if (kind === "pair" && pk === "object" && kinds[dump[dump[p * 5 + 3] * 5]] === "import_statement") { bump("importAttributes"); continue; }
+    if (kind === "object" && pk === "import_attribute") { bump("importAttributes"); continue; }
+    if (kind === "pair" && pk === "object" && kinds[dump[dump[p * 5 + 3] * 5]] === "import_attribute") { bump("importAttributes"); continue; }
     let s = dump[i * 5 + 1];
     let e = dump[i * 5 + 2];
     if (STRIP(f)) e = trimEnd(buf, s, e, cm);
@@ -155,27 +155,31 @@ const STRIP = (f) => (f.startsWith("S:") && f !== "S:empty") || f === "M:field" 
 // The end of a statement or field: without trailing white space and comments (this grammar keeps a trailing comment
 // inside the statement it ends, Babel does not) and without one terminating `;`. cm maps a comment end to its start.
 function trimEnd(buf, s, e, cm) {
-  const ws = () => {
+  const trimTrivia = () => {
     while (e > s) {
+      // A line comment can end with whitespace, so check its recorded boundary before trimming a character.
+      const commentStart = cm.get(e);
+      if (commentStart !== undefined && commentStart > s) {
+        e = commentStart;
+        continue;
+      }
       const c = buf[e - 1];
-      if (c === 0x20 || (c >= 0x09 && c <= 0x0d)) e--;
-      else if (e - s >= 2 && c === 0xa0 && buf[e - 2] === 0xc2) e -= 2; // NBSP
-      else if (e - s >= 3 && ((buf[e - 3] === 0xe2 && buf[e - 2] === 0x80 && (c === 0xa8 || c === 0xa9)) || (buf[e - 3] === 0xef && buf[e - 2] === 0xbb && c === 0xbf))) e -= 3; // LS PS BOM
-      else return;
+      if (c === 0x20 || (c >= 0x09 && c <= 0x0d)) {
+        e--;
+        continue;
+      }
+      if (c < 0x80) return;
+
+      // ECMAScript whitespace and line terminators take at most three UTF-8 bytes.
+      const last = buf.toString("utf8", Math.max(s, e - 3), e).at(-1);
+      if (last.trim()) return;
+      e -= Buffer.byteLength(last);
     }
   };
-  const comments = () => {
-    for (;;) {
-      ws();
-      const c = cm.get(e);
-      if (c === undefined || c <= s) return;
-      e = c;
-    }
-  };
-  comments();
+  trimTrivia();
   if (e > s && buf[e - 1] === 0x3b) {
     e--;
-    comments();
+    trimTrivia();
   }
   return e;
 }

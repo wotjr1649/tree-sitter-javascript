@@ -10,7 +10,7 @@
 `go-treesitter` pins this grammar from the origin, `tree-sitter/tree-sitter-javascript` (commit `58404d8`), and needs
 fixes faster than the origin ships them. Its ADR-0024 rule 7 (owner-maintained repositories) designates this repository
 as an independent source, created without a GitHub fork relationship, with the same model as
-`wotjr1649/tree-sitter-mssql`. go-treesitter still pins the origin; moving its pin here is a separate PR with its own
+`wotjr1649/tree-sitter-mssql`. As of this decision (2026-11-18) go-treesitter still pins the origin; moving its pin here is a separate PR with its own
 comparison (rule 7.5, ADR-0023 patches carried unchanged per 7.6) and the owner's approval (7.10).
 
 The baseline is origin v0.25.0, commit `44c892e0be055ac465d5eeddae6d3e194424e7de` (tag object `f76aea6`). The commit

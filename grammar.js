@@ -40,18 +40,51 @@ module.exports = grammar({
     // it when it decides on an automatic semicolon. Valid after a class field name without an initializer...
     $._binding_end,
     // ...and after a keyword that may still go on: before a declarator (`let`, `using`) or a property name (`get`,
-    // `set`, `static`, `async` in a class), after `await` and `yield`.
+    // `set`, `static`, `async` in a class).
     $._keyword_continues,
     // Never produced: the scanner only reads whether it is valid, after `return`, `break`, `continue` and a label, where a
     // lone CR ends the statement like any other line terminator (ECMA-262 12.9.1: no LineTerminator here).
     $._restricted_keyword,
     // A declaration without an initializer can end before an opening parenthesis on the next line.
     $._declaration_end,
+    // Only the validity of this marker is used, to tell a modifier from a field before '*'.
+    $._generator_method_continues,
+    $._static_before_get_field,
+    // A line break before using can select the await operand instead of the declaration.
+    $._await_operand_continues,
+    // The scanner returns the same identifier token for await and yield when their keyword is inactive.
+    $.identifier,
+    $._enter_plain,
+    $._enter_await,
+    $._enter_yield,
+    $._enter_both,
+    $._enter_plain_expression,
+    $._enter_async_arrow,
+    $._enter_static_block,
+    $._enter_ordinary_method,
+    $._leave_context,
+    $._leave_concise_body,
+    $._yield_operand,
+    $._yield_line_terminator,
+    // Replay the next Annex B extra after deciding whether the preceding construct ends.
+    $._annex_prefix,
+    // A declaration requires both gaps in await using Binding to have no line terminator.
+    $._await_using,
+    $._jsx_attribute_character_reference,
+    $._jsx_double_string_fragment,
+    $._jsx_single_string_fragment,
+    // ASI reads these markers after a completed arrow or postfix update.
+    $._arrow_function_end,
+    $._postfix_update_end,
+    // A line break before using can also end a Script statement.
+    $._await_using_asi,
+    $._context_await,
   ],
 
   extras: $ => [
     $.comment,
     $.html_comment,
+    $._annex_prefix,
     /[\s\p{Zs}\uFEFF\u2028\u2029\u2060\u200B]/,
   ],
 
@@ -85,6 +118,7 @@ module.exports = grammar({
     $._lhs_expression,
     $._keyword_identifier,
     $._jsx_keyword_identifier,
+    $._await_keyword,
     $._await_operand,
     $._postfix_expression,
   ],
@@ -130,12 +164,14 @@ module.exports = grammar({
   ],
 
   conflicts: $ => [
+    [$.primary_expression, $._nonordinary_method_head],
     [$.primary_expression, $._property_name],
     [$.primary_expression, $.await_expression],
     [$.primary_expression, $.await_expression, $._property_name],
     [$.primary_expression, $.arrow_function],
     [$.primary_expression, $.arrow_function, $._property_name],
     [$.primary_expression, $.method_definition],
+    [$.primary_expression, $._ordinary_method_name],
     [$.primary_expression, $.rest_pattern],
     [$.primary_expression, $.pattern],
     [$.primary_expression, $._for_header],
@@ -483,7 +519,7 @@ module.exports = grammar({
           field('operator', 'of'),
         ),
         seq(
-          field('kind', seq('await', 'using')),
+          field('kind', seq($._await_keyword, $._await_using, 'using')),
           field('left', choice(
             $.identifier,
             alias('of', $.identifier),
@@ -652,15 +688,14 @@ module.exports = grammar({
       $.call_expression,
     ),
 
-    // A hidden rule, so that the marker does not split the productions of yield_expression (parser size).
-    _yield_keyword: $ => seq('yield', optional($._keyword_continues)),
-
     yield_expression: $ => prec.right(seq(
-      $._yield_keyword,
-      choice(
-        seq('*', $.expression),
-        optional($.expression),
-      ))),
+      'yield',
+      optional(choice(
+        seq($._yield_operand, optional('*'), $.expression),
+        // Require a semicolon for recovery if a line break cannot end the expression by ASI.
+        seq($._yield_line_terminator, ';'),
+      )),
+    )),
 
     object: $ => prec('object', seq(
       '{',
@@ -842,29 +877,20 @@ module.exports = grammar({
       seq(
         '"',
         repeat(choice(
-          alias($.unescaped_double_jsx_string_fragment, $.string_fragment),
-          $.html_character_reference,
+          alias($._jsx_double_string_fragment, $.string_fragment),
+          alias($._jsx_attribute_character_reference, $.html_character_reference),
         )),
         '"',
       ),
       seq(
         '\'',
         repeat(choice(
-          alias($.unescaped_single_jsx_string_fragment, $.string_fragment),
-          $.html_character_reference,
+          alias($._jsx_single_string_fragment, $.string_fragment),
+          alias($._jsx_attribute_character_reference, $.html_character_reference),
         )),
         '\'',
       ),
     ),
-
-    // Workaround to https://github.com/tree-sitter/tree-sitter/issues/1156
-    // We give names to the token() constructs containing a regexp
-    // so as to obtain a node in the CST.
-    // An entity prefix interrupted by NUL is text.
-    unescaped_double_jsx_string_fragment: _ => token.immediate(prec(1, /([^"&\x00]|\x00+|&([^#A-Za-z\x00]|([A-Za-z]+|#([xX][0-9a-fA-F]*|[0-9]*))?\x00+))+/)),
-
-    // same here
-    unescaped_single_jsx_string_fragment: _ => token.immediate(prec(1, /([^'&\x00]|\x00+|&([^#A-Za-z\x00]|([A-Za-z]+|#([xX][0-9a-fA-F]*|[0-9]*))?\x00+))+/)),
 
     _jsx_attribute_value: $ => choice(
       alias($._jsx_string, $.string),
@@ -894,62 +920,62 @@ module.exports = grammar({
     class_heritage: $ => seq('extends', $.expression),
 
     function_expression: $ => prec('literal', seq(
-      optional('async'),
-      'function',
-      field('name', optional($.identifier)),
+      choice(
+        seq('function', field('name', optional($.identifier)), $._enter_plain),
+        seq('async', 'function', field('name', optional($.identifier)), $._enter_await),
+      ),
       $._call_signature,
       field('body', $.statement_block),
+      $._leave_context,
     )),
 
     function_declaration: $ => prec.right('declaration', seq(
-      optional('async'),
-      'function',
-      field('name', $.identifier),
+      choice(
+        seq('function', field('name', $.identifier), $._enter_plain),
+        seq('async', 'function', field('name', $.identifier), $._enter_await),
+      ),
       $._call_signature,
       field('body', $.statement_block),
+      $._leave_context,
       optional($._automatic_semicolon),
     )),
 
     generator_function: $ => prec('literal', seq(
-      optional('async'),
-      'function',
-      '*',
-      field('name', optional($.identifier)),
+      choice(
+        seq('function', '*', field('name', optional($.identifier)), $._enter_yield),
+        seq('async', 'function', '*', field('name', optional($.identifier)), $._enter_both),
+      ),
       $._call_signature,
       field('body', $.statement_block),
+      $._leave_context,
     )),
 
     generator_function_declaration: $ => prec.right('declaration', seq(
-      optional('async'),
-      'function',
-      '*',
-      field('name', $.identifier),
+      choice(
+        seq('function', '*', field('name', $.identifier), $._enter_yield),
+        seq('async', 'function', '*', field('name', $.identifier), $._enter_both),
+      ),
       $._call_signature,
       field('body', $.statement_block),
+      $._leave_context,
       optional($._automatic_semicolon),
     )),
 
     arrow_function: $ => seq(
       choice(
-        seq(
-          optional('async'),
-          choice(
-            field('parameter', choice(
-              alias($._reserved_identifier, $.identifier),
-              $.identifier,
-            )),
-            $._call_signature,
-          ),
-        ),
-        // After `async`, `of` is a keyword for the parser: `for (async of => {};;)` starts a for-of head otherwise.
-        // shortcut: a line break after `async` or before `=>` is accepted (rejecting it cost +1.2 % to +5.3 %).
-        seq('async', field('parameter', alias('of', $.identifier))),
+        seq($._arrow_parameters, '=>', $._enter_plain_expression),
+        seq('async', choice($._arrow_parameters, field('parameter', alias('of', $.identifier))), '=>', $._enter_async_arrow),
       ),
-      '=>',
-      field('body', choice(
-        $.expression,
-        $.statement_block,
-      )),
+      choice(
+        seq(field('body', $.expression), $._leave_concise_body),
+        seq(field('body', $.statement_block), $._leave_context),
+      ),
+      optional($._arrow_function_end),
+    ),
+
+    _arrow_parameters: $ => choice(
+      field('parameter', choice(alias($._reserved_identifier, $.identifier), $.identifier)),
+      $._call_signature,
     ),
 
     // Override
@@ -980,11 +1006,14 @@ module.exports = grammar({
       field('arguments', optional(prec.dynamic(1, $.arguments))),
     )),
 
+    // Async arrows give their await keyword precedence over the Script identifier fallback.
+    _await_keyword: $ => choice('await', alias($._context_await, 'await')),
+
     // Prefer the keyword interpretation when await has a unary operand.
     // A direct assignment is outside that operand, so `await(a).x=b` retains its identifier interpretation.
     await_expression: $ => prec.dynamic(1, prec('unary_void', seq(
-      'await',
-      optional($._keyword_continues),
+      $._await_keyword,
+      optional(choice($._await_operand_continues, $._await_using, $._await_using_asi)),
       $._await_operand,
     ))),
 
@@ -1120,6 +1149,7 @@ module.exports = grammar({
       seq(
         field('argument', choice($.expression, $.primary_expression)),
         field('operator', choice('++', '--')),
+        optional($._postfix_update_end),
       ),
       seq(
         field('operator', choice('++', '--')),
@@ -1373,24 +1403,36 @@ module.exports = grammar({
 
     field_definition: $ => seq(
       repeat(field('decorator', $.decorator)),
-      optional('static'),
+      optional(choice('static', alias($._static_before_get_field, 'static'))),
       field('property', $._property_name),
-      optional(choice($._initializer, $._binding_end)),
+      optional(choice($._field_initializer, $._binding_end)),
+    ),
+
+    _field_initializer: $ => seq(
+      '=',
+      $._enter_plain_expression,
+      field('value', $.expression),
+      $._leave_concise_body,
+      optional($._binding_end),
     ),
 
     formal_parameters: $ => seq(
       '(',
-      optional(seq(
-        commaSep1($._formal_parameter),
-        optional(','),
-      )),
+      optional($._parameter_list),
       ')',
+    ),
+
+    _parameter_list: $ => seq(
+      commaSep1($._formal_parameter),
+      optional(','),
     ),
 
     class_static_block: $ => seq(
       'static',
       optional($._automatic_semicolon),
+      $._enter_static_block,
       field('body', $.statement_block),
+      $._leave_context,
     ),
 
     // This negative dynamic precedence ensures that during error recovery,
@@ -1410,13 +1452,37 @@ module.exports = grammar({
       repeat(field('decorator', $.decorator)),
       optional(choice(
         'static',
+        alias($._static_before_get_field, 'static'),
         alias(token(seq('static', /\s+/, 'get', /\s*\n/)), 'static get'),
       )),
-      optional('async'),
-      optional(choice('get', 'set', '*')),
-      field('name', $._property_name),
-      field('parameters', $.formal_parameters),
+      choice(
+        seq($._ordinary_method_name, field('parameters', alias($._ordinary_method_parameters, $.formal_parameters))),
+        seq(
+          $._nonordinary_method_head,
+          field('parameters', $.formal_parameters),
+        ),
+      ),
       field('body', $.statement_block),
+      $._leave_context,
+    ),
+
+    _nonordinary_method_head: $ => choice(
+      seq('async', optional($._restricted_keyword), optional(choice('get', 'set')), field('name', $._property_name), $._enter_await),
+      seq(optional($._generator_method_continues), '*', field('name', $._property_name), $._enter_yield),
+      seq('async', optional($._restricted_keyword), optional($._generator_method_continues), '*', field('name', $._property_name), $._enter_both),
+    ),
+
+    // Reduce the method head before '(' so a block call can still take its own parse branch.
+    _ordinary_method_name: $ => seq(
+      optional(choice('get', 'set')),
+      field('name', $._property_name),
+    ),
+
+    _ordinary_method_parameters: $ => seq(
+      '(',
+      $._enter_ordinary_method,
+      optional($._parameter_list),
+      ')',
     ),
 
     pair: $ => seq(
@@ -1458,7 +1524,7 @@ module.exports = grammar({
       ...CONTEXTUAL_KEYWORDS,
     ),
 
-    _semicolon: $ => choice($._automatic_semicolon, ';'),
+    _semicolon: $ => choice($._automatic_semicolon, $._await_using_asi, ';'),
   },
 });
 
@@ -1471,7 +1537,7 @@ module.exports = grammar({
  * @returns {ChoiceRule}
  */
 function usingDeclaration($, semicolon) {
-  const kind = field('kind', choice('using', seq('await', 'using')));
+  const kind = field('kind', choice('using', seq($._await_keyword, $._await_using, 'using')));
   return choice(
     seq(kind, commaSep1($._using_declarator), semicolon),
     // TypeScript reads `using as …` and `using satisfies …` as declarations; the static precedence keeps the
