@@ -12,7 +12,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
+      - name: Read tree-sitter CLI pin
+        id: tree-sitter-pin
+        shell: bash
+        run: node -p '"ref=v" + require("./package.json").devDependencies["tree-sitter-cli"]' >> "$GITHUB_OUTPUT"
       - name: Run fuzzer
         uses: tree-sitter/fuzz-action@v4
         with:
-          tree-sitter-version: v0.27.2
+          tree-sitter-version: ${{ steps.tree-sitter-pin.outputs.ref }}
