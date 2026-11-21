@@ -15,6 +15,15 @@ if(NOT ${TREE_SITTER_ABI_VERSION} MATCHES "^[0-9]+$")
     message(FATAL_ERROR "TREE_SITTER_ABI_VERSION must be an integer")
 endif()
 
+# Use the ABI of the source being compiled. TREE_SITTER_ABI_VERSION controls ts-generate.
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS src/parser.c)
+file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/src/parser.c" PARSER_ABI_DEFINE
+     LIMIT_COUNT 1 REGEX "^#define LANGUAGE_VERSION [0-9]+$")
+if(NOT PARSER_ABI_DEFINE MATCHES "^#define LANGUAGE_VERSION ([0-9]+)$")
+    message(FATAL_ERROR "Cannot read LANGUAGE_VERSION from src/parser.c")
+endif()
+set(PARSER_ABI_VERSION "${CMAKE_MATCH_1}")
+
 include(GNUInstallDirs)
 
 add_library(tree-sitter-javascript src/parser.c)
@@ -34,7 +43,7 @@ set_target_properties(tree-sitter-javascript
                       PROPERTIES
                       C_STANDARD 11
                       POSITION_INDEPENDENT_CODE ON
-                      SOVERSION "${TREE_SITTER_ABI_VERSION}.${PROJECT_VERSION_MAJOR}"
+                      SOVERSION "${PARSER_ABI_VERSION}.${PROJECT_VERSION_MAJOR}"
                       DEFINE_SYMBOL "")
 
 foreach(dir IN ITEMS LIBDIR INCLUDEDIR)

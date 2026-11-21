@@ -59,13 +59,15 @@ ifneq ($(STRIP),)
 	$(STRIP) $@
 endif
 
+sed_replacement = $(subst |,\|,$(subst &,\&,$(subst \,\\,$(1))))
+
 $(LANGUAGE_NAME).pc: bindings/c/$(LANGUAGE_NAME).pc.in
-	sed -e 's|@PROJECT_VERSION@|$(VERSION)|' \
-		-e 's|@PC_LIBDIR@|$(LIBDIR:$(PREFIX)/%=$${prefix}/%)|' \
-		-e 's|@PC_INCLUDEDIR@|$(INCLUDEDIR:$(PREFIX)/%=$${prefix}/%)|' \
-		-e 's|@PROJECT_DESCRIPTION@|$(DESCRIPTION)|' \
-		-e 's|@PROJECT_HOMEPAGE_URL@|$(HOMEPAGE_URL)|' \
-		-e 's|@CMAKE_INSTALL_PREFIX@|$(PREFIX)|' $< > $@
+	sed -e 's|@PROJECT_VERSION@|$(call sed_replacement,$(VERSION))|' \
+		-e 's|@PC_LIBDIR@|$(call sed_replacement,$(LIBDIR:$(PREFIX)/%=$${prefix}/%))|' \
+		-e 's|@PC_INCLUDEDIR@|$(call sed_replacement,$(INCLUDEDIR:$(PREFIX)/%=$${prefix}/%))|' \
+		-e 's|@PROJECT_DESCRIPTION@|$(call sed_replacement,$(DESCRIPTION))|' \
+		-e 's|@PROJECT_HOMEPAGE_URL@|$(call sed_replacement,$(HOMEPAGE_URL))|' \
+		-e 's|@CMAKE_INSTALL_PREFIX@|$(call sed_replacement,$(PREFIX))|' $< > $@
 
 $(PARSER): $(SRC_DIR)/grammar.json
 	$(TS) generate $^
