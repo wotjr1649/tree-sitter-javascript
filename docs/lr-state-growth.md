@@ -91,9 +91,65 @@ Two other levers are not duplication:
 These candidates reduce states and fix no defect. Performance work ended with v4.4.0 (AGENTS.md), so adopting them
 needs the owner to reopen it first.
 
+## Other generated-parser counts
+
+- `LARGE_STATE_COUNT` (+82) follows from the state and symbol growth. No change targets it.
+- `SYMBOL_COUNT` (+53) adds 56 symbols and removes 3. The added symbols are 28 external tokens, 5 lexer tokens
+  (`satisfies`, the JSX quote pair that #63 split for the external scanner, and the NUL and invalid escape
+  sequences), and 23 hidden rules and repeat helpers. Several hidden rules exist to share states:
+  `_for_declaration`, `_nonordinary_method_head`, `_parameter_list` and `_arrow_parameters`.
+- `EXTERNAL_TOKEN_COUNT` (+28): all 36 external tokens are referenced in `grammar.js` and in `src/scanner.c`. They
+  include 9 never-produced ASI validity markers, 11 context tokens for `await` and `yield`, 2 `yield` tokens,
+  1 Annex B token, 2 `await using` tokens and 3 JSX attribute tokens. Their names and order are frozen through 4.x.
+- `src/parser.c` size (+36.6 %) follows from the tables. Compiled with gcc 16.2 at `-O2` (MSYS2 UCRT64), the
+  `.text` of `parser.o` grows from 410,528 to 589,024 bytes and that of `scanner.o` from 2,168 to 12,488 bytes. A
+  stripped benchmark executable grows from 610,816 to 799,232 bytes (+188,416, +30.8 %).
+
+## Size and performance
+
+The measurement used `scripts/parse-bench.c`'s workload: fresh parses, and a one-space edit followed by an
+incremental parse. It timed only the parse with `QueryPerformanceCounter` and counted runtime allocations with
+`ts_set_allocator`. Both versions were linked against go-tree-sitter v0.25.0's runtime with the same flags. The
+input packs were the default, N-of-M and npm packs that `scripts/parse-bench.sh` builds. Each workload ran 15
+paired rounds on Windows 11 with alternating order. The table gives median parse times and the interquartile range
+of the paired v4.4.0/v1.0.0 ratios.
+
+| Input set | Files | Error trees v1.0.0 → v4.4.0 | Fresh v1.0.0 → v4.4.0 | Ratio [IQR] | Incremental v1.0.0 → v4.4.0 | Ratio [IQR] |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| npm | 375 | 0 → 0 | 1,008.6 → 1,052.9 ms | 104.4 % [102.7, 107.5] | 53.1 → 52.1 ms | 98.1 % [97.1, 117.4] |
+| Default | 1,449 | 887 → 95 | 78.2 → 71.5 ms | 91.4 % [85.9, 96.7] | 15.3 → 8.2 ms | 53.6 % [50.0, 56.4] |
+| N-of-M | 1,068 | 535 → 108 | 56.1 → 55.1 ms | 98.2 % [94.0, 104.3] | 11.3 → 8.1 ms | 72.1 % [67.9, 77.8] |
+
+Only npm parses without errors in both versions, so it is the like-for-like comparison. In the default and N-of-M
+sets v1.0.0 builds many more error trees, and error recovery dominates the difference. The Linux Callgrind
+instruction counts in `CHANGELOG.md` (v1.0.0 = 100, last full table at v4.2.0) agree on npm, with 104.07 fresh and
+107.36 incremental. On Windows the npm incremental times have too wide a range to separate from that.
+
+| Memory (npm) | v1.0.0 | v4.4.0 | change |
+| --- | ---: | ---: | ---: |
+| Process peak working set | 18.54 MiB | 19.03 MiB | +2.6 % |
+| Tree bytes summed over files | 248,904,496 | 251,243,936 | +0.94 % |
+| Largest single tree | 12,750,136 | 12,904,416 | +1.2 % |
+
+The working set on the default and N-of-M packs rises by about 0.4 MiB. Hidden zero-width tokens such as the
+`_enter_*` markers are leaves in the tree, which likely accounts for most of the tree-size increase.
+
+Removing the remaining duplication would change little. The JSX member suffix candidate (−86 states) shrank an
+unstripped benchmark executable by 6,656 bytes and showed no parse-time difference that the measurement could
+resolve.
+
+### Conclusion
+
+The 52 % state growth costs about 4 % parse time on clean real-world code (7 % for incremental parses under
+Callgrind), 1 % to 3 % memory, and 190 KB of binary size. On inputs that v1.0.0 parsed with errors, v4.4.0 is
+faster. The closed performance targets, N-of-M at or below 95 % of v1.0.0 and npm close to v1.0.0, remain unmet
+as recorded in `AGENTS.md`.
+
 ## Not verified
 
 - Candidates 1 and 2 were checked only on the 735 JavaScript corpus inputs. They were not checked on the full
   fixed input sets, on malformed JSX, on TypeScript and TSX, together, or for runtime cost. The candidate diffs are
   not committed.
 - How many of the +128 states of #29 a narrower marker placement could save was not measured.
+- The Windows timings come from one machine without CPU pinning. Callgrind on Linux remains the release
+  criterion. The benchmark did not cover TypeScript or TSX, which vendor this grammar.
