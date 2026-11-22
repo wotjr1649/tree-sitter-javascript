@@ -38,8 +38,9 @@ approval. go-treesitter regenerates `src/parser.c` with its own pinned CLI.
   `tree-sitter.json` `metadata.version`, then regenerates `src/` because `src/parser.c` embeds that version.
   Leave release versions unchanged in fix PRs.
 - The grammar checks syntax, not early errors (static semantics, e.g. a `using` declaration without an initializer,
-  `for (using x;;);`); those are a non-goal and stay accepted (owner decision, 2026-11-19). Grammar restrictions such
-  as `for (using x in o);` or `await using` in a non-async function are defects, not early errors (#26).
+  `for (using x;;);`, or an optional chain as an assignment target, `a?.b = 1` (#19)); those are a non-goal and stay
+  accepted (owner decisions, 2026-11-19 and 2026-11-22). Grammar restrictions such as `for (using x in o);` or
+  `await using` in a non-async function are defects, not early errors (#26).
 - Hyphens after a dot in JSX member tag names (e.g. `<A.b-c/>`) are a non-goal and remain syntax errors.
 - The generate command and CMake default read the ABI from `ci/tree-sitter-abi.txt`. Binding runtime lower bounds
   are in the binding manifests. Changing the ABI or a runtime lower bound requires owner approval and a major release.
@@ -51,6 +52,10 @@ approval. go-treesitter regenerates `src/parser.c` with its own pinned CLI.
   and make any change to either in a major release.
 - A fix starts from a failing case (corpus test or oracle case) and cites its evidence. Existing corpus tests keep
   passing unless the change alters them on purpose and says why.
+- Performance work ended with v4.4.0 (owner decision, 2026-11-22). The Linux Callgrind targets (N-of-M at or below 95 %
+  of v1.0.0 instructions, npm close to v1.0.0) are closed as not met. Change `grammar.js` or
+  `src/scanner.c` for a defect, a CLI pin move or a downstream need, not for speed; reopening performance work needs
+  owner approval.
 - Keep every copyright line in `LICENSE` and the attribution in `NOTICE` (MIT).
 - Agents prepare branches, commits and pull requests. Every merge, tag, release, publication, repository-setting change
   and deletion needs the owner's separate approval. No registry publishing (npm, crates.io, PyPI).
