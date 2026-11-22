@@ -138,10 +138,25 @@ Removing the remaining duplication would change little. The JSX member suffix ca
 unstripped benchmark executable by 6,656 bytes and showed no parse-time difference that the measurement could
 resolve.
 
+### With the v0.27.2 runtime
+
+go-treesitter links the tree-sitter v0.27.2 C runtime (commit `3fb7be4`), while `scripts/parse-bench.sh` and the
+table above use go-tree-sitter v0.25.0's. The same 15 paired rounds were repeated with lib.c from v0.27.2:
+
+| npm | v0.25.0 runtime | v0.27.2 runtime |
+| --- | ---: | ---: |
+| Fresh, v4.4.0/v1.0.0 | 104.4 % [102.7, 107.5] | 101.7 % [95.6, 112.5] |
+| Incremental, v4.4.0/v1.0.0 | 98.1 % [97.1, 117.4] | 124.7 % [104.3, 129.0] |
+| Tree bytes summed over files | +0.94 % | +0.94 % |
+
+Memory does not depend on the runtime. The fresh-parse cost stays within a few percent. With v0.27.2, the
+incremental ratio comes out higher, but its range is too wide on Windows to settle the size. A Callgrind run of
+`scripts/parse-bench.sh` with the v0.27.2 runtime would settle it.
+
 ### Conclusion
 
 The 52 % state growth costs about 4 % parse time on clean real-world code (7 % for incremental parses under
-Callgrind), 1 % to 3 % memory, and 190 KB of binary size. On inputs that v1.0.0 parsed with errors, v4.4.0 is
+Callgrind with the v0.25.0 runtime), 1 % to 3 % memory, and 190 KB of binary size. On inputs that v1.0.0 parsed with errors, v4.4.0 is
 faster. The closed performance targets, N-of-M at or below 95 % of v1.0.0 and npm close to v1.0.0, remain unmet
 as recorded in `AGENTS.md`.
 
