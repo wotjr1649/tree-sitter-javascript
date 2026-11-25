@@ -57,7 +57,7 @@ jobs:
           ' src/parser.c
           git diff --exit-code -- src
       - name: Run tests
-        uses: tree-sitter/parser-test-action@v2
+        uses: tree-sitter/parser-test-action@v3
         env:
           # Test the 0.26.1 Python runtime; the package range (~=0.25) stays as the consumer lower bound.
           PIP_CONSTRAINT: ${{github.workspace}}/ci/python-constraints.txt
